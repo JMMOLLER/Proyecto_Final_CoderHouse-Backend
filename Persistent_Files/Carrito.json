@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "timestamp": "3/10/2022",
+    "productos": [
+      {
+        "id": 2,
+        "timestamp": "07/31/2022",
+        "tittle": "tsmallwood1",
+        "description": "vivamus vel nulla eget eros elementum pellentesque quisque porta volutpat erat quisque erat eros viverra eget congue eget",
+        "code": "20-154-3395",
+        "thumbnail": "http://dummyimage.com/220x100.png/cc0000/ffffff",
+        "price": 453.41,
+        "stock": "5259344006"
+      }
+    ]
+  }
+]
