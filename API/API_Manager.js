@@ -154,14 +154,13 @@ class Carrito{
         try{
             const data = this.getAll();
             const producto = data.find((elemento) => elemento.id === id);
-            if(typeof producto != 'undefined'){
-                return producto;
-            }else{
-                return false;
+            if(typeof producto == 'undefined'){
+                throw new Error('ID_carrito not exists')
             }
+            return [producto];
         }catch(e){
             this.log(e);
-            return false;
+            return [false, e];
         }
     }
 
@@ -191,18 +190,22 @@ class Carrito{
         try{
             const data = this.getAll();
             const index = data.findIndex((elemento) => elemento.id == id_carrito);
-            if(index == -1){throw new Error('No se encontró el ID_carrito')}
+            if(index == -1){throw new Error('ID_carrito not exists')}
             const product = this.Productos.getById(id_producto);
             if(typeof product != 'boolean'){
                 data[index].productos.push(product)
             }else{
-                throw new Error('El ID_producto no existe');
+                throw new Error('ID_producto not exists');
             }
             fs.writeFileSync(this.filename, JSON.stringify(data, null, 2))
             return [true];
         }catch(e){
-            this.log(e);
-            return [false, e];
+            if(!(e.message).includes('exists')){
+                this.log(e)
+                return [false, e];
+            }else{
+                return [false, e];
+            }
         }
     }
 
@@ -210,15 +213,19 @@ class Carrito{
         try{
             const data = this.getAll();
             const index = data.findIndex((elemento) => elemento.id == id_carrito);
-            if(index == -1){throw new Error('No se encontró el ID_carrito')};
+            if(index == -1){throw new Error('ID_carrito not exists');};
             const index_product = data[index].productos.findIndex((elemento) => elemento.id == id_producto);
-            if(index_product == -1){throw new Error('No se encontró el ID_producto')};
+            if(index_product == -1){throw new Error('ID_producto not exists in carrito');};
             data[index].productos = data[index].productos.filter(producto => producto.id != id_producto);//FALTA APLICAR LAS VALIDACIONES CORRESPONDIENTES Y RETORNAR ARRAY
             fs.writeFileSync(this.filename, JSON.stringify(data, null, 2));
             return [true];
         }catch(e){
-            this.log(e);
-            return [false, e];
+            if(!(e.message).includes('exists')){
+                this.log(e)
+                return [false, e];
+            }else{
+                return [false, e];
+            }
         }
     }
 
@@ -226,28 +233,32 @@ class Carrito{
         try{
             const data = this.getAll();
             if(data.findIndex((elemento) => elemento.id == id) == -1){
-                throw new Error('No se encontró el ID');
+                throw new Error('ID carrito not exists');
             }
             const new_data = data.filter((elemento) => elemento.id != id);
             fs.writeFileSync(this.filename, JSON.stringify(new_data, null, 2));
-            return true;
+            return [true];
         }catch(e){
-            if(e!='Error'){this.log(e)};
-            return false;
+            if(!(e.message).includes('exists')){
+                this.log(e)
+                return [false, e];
+            }else{
+                return [false, e];
+            }
         }
     }
 
     validateProduct(producto){
         try{
-            if(producto.id){throw new Error}
-            if(!producto.tittle){throw new Error}
-            if(!producto.description){throw new Error}
-            if(!producto.thumbnail){throw new Error}
-            if(!producto.price){throw new Error}
-            if(!producto.stock){throw new Error}
+            if(producto.id){throw new Error('Product ID is required')}
+            if(!producto.tittle){throw new Error('Product tittle is required')}
+            if(!producto.description){throw new Error('Product description is required')}
+            if(!producto.thumbnail){throw new Error('Product thumbnail is required')}
+            if(!producto.price){throw new Error('Product price is required')}
+            if(!producto.stock){throw new Error('Product stock is required')}
             return true;
         }catch(e){
-            if(e!='Error'){this.log(e)};
+            this.log(e);
             return false;
         }
     }

@@ -66,13 +66,20 @@ API.delete('/api/productos/:id', validateAdmin, (req, res) => {
 /* API CARRITO */
 
 API.get('/api/carrito/:id/productos', (req, res) => {
-    const carrito = BD_Carrito.getById(parseInt(req.params.id));
-    if(typeof carrito != 'boolean'){
-        carrito.productos.length != 0
-            ? res.json(carrito.productos)
-            : res.json({productos: 'EMPTY'});
-    }else{
-        res.json({status: 'ERROR - ID carrito not exists'})
+    try {
+        const carrito = BD_Carrito.getById(parseInt(req.params.id));
+        if(carrito.length == 1){
+            carrito[0].productos.length != 0
+                ? res.json(carrito[0].productos)
+                : res.json({productos: 'EMPTY'});
+        }else{
+            carrito[1].message.includes('exists')
+                    ? res.json({status: 'ERROR - '+carrito[1].message})
+                    : res.json({status: 'ERROR - internal error'});
+        }
+    }catch(e){
+        console.log(e);
+        res.json({status: 'ERROR - an error was encountered while processing the request'});
     }
 });
 
@@ -89,7 +96,9 @@ API.post('/api/carrito/:id1/productos/:id2', (req, res) => {
         if(status.length == 1) {
             res.json({status: 'OK'});
         }else{
-            res.json({status: 'ERROR - '+status[1].message});
+            status[1].message.includes('exists')
+                ? res.json({status: 'ERROR - '+status[1].message})
+                : res.json({status: 'ERROR - internal error'});
         }
     }catch{
         res.json({status: 'ERROR - an error was encountered while processing the request'});
@@ -97,9 +106,18 @@ API.post('/api/carrito/:id1/productos/:id2', (req, res) => {
 });
 
 API.delete('/api/carrito/:id', (req, res) => {
-    BD_Carrito.deleteByID(parseInt(req.params.id))
-        ? res.json({status: 'OK'})
-        : res.json({status: 'ERROR'});
+    try{
+        const status = BD_Carrito.deleteByID(parseInt(req.params.id));
+        if(status.length == 1) {
+            res.json({status: 'OK'});
+        }else{
+            status[1].message.includes('exists')
+                ? res.json({status: 'ERROR - '+status[1].message})
+                : res.json({status: 'ERROR - internal error'});
+        }
+    }catch{
+        res.json({status: 'ERROR - an error was encountered while processing the request'});
+    }
 });
 
 API.delete('/api/carrito/:id/productos/:id_prod', (req, res) => {
@@ -108,7 +126,9 @@ API.delete('/api/carrito/:id/productos/:id_prod', (req, res) => {
         if(status.length == 1) {
             res.json({status: 'OK'});;
         }else{
-            res.json({status: 'ERROR - '+status[1].message});
+            status[1].message.includes('exists')
+                ? res.json({status: 'ERROR - '+status[1].message})
+                : res.json({status: 'ERROR - internal error'});
         }
     }catch{
         res.json({status: 'ERROR - an error was encountered while processing the request'});

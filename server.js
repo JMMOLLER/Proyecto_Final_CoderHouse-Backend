@@ -18,4 +18,7 @@ server.on('error', (e) => console.log("Se ha generado un error: " + e));
 
 app.use('/', USER)
 app.use('/api', API)
+app.use((req, res) =>{
+    res.status(404).send({error: -2, description: {route: req.url, method: req.method}, status: 'Route not found'});
+});
 
