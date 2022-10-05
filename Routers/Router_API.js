@@ -47,9 +47,10 @@ API.post('/api/productos', validateAdmin, (req, res) => {
 
 API.put('/api/productos/:id', validateAdmin, (req, res) => {
     if(BD_Productos.validateProduct(req.body)){
-        BD_Productos.updateProduct(req.body, parseInt(req.params.id))
+        const status = BD_Productos.updateProduct(req.body, parseInt(req.params.id))
+        status.length == 1
             ? res.json({status: 'OK'})
-            : res.json({status: 'ERROR - an error was encountered while inserting the product'})
+            : res.json({status: 'ERROR - ID_producto not exists'})
     }else{
         res.json({status: 'ERROR - invalid JSON structure'})
     }
@@ -69,9 +70,15 @@ API.get('/api/carrito/:id/productos', (req, res) => {
     try {
         const carrito = BD_Carrito.getById(parseInt(req.params.id));
         if(carrito.length == 1){
-            carrito[0].productos.length != 0
-                ? res.json(carrito[0].productos)
-                : res.json({productos: 'EMPTY'});
+            if(carrito[0].productos.length != 0){
+                /* DEVUELVE UNA LISTA DE IDs Y CON LA CLASE PRODUCTOS VAMOS RETORNANDO LOS VALORES COMPLETOS */
+                const productos = carrito[0].productos.map((elemento) => {
+                    return BD_Productos.getById(elemento);
+                });
+                res.json(productos);
+            }else{
+                res.json({productos: 'EMPTY'})
+            }
         }else{
             carrito[1].message.includes('exists')
                     ? res.json({status: 'ERROR - '+carrito[1].message})

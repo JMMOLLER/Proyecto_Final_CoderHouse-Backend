@@ -38,7 +38,6 @@ class Productos {
     setProduct(new_data){
         try{
             const data = this.getAll();
-            const timestamp = this.setTimestamp(new Date());//verificar su funcionamiento
             let id = 0, code = this.generateCode();
             data.map((elemento) => {
                 if(id < Math.max(elemento.id)){
@@ -52,7 +51,7 @@ class Productos {
             });
             new_data['code']=code;
             new_data['id']=id+1;
-            new_data['timestamp']=timestamp;
+            new_data['timestamp']=this.setTimestamp(new Date());
             data.push(new_data);
             fs.writeFileSync(this.filename, JSON.stringify(data, null, 2))
             return true;
@@ -62,22 +61,23 @@ class Productos {
         }
     }
 
-    updateProduct(new_data, old_id){
+    updateProduct(new_data, id_producto){
         try{
             const data = this.getAll();
-            let id = 0;
-            data.map((elemento) => {
-                if(id < Math.max(elemento.id)){
-                    id = Math.max(elemento.id);
-                }
-            })
-            new_data['id'] = id+1;
-            data[data.findIndex((elemento) => elemento.id == old_id)] = new_data;
+            const data_to_update = this.getById(id_producto);
+            if(typeof data_to_update === 'boolean'){throw new Error('ID_producto not exists')};
+            new_data['id'] = data_to_update.id;
+            new_data['timestamp']=this.setTimestamp(new Date());
+            data[data.findIndex((elemento) => elemento.id == id_producto)] = new_data;
             fs.writeFileSync(this.filename, JSON.stringify(data, null, 2));
-            return true;
+            return [true];
         }catch(e){
-            this.log(e);
-            return false;
+            if(!(e.message).includes('exists')){
+                this.log(e)
+                return [false, e];
+            }else{
+                return [false, e];
+            }
         }
     }
 
@@ -99,6 +99,7 @@ class Productos {
     validateProduct(producto){
         try{
             if(producto.id){throw new Error}
+            if(producto.timestamp){throw new Error}
             if(!producto.tittle){throw new Error}
             if(!producto.description){throw new Error}
             if(!producto.thumbnail){throw new Error}
@@ -179,7 +180,7 @@ class Carrito{
             new_data['productos']=[];
             data.push(new_data);
             fs.writeFileSync(this.filename, JSON.stringify(data, null, 2))
-            return id;
+            return id+1;
         }catch(e){
             this.log(e);
             return false;
@@ -193,7 +194,7 @@ class Carrito{
             if(index == -1){throw new Error('ID_carrito not exists')}
             const product = this.Productos.getById(id_producto);
             if(typeof product != 'boolean'){
-                data[index].productos.push(product)
+                data[index].productos.push(id_producto)
             }else{
                 throw new Error('ID_producto not exists');
             }
@@ -250,7 +251,8 @@ class Carrito{
 
     validateProduct(producto){
         try{
-            if(producto.id){throw new Error('Product ID is required')}
+            if(producto.id){throw new Error('invalid structure')}
+            if(producto.timestamp){throw new Error('invalid structure')}
             if(!producto.tittle){throw new Error('Product tittle is required')}
             if(!producto.description){throw new Error('Product description is required')}
             if(!producto.thumbnail){throw new Error('Product thumbnail is required')}
