@@ -230,6 +230,13 @@ class Carrito{
         }
     }
 
+    /**
+     * It deletes a row from a JSON file
+     * @param id - The id of the cart to be deleted
+     * @returns an array with two elements. The first element is a boolean that indicates if the
+     * operation was successful or not. The second element is the error message if the operation was
+     * not successful.
+     */
     deleteByID(id) {
         try{
             const data = this.getAll();
@@ -249,6 +256,11 @@ class Carrito{
         }
     }
 
+    /**
+     * It validates a product object, and returns true if it's valid, or false if it's not.
+     * @param producto - The product object to be validated.
+     * @returns A boolean value.
+     */
     validateProduct(producto){
         try{
             if(producto.id){throw new Error('invalid structure')}
@@ -265,10 +277,20 @@ class Carrito{
         }
     }
 
+    /**
+     * It takes a date object and returns a string in the format dd/mm/yyyy.
+     * @param date - The date object to be formatted.
+     * @returns The date in the format dd/mm/yyyy
+     */
     setTimestamp(date) {
         return date.getDate()+'/'+(date.getMonth()+1)+'/'+date.getFullYear();
     }
 
+    /**
+     * It generates a random number between 10 and 99, then adds a dash, then generates a random number
+     * between 100 and 999, then adds a dash, then generates a random number between 1000 and 9999.
+     * @returns A string of numbers separated by dashes.
+     */
     generateCode(){
         return Math.floor((Math.random() * (99 - 10 + 1)) + 10)+
             '-'+Math.floor((Math.random() * (999 - 100 + 1)) + 100)+
