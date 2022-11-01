@@ -47,18 +47,9 @@ class Carrito{
             await this.mongodb(this.url);
             if(!await this.getById(id_carrito)){return false;}
             const productos_carrito = []
-            let exists = false;
             await this.getById(id_carrito).then( element => element.productos.map(producto => { productos_carrito.push(producto); }));
-            for (let index = 0; index < productos_carrito.length; index++) {
-                if(productos_carrito[index].id == id_producto){
-                    productos_carrito[index].quantity = productos_carrito[index].quantity+1;
-                    exists=true;
-                    break;
-                }
-            }
-            if(!exists){
-                productos_carrito.push({id:id_producto, quantity:1})
-            }
+            const index = productos_carrito.findIndex(producto => producto.id === id_producto);
+            index > -1 ? productos_carrito[index].quantity = productos_carrito[index].quantity+1 : productos_carrito.push({id:id_producto, quantity:1})
             const doc = await CarritoModel.findById(id_carrito);
             doc.productos = productos_carrito;
             doc.save();
@@ -76,16 +67,10 @@ class Carrito{
             let productos_carrito = [];
             let cantidad = 0;
             await this.getById(id_carrito).then( element => element.productos.map(producto => { productos_carrito.push(producto); }));
-            for (let index = 0; index < productos_carrito.length; index++) {
-                if(productos_carrito[index].id == id_producto){
-                    cantidad = productos_carrito[index].quantity-1;
-                    if(cantidad==0){
-                        productos_carrito = productos_carrito.filter(producto => producto.id!=id_producto);
-                    }else{
-                        productos_carrito[index].quantity = cantidad;
-                    }
-                    break;
-                }
+            const index = productos_carrito.findIndex(producto => producto.id === id_producto);
+            if(index > -1){
+                cantidad = productos_carrito[index].quantity-1;
+                cantidad == 0 ? productos_carrito = productos_carrito.filter(producto => producto.id!=id_producto) : productos_carrito[index].quantity = cantidad;
             }
             const doc = await CarritoModel.findById(id_carrito);
             doc.productos = productos_carrito;
