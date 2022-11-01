@@ -9,7 +9,7 @@ const { BD_Productos } = require('../DAOs/Productos.daos.js');
 
 /* MÉTODO PARA MOSTRAR TODOS LOS CARRITOS */
 
-API_Carrito.get('/api/carrito', async(req, res) => {
+API_Carrito.get('/api/carritos', async(req, res) => {
     res.send(await BD_Carrito.getAll());
 });
 
@@ -86,7 +86,7 @@ API_Carrito.delete('/api/carrito/:id', async(req, res) => {
 
 /* MÉTODO PARA ELIMINAR UN PRODUCTO DEL CARRITO */
 
-API_Carrito.delete('/api/carrito/:id/productos/:id_prod', async(req, res) => {
+API_Carrito.delete('/api/carrito/:id/producto/:id_prod', async(req, res) => {
     try{
         const status = await BD_Carrito.deleteProduct(req.params.id, req.params.id_prod);
         status.length == 2

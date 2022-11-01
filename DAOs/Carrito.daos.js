@@ -14,7 +14,7 @@ class Carrito{
             await this.mongodb(this.url);
             return await CarritoModel.find();
         }catch(err){
-            console.log(e);
+            console.log(err);
             return false;
         }
     }
@@ -22,9 +22,11 @@ class Carrito{
     async getById(id){
         try{
             await this.mongodb(this.url);
-            return await CarritoModel.findById(id);
-        }catch(e){
-            console.log(e);
+            const doc = await CarritoModel.findById(id);
+            if(doc==null){throw new Error()}
+            return doc;
+        }catch(err){
+            console.log(err);
             return false;
         }
     }
@@ -34,8 +36,8 @@ class Carrito{
             await this.mongodb(this.url);
             const newCarrito = new CarritoModel({timestamp:this.setTimestamp(new Date())});
             return await newCarrito.save()
-        }catch(e){
-            console.log(e);
+        }catch(err){
+            console.log(err);
             return false;
         }
     }
@@ -43,20 +45,51 @@ class Carrito{
     async setProduct(id_carrito, id_producto){
         try{
             await this.mongodb(this.url);
-            if(!this.getById(id_producto)){return false;}
-            await CarritoModel.findByIdAndUpdate(id_carrito, {$push: {productos:id_producto}});
+            if(!await this.getById(id_carrito)){return false;}
+            const productos_carrito = []
+            let exists = false;
+            await this.getById(id_carrito).then( element => element.productos.map(producto => { productos_carrito.push(producto); }));
+            for (let index = 0; index < productos_carrito.length; index++) {
+                if(productos_carrito[index].id == id_producto){
+                    productos_carrito[index].quantity = productos_carrito[index].quantity+1;
+                    exists=true;
+                    break;
+                }
+            }
+            if(!exists){
+                productos_carrito.push({id:id_producto, quantity:1})
+            }
+            const doc = await CarritoModel.findById(id_carrito);
+            doc.productos = productos_carrito;
+            doc.save();
             return true;
         }catch(err){
-            console.log(e);
+            console.log(err);
             return false;
         }
     }
 
     async deleteProduct(id_carrito, id_producto){
         try{
-            if(!this.getById(id_carrito)){throw new Error()}
+            if(!await this.getById(id_carrito)){throw new Error()}
             await this.mongodb(this.url);
-            await CarritoModel.findByIdAndUpdate(id_carrito, {$pull: {productos:id_producto}});
+            let productos_carrito = [];
+            let cantidad = 0;
+            await this.getById(id_carrito).then( element => element.productos.map(producto => { productos_carrito.push(producto); }));
+            for (let index = 0; index < productos_carrito.length; index++) {
+                if(productos_carrito[index].id == id_producto){
+                    cantidad = productos_carrito[index].quantity-1;
+                    if(cantidad==0){
+                        productos_carrito = productos_carrito.filter(producto => producto.id!=id_producto);
+                    }else{
+                        productos_carrito[index].quantity = cantidad;
+                    }
+                    break;
+                }
+            }
+            const doc = await CarritoModel.findById(id_carrito);
+            doc.productos = productos_carrito;
+            doc.save();
             return [true];
         }catch(err){
             console.log(err);
@@ -97,8 +130,8 @@ class Carrito{
             if(!producto.price){throw new Error('Product price is required')}
             if(!producto.stock){throw new Error('Product stock is required')}
             return true;
-        }catch(e){
-            this.log(e);
+        }catch(err){
+            this.log(err);
             return false;
         }
     }
