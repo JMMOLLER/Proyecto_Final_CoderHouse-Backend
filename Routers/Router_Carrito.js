@@ -34,7 +34,7 @@ API_Carrito.get('/api/carrito/:id/productos', async(req, res) => {
                 const datos = status.productos.map((id) => { return id });
                 const productos = []
                 for(let i = 0; i < datos.length; i++){
-                    productos.push(await BD_Productos.getById(datos[i]));
+                    productos.push(await BD_Productos.getById(datos[i].id));
                 }
                 res.json(productos);
             }else{
