@@ -1,7 +1,7 @@
 const express = require('express');
 const API_Carrito = express.Router();
-const { BD_Carrito } = require('../DAOs/Carrito.daos.js');
-const { BD_Productos } = require('../DAOs/Productos.daos.js');
+const { BD_Carrito } = require('../DB/DAOs/Carrito.daos.js');
+const { BD_Productos } = require('../DB/DAOs/Productos.daos.js');
 
 
 

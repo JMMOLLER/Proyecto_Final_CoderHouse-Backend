@@ -16,7 +16,7 @@
     <!-- Main css -->
     <link rel="stylesheet" href="assets\css\style-register.css">
 </head>
-<body style="height: 100%;">
+<body>
 
     
 
@@ -50,14 +50,14 @@
                             <input id="phone" class="form-input input100" type="tel" name="phone"/>
                             <div class="alert alert-info" style="display: none;"></div>
                         </div>
-                        <div class="form-selector">
+                        <div class="form-selector" id="form-option">
                             <div class="form-option">
                                 <label for="selector" class="label-sel" style="display: none;">Tipo de Imagen</label>
                                 <select name="avatar_type" id="selector" class="form-selec">
                                     <option value="0" class="option-sel">URL</option>
                                     <option value="1">Archivo</option>
                                 </select>
-                                <div class="arrow"></div>
+                                <div class="arrow" id="arrow"></div>
                             </div>
                             <input type="text" class="input-avatar" name="avatar" id="avatar_input" placeholder="URL"/>
                         </div>

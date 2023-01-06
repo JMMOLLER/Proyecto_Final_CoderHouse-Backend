@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const API_Producto = express.Router();
 const BaseDir = path.join(__dirname, '../');
-const { BD_Productos } = require('../DAOs/Productos.daos.js');
+const { BD_Productos } = require('../DB/DAOs/Productos.daos.js');
 let isLoggedIn = false;
 
 /**
