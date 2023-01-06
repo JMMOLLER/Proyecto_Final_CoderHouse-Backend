@@ -3,12 +3,19 @@ const { CarritoModel } = require("../models/CarritoModel");
 
 class Carrito{
 
+    /**
+     * It connects to the database.
+     */
     constructor(){
         this.url = 
         "mongodb+srv://Admin23:ProyectoCoder@backend-coderhouse.r8d7zxk.mongodb.net/eCommerce";
         this.mongodb = mongoose.connect;
     }
 
+    /**
+     * It connects to the database, then it returns all the documents in the collection.
+     * @returns The result of the query.
+     */
     async getAll(){
         try{
             await this.mongodb(this.url);
@@ -19,6 +26,12 @@ class Carrito{
         }
     }
 
+    /**
+     * It connects to the database, then it searches for a document with the given id, if it doesn't
+     * find it, it throws an error, if it finds it, it returns the document.
+     * @param id - The id of the document to be retrieved.
+     * @returns The document with the id that was passed as a parameter.
+     */
     async getById(id){
         try{
             await this.mongodb(this.url);
@@ -31,6 +44,10 @@ class Carrito{
         }
     }
 
+    /**
+     * It creates a new carrito (cart) in the database.
+     * @returns The newCarrito object is being returned.
+     */
     async createCarrito(){
         try{
             await this.mongodb(this.url);
@@ -42,14 +59,29 @@ class Carrito{
         }
     }
 
+    /**
+     * It takes an id_carrito and an id_producto, and if the id_producto is already in the carrito, it
+     * increases the quantity of that producto by 1, otherwise it adds the producto to the carrito
+     * @param id_carrito - the id of the cart
+     * @param id_producto - id of the product
+     * @returns a boolean value.
+     */
     async setProduct(id_carrito, id_producto){
         try{
             await this.mongodb(this.url);
             if(!await this.getById(id_carrito)){return false;}
             const productos_carrito = []
-            await this.getById(id_carrito).then( element => element.productos.map(producto => { productos_carrito.push(producto); }));
+            await this.getById(id_carrito).then(
+                element => element.productos.map(
+                    producto => { 
+                        productos_carrito.push(producto);
+                    }
+                )
+            );
             const index = productos_carrito.findIndex(producto => producto.id === id_producto);
-            index > -1 ? productos_carrito[index].quantity = productos_carrito[index].quantity+1 : productos_carrito.push({id:id_producto, quantity:1})
+            index > -1 
+                ? productos_carrito[index].quantity = productos_carrito[index].quantity+1 
+                : productos_carrito.push({id:id_producto, quantity:1})
             const doc = await CarritoModel.findById(id_carrito);
             doc.productos = productos_carrito;
             doc.save();
@@ -60,17 +92,31 @@ class Carrito{
         }
     }
 
+    /**
+     * It deletes a product from a shopping cart
+     * @param id_carrito - the id of the cart
+     * @param id_producto - id of the product to be deleted
+     * @returns The result of the operation.
+     */
     async deleteProduct(id_carrito, id_producto){
         try{
             if(!await this.getById(id_carrito)){throw new Error()}
             await this.mongodb(this.url);
             let productos_carrito = [];
             let cantidad = 0;
-            await this.getById(id_carrito).then( element => element.productos.map(producto => { productos_carrito.push(producto); }));
+            await this.getById(id_carrito).then(
+                element => element.productos.map(
+                    producto => {
+                        productos_carrito.push(producto);
+                    }
+                )
+            );
             const index = productos_carrito.findIndex(producto => producto.id === id_producto);
             if(index > -1){
                 cantidad = productos_carrito[index].quantity-1;
-                cantidad == 0 ? productos_carrito = productos_carrito.filter(producto => producto.id!=id_producto) : productos_carrito[index].quantity = cantidad;
+                cantidad == 0 
+                    ? productos_carrito = productos_carrito.filter(producto => producto.id!=id_producto)
+                    : productos_carrito[index].quantity = cantidad;
             }
             const doc = await CarritoModel.findById(id_carrito);
             doc.productos = productos_carrito;
@@ -107,8 +153,8 @@ class Carrito{
      */
     validateProduct(producto){
         try{
-            if(producto.id){throw new Error('invalid structure')}
-            if(producto.timestamp){throw new Error('invalid structure')}
+            if(producto.id){throw new Error('Product id is not required')}
+            if(producto.timestamp){throw new Error('Product timestamp is not required')}
             if(!producto.tittle){throw new Error('Product tittle is required')}
             if(!producto.description){throw new Error('Product description is required')}
             if(!producto.thumbnail){throw new Error('Product thumbnail is required')}
