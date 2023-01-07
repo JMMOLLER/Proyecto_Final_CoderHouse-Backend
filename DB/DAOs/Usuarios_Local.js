@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Author_Local_Model } = require("../models/UsuariosModel");
+const { UserModel } = require("../models/UsuariosModel");
 
 class Autores{
 
@@ -18,7 +18,7 @@ class Autores{
     async getAll(){
         try{
             this.mongodb(this.url);
-            const data = await Author_Local_Model.find().lean();
+            const data = await UserModel.find().lean();
             return data;
         }catch(err){
             console.log(err);
@@ -34,8 +34,8 @@ class Autores{
      */
     async getById(id){
         try{
-            await this.mongodb(this.url);
-            const doc = await Author_Local_Model.findById(id).lean();
+            this.mongodb(this.url);
+            const doc = await UserModel.findById(id).lean();
             if(doc==null){return false;}
             return doc;
         }catch(err){
@@ -44,9 +44,14 @@ class Autores{
         }
     }
 
+    /**
+     * It checks if the email is already in the database.
+     * @param email - email
+     * @returns A promise.
+     */
     async checkEmail(email){
-        await this.mongodb(this.url);
-        const doc = await Author_Local_Model.findOne({email: email})
+        this.mongodb(this.url);
+        const doc = await UserModel.findOne({email: email})
         if(doc==null){return true}
         else{return false};
     }
@@ -57,10 +62,9 @@ class Autores{
      */
     async createAuthor(data){
         try{
-            await this.mongodb(this.url);
+            this.mongodb(this.url);
             if(await this.checkEmail(data.email)){
-                const newAuthor = new Author_Local_Model(data);
-                newAuthor.Timestamp = this.setTimestamp(new Date());
+                const newAuthor = new UserModel(data);
                 await newAuthor.save();
                 return true;
             }else{
@@ -82,35 +86,12 @@ class Autores{
     async deleteByID(id) {
         try{
             await this.mongodb(this.url);
-            await Author_Local_Model.findByIdAndDelete(id);
+            await UserModel.findByIdAndDelete(id);
             return true;
         }catch(err){
             console.log(err);
             return false;
         }
-    }
-
-    async login(credentials){
-        try{
-            const username = credentials.username;
-            await this.mongodb(this.url);
-            const doc = await Author_Local_Model.findOne({nickname: username}).lean();
-            if(doc==null){return {status: false}}
-            if(doc.password != credentials.password){return {status: false}}
-            return {status: true, ID: doc._id};
-        }catch(err){
-            console.log(err);
-            return false;
-        }
-    }
-
-    /**
-     * It takes a date object and returns a string in the format dd/mm/yyyy.
-     * @param date - The date object to be formatted.
-     * @returns The date in the format dd/mm/yyyy
-     */
-    setTimestamp(date) {
-        return date.getDate()+'/'+(date.getMonth()+1)+'/'+date.getFullYear();
     }
 }
 
