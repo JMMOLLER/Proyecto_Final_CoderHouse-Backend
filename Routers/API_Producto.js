@@ -29,11 +29,11 @@ function validateAdmin(req, res, next) {
 
 /* API PRODUCTOS */
 
-API_Producto.get('/api/productos/', async(req, res) => {
+API_Producto.get('/', async(req, res) => {
     res.json(await BD_Productos.getAll());
 });
 
-API_Producto.get('/api/productos/:id', validateAdmin, async(req, res) => {
+API_Producto.get('/:id', validateAdmin, async(req, res) => {
     console.log(req.params.id);
     const producto = await BD_Productos.getById(req.params.id);
     typeof producto != 'boolean'
@@ -41,7 +41,7 @@ API_Producto.get('/api/productos/:id', validateAdmin, async(req, res) => {
         : res.json({status: 'ERROR - ID Product not exists'})
 });
 
-API_Producto.post('/api/productos', validateAdmin, async (req, res) => {
+API_Producto.post('/', validateAdmin, async (req, res) => {
     console.log(req.body);
     if(BD_Productos.validateProduct(req.body)){
         const status = await BD_Productos.setProduct(req.body);
@@ -53,7 +53,7 @@ API_Producto.post('/api/productos', validateAdmin, async (req, res) => {
     }
 });
 
-API_Producto.put('/api/productos/:id', validateAdmin, async(req, res) => {
+API_Producto.put('/:id', validateAdmin, async(req, res) => {
     console.log(req.params.id);
     if(BD_Productos.validateProduct(req.body)){
         await BD_Productos.updateProduct(req.body, req.params.id)
@@ -64,7 +64,7 @@ API_Producto.put('/api/productos/:id', validateAdmin, async(req, res) => {
     }
 });
 
-API_Producto.delete('/api/productos/:id', validateAdmin, async(req, res) => {
+API_Producto.delete('/:id', validateAdmin, async(req, res) => {
     console.log(req.params.id);
     if(await BD_Productos.deleteByID(req.params.id)){
         res.json({status: "OK"});
@@ -73,4 +73,4 @@ API_Producto.delete('/api/productos/:id', validateAdmin, async(req, res) => {
     }
 });
 
-module.exports = API_Producto;
+module.exports = { API_Producto };

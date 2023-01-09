@@ -3,19 +3,31 @@ const API_Carrito = express.Router();
 const { BD_Carrito } = require('../DB/DAOs/Carrito.daos.js');
 const { BD_Productos } = require('../DB/DAOs/Productos.daos.js');
 
+/* ============ FUNCTIONS ============ */
 
+function isUnlogged(req, res, next) {
+    if (req.isUnauthenticated())
+        return next();
+    res.redirect('/');
+}
 
-/* API CARRITO */
+function isLogged(req, res, next) {
+    if (req.isAuthenticated())
+        return next();
+    res.json({error: -1, description: {route: req.originalUrl, method: req.method}, status: 'No autorizado'});
+}
+
+/* ============ API CARRITO ============= */
 
 /* MÉTODO PARA MOSTRAR TODOS LOS CARRITOS */
 
-API_Carrito.get('/api/carritos', async(req, res) => {
+API_Carrito.get('/all', async(req, res) => {
     res.send(await BD_Carrito.getAll());
 });
 
 /* MÉTODO PARA MOSTRAR UN CARRITO POR ID */
 
-API_Carrito.get('/api/carrito/:id', async(req, res) => {
+API_Carrito.get('/:id', async(req, res) => {
     const status = await BD_Carrito.getById(req.params.id);
     !status
         ? res.json({status: "ERROR - ID Carrito no existe"})
@@ -24,7 +36,7 @@ API_Carrito.get('/api/carrito/:id', async(req, res) => {
 
 /* MÉTODO PARA MOSTRAR LOS PRODUCTOS AGREGADOS EN UN CARRITO */
 
-API_Carrito.get('/api/carrito/:id/productos', async(req, res) => {
+API_Carrito.get('/:id/productos', async(req, res) => {
     try {
         const status = await BD_Carrito.getById(req.params.id);
         if(status){
@@ -51,8 +63,8 @@ API_Carrito.get('/api/carrito/:id/productos', async(req, res) => {
 
 /* MÉTODO PARA CREAR UN CARRITO */
 
-API_Carrito.post('/api/carrito/', async(req, res) => {
-    const new_carrito = await BD_Carrito.createCarrito();
+API_Carrito.post('/', isLogged, async(req, res) => {
+    const new_carrito = await BD_Carrito.createCarrito(req.session.passport.user);
     !new_carrito
         ? res.json({status: 'ERROR - while creating carrito'})
         : res.send(new_carrito)
@@ -60,7 +72,7 @@ API_Carrito.post('/api/carrito/', async(req, res) => {
 
 /* MÉTODO PARA AGREGAR UN ID DE PRODUCTO AL CARRITO POR ID */
 
-API_Carrito.post('/api/carrito/:id1/producto/:id2', async(req, res) => {
+API_Carrito.post('/:id1/producto/:id2', async(req, res) => {
     try{
         const status = await BD_Carrito.setProduct(req.params.id1, req.params.id2);
         !status
@@ -97,4 +109,4 @@ API_Carrito.delete('/api/carrito/:id/producto/:id_prod', async(req, res) => {
     }
 });
 
-module.exports = API_Carrito;
+module.exports = { API_Carrito };
