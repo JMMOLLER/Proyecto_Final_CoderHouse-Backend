@@ -33,10 +33,37 @@ class Carrito{
      */
     async getById(id){
         try{
-            await this.mongodb(this.url);
+            this.mongodb(this.url);
             const doc = await CarritoModel.findById(id);
             if(doc==null){throw new Error()}
             return doc;
+        }catch(err){
+            console.log(err);
+            return false;
+        }
+    }
+
+    async getByUserId(id){
+        try{
+            this.mongodb(this.url);
+            const doc = await CarritoModel.findOne({owner:id});
+            if(doc==null){throw new Error()}
+            return doc;
+        }catch(err){
+            console.log(err);
+            return false;
+        }
+    }
+
+    async getIDcart(id){
+        try{
+            this.mongodb(this.url);
+            let doc = await CarritoModel.findOne({owner:id});
+            if(doc==null){
+                await this.createCarrito(id)
+                doc = await CarritoModel.findOne({owner:id});
+            }
+            return doc._id.toString();
         }catch(err){
             console.log(err);
             return false;
@@ -47,10 +74,13 @@ class Carrito{
      * It creates a new carrito (cart) in the database.
      * @returns The newCarrito object is being returned.
      */
-    async createCarrito(){
+    async createCarrito(id){
         try{
-            await this.mongodb(this.url);
-            const newCarrito = new CarritoModel({timestamp:this.setTimestamp(new Date())});
+            this.mongodb(this.url);
+            const newCarrito = new CarritoModel({
+                timestamp:this.setTimestamp(new Date()), 
+                owner:id
+            });
             return await newCarrito.save()
         }catch(err){
             console.log(err);
@@ -67,7 +97,7 @@ class Carrito{
      */
     async setProduct(id_carrito, id_producto){
         try{
-            await this.mongodb(this.url);
+            this.mongodb(this.url);
             if(!await this.getById(id_carrito)){return false;}
             const productos_carrito = []
             await this.getById(id_carrito).then(

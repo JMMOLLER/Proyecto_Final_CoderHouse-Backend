@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { UserModel } = require("../models/UsuariosModel");
+mongoose.set('strictQuery', true);
 
 class Autores{
 
@@ -60,19 +61,19 @@ class Autores{
      * It creates a new carrito (cart) in the database.
      * @returns The newAuthor object is being returned.
      */
-    async createAuthor(data){
+    async createUser(data){
         try{
             this.mongodb(this.url);
             if(await this.checkEmail(data.email)){
                 const newAuthor = new UserModel(data);
                 await newAuthor.save();
-                return true;
+                return {id: newAuthor._id, status: true};
             }else{
                 throw new Error('Email no disponible')
             }
         }catch(err){
             console.log(err);
-            return false;
+            return {status: false};
         }
     }
 

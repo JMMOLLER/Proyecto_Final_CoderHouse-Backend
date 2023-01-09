@@ -10,7 +10,7 @@ class Productos {
 
     async getAll(){
         try{
-            await this.mongodb(this.url);
+            this.mongodb(this.url);
             return await ProductModel.find();
         }catch(err){
             console.log(err);
@@ -20,7 +20,7 @@ class Productos {
 
     async getById(id){
         try{
-            await this.mongodb(this.url);
+            this.mongodb(this.url);
             return await ProductModel.findById(id);
         }catch(err){
             console.log(err);
@@ -32,7 +32,7 @@ class Productos {
         try{
             new_data['code']=this.generateCode();
             new_data['timestamp']=this.setTimestamp(new Date());
-            await this.mongodb(this.url);
+            this.mongodb(this.url);
             const newProduct = new ProductModel(new_data);
             await newProduct.save();
             return true;
@@ -47,7 +47,7 @@ class Productos {
             const data_to_update = this.getById(id_producto);
             if(typeof data_to_update === 'boolean'){throw new Error('ID_producto not exists')};
             new_data['timestamp']=this.setTimestamp(new Date());
-            await this.mongodb(this.url);
+            this.mongodb(this.url);
             await ProductModel.findByIdAndUpdate(id_producto,new_data);
             return true;
         }catch(err){
@@ -58,7 +58,7 @@ class Productos {
 
     async deleteByID(id) {
         try{
-            await this.mongodb(this.url);
+            this.mongodb(this.url);
             await ProductModel.findByIdAndDelete(id)
             return true;
         }catch(err){
