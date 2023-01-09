@@ -9,21 +9,22 @@
     
     $('.validate-form').on('submit',function(){
         let check = true;
+        let isRegister = false;
         for(var i=0; i<input.length; i++) {
             if(validate(input[i]) == false){
                 showValidate(input[i]);
                 check=false;
             }else if(input[i].id=="re_password"){
+                isRegister = true;
                 if(input[i].value!=input[i-1].value){
                     showValidate(input[i]);
                     check=false;
                 }
             }
         }
-        if(check)
+        if(check && isRegister)
             process(event);
-        else
-            return check;
+        return check;
     });
 
 

@@ -161,8 +161,8 @@ iframe {
 }
 
 .container-login100 {
-  width: 100%;  
-  min-height: 100vh;
+  width: 100%;
+  min-height: 93.5vh;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
@@ -172,10 +172,9 @@ iframe {
   justify-content: center;
   align-items: center;
   padding: 15px;
-  
   background-position: center;
   background-size: cover;
-  background-repeat: no-repeat;;
+  background-repeat: no-repeat;
 }
 
 
