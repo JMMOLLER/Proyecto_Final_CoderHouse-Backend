@@ -9,6 +9,8 @@ const { sendMail } = require('../../Dependencies/NodeMailer');
 //const { BD_Autores_Local } = require('../DAOs/Usuarios_Local');
 const bCrypt = require('bcrypt');
 
+/* ========= FUNCTIONS ========= */
+
 async function newUserEmail(user_data){
     return sendMail({
         from: 'Servidor Node.js',
@@ -30,6 +32,26 @@ function createHash(password){
 function isValidPassword(user, password){
 	return bCrypt.compareSync(password, user.password);
 }
+
+async function deleteUploadImg(req){
+    if(req.body.avatar_type!="0"){
+        req.body.avatar = req.file.filename;
+        await fs.remove(BaseDir + '/public/uploads/' + req.file.filename);
+    }
+    return;
+}
+
+function checkUserAvatar(req){
+    if(req.body.avatar_type!="0")
+        if(req.file)
+            req.body.avatar = "/uploads/" + req.file.filename;
+        else
+            req.body.avatar = "/uploads/default.png";
+    else if(req.body.avatar == "")
+        req.body.avatar = "/uploads/default.png";
+}
+
+/* ========= PASSPORT ========= */
 
 Passport.use('local', new LocalStrategy({
     usernameField: 'email',
@@ -58,16 +80,15 @@ Passport.use('signup', new LocalStrategy({
     mongoose.connect(process.env.MONGODB_URI);
     UserModel.findOne({ email: req.body.email }, async(error, mail) => {
         if (error) {
-            await fs.remove(BaseDir + '/public/uploads/' + req.file.filename);
+            await deleteUploadImg(req);
             console.log('Error con el registro ' + error);
             return done(err);
         } if (mail) {
-            await fs.remove(BaseDir + '/public/uploads/' + req.file.filename);
+            await deleteUploadImg(req);
             console.log('Email ya registrado');
             return done(null, false);
         }
-        if(req.body.avatar_type!="0")
-            req.body.avatar = req.file.filename;
+        checkUserAvatar(req);
         const newUser = {
             address: req.body.address,
             password: createHash(req.body.password),
@@ -75,14 +96,14 @@ Passport.use('signup', new LocalStrategy({
             name: req.body.name,
             age: req.body.age,
             avatar: req.body.avatar,
+            phone_number: req.body.phone_number
         };
         UserModel.create(newUser, async(err, userWithID) => {
             if (err) {
                 console.log('Error al guardar el usuario: ' + err);
-                await fs.remove(BaseDir + '/public/uploads/' + req.file.filename)
+                await deleteUploadImg(req);
                 return done(err);
             }
-            console.log(userWithID);
             console.log('Registro de usuario completo');
             await newUserEmail(userWithID);
             return done(null, userWithID);
