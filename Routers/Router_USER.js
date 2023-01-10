@@ -32,16 +32,6 @@ function isLogged(req, res, next) {
     res.redirect('/login');
 }
 
-async function creteCookie(req) {
-    const cartID = await BD_Carrito.getIDcartByUserID(req.session.passport.user);
-    if(cartID)
-        return {
-            UID: req.session.passport.user, 
-            cartID: cartID
-        };
-    return false
-}
-
 /* ============ ROUTES ============ */
 Route.get('/', (req, res) => {
     res.render('index', {title: 'Home', layout: 'index', user: req.isAuthenticated()});
