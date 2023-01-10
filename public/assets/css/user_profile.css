@@ -1,10 +1,11 @@
 .padding {
     padding: 3rem !important;
-    padding-left: 300px !important;
+    padding-left: 200px !important;
 }
 
 body {
     background-color: aqua;
+    background-image: url('../images/bg-02.jpg');
 }
 
 .user-card-full {
@@ -37,7 +38,7 @@ body {
 }
 
 .bg-c-lite-green {
-        background: -webkit-gradient(linear, left top, right top, from(#f29263), to(#ee5a6f));
+    background: -webkit-gradient(linear, left top, right top, from(#f29263), to(#ee5a6f));
     background: linear-gradient(to right, #ee5a6f, #f29263);
 }
 
