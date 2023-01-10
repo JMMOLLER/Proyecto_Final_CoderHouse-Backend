@@ -33,7 +33,7 @@ function isLogged(req, res, next) {
 }
 
 async function creteCookie(req) {
-    const cartID = await BD_Carrito.getIDcart(req.session.passport.user);
+    const cartID = await BD_Carrito.getIDcartByUserID(req.session.passport.user);
     if(cartID)
         return {
             UID: req.session.passport.user, 
@@ -43,28 +43,40 @@ async function creteCookie(req) {
 }
 
 /* ============ ROUTES ============ */
-Route.get('/', function (req, res) {
+Route.get('/', (req, res) => {
     res.render('index', {title: 'Home', layout: 'index', user: req.isAuthenticated()});
 })
 
-Route.get('/products', async function (req, res) {
+Route.get('/products', async(req, res) => {
     const products= await BD_Productos.getAll();
     res.render('index', {title: 'Productos', layout: 'products', products: products, user: req.isAuthenticated()});
 });
 
 /* USER */
-Route.get('/user/profile', isLogged, async function (req, res) {
-    res.cookie('user_data', await creteCookie(req));
+Route.get('/user/profile', isLogged, async(req, res) => {
     res.render('index', {title: 'Perfil', layout: 'user_profile', user: req.isAuthenticated()});
 });
 
-Route.get('/user/cart', isLogged, async function (req, res) {
-    //const products = await BD_Carrito.getById();
-    res.render('index', {title: 'Carrito', layout: 'user_cart'});
+Route.get('/user/cart', isLogged, async(req, res) => {
+    const cart = await BD_Carrito.getCartByUserID(req.session.passport.user);
+    const products = await BD_Carrito.getInfoProducts(cart.productos);
+    let total = 0
+    products.forEach(product => {
+        total += product.price * product.quantity;
+    });
+    console.log(products);
+    res.render('index', {
+        title: 'Carrito', 
+        layout: 'user_cart', 
+        user: req.isAuthenticated(), 
+        products: products,
+        cant: products.length,
+        total: total.toFixed(2)
+    });
 });
 
 /* LOGIN */
-Route.get('/login', isUnlogged, function (req, res) {
+Route.get('/login', isUnlogged, (req, res) => {
     res.render('index', {title: 'Login', layout: 'login'});
 });
 
@@ -73,12 +85,12 @@ Route.post('/login', isUnlogged, Passport.authenticate('local', {
     failureRedirect: '/fail_login',
 }));
 
-Route.get('/fail_login', function (req, res) {
+Route.get('/fail_login', (req, res) => {
     res.render('index',{layout: 'error_template', err: true});
 });
 
 /* REGISTRO */
-Route.get('/register', isUnlogged, function (req, res) {
+Route.get('/register', isUnlogged, (req, res) => {
     res.render('index', {title: 'Regristro', layout: 'register'});
 });
 
@@ -87,23 +99,22 @@ Route.post('/register', isUnlogged, upload.single('avatar'), Passport.authentica
     failureRedirect: '/fail_register',
 }));
 
-Route.get('/fail_register', function (req, res) {
+Route.get('/fail_register', (req, res) => {
     res.render('index',{layout: 'error_template'});
 });
 
 /* TEST */
-Route.get('/test', function (req, res) {
+Route.get('/test', (req, res) => {
     res.render('index', {title: 'Test', layout: 'test'});
 });
 
-Route.post('/test', function (req, res) {
+Route.post('/test', (req, res) => {
     res.json(req.body);
 });
 
 /* LOGOUT */
-Route.get('/logout', function (req, res) {
+Route.get('/logout', (req, res) => {
     res.clearCookie('session');
-    res.clearCookie('user_data');
     req.session.destroy((err) =>{
         if(err)
             console.log(err);

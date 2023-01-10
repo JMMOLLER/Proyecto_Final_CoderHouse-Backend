@@ -86,7 +86,7 @@ class Autores{
      */
     async deleteByID(id) {
         try{
-            await this.mongodb(this.url);
+            this.mongodb(this.url);
             await UserModel.findByIdAndDelete(id);
             return true;
         }catch(err){

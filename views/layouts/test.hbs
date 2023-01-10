@@ -1,154 +1,147 @@
-{{> navbar}}
-<link
-  href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.1.0/mdb.min.css"
-  rel="stylesheet"
-/>
 <style>
-    @media (min-width: 1025px) {
-        .h-custom {
-            height: 100vh !important;
-        }
-    }
-    
-    .select {
-        cursor: pointer;
-        height: 1.2cm;
-        border-radius: 5px;
-        background-color: #ece9ff;
-        color: #68676e;
-        border-color: rgb(0 0 0 / 15%);
-    }
-
-    .card-registration .select-input.form-control[readonly]:not([disabled]) {
-        font-size: 1rem;
-        line-height: 2.15;
-        padding-left: .75em;
-        padding-right: .75em;
-    }
-
-    .card-registration .select-arrow {
-        top: 13px;
-    }
-
-    .bg-grey {
-        background-color: #eae8e8;
-    }
-
-    @media (min-width: 992px) {
-        .card-registration-2 .bg-grey {
-            border-top-right-radius: 16px;
-            border-bottom-right-radius: 16px;
-        }
-    }
-
-    @media (max-width: 991px) {
-        .card-registration-2 .bg-grey {
-            border-bottom-left-radius: 16px;
-            border-bottom-right-radius: 16px;
-        }
-    }
+  .circle-loader {
+    margin: 0 0 30px 10px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    border-left-color: #5cb85c;
+    animation-name: loader-spin;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+}
+.circle-loader, .circle-loader:after {
+    border-radius: 50%;
+    width: 8em;
+    height: 8em;
+}
+.success {
+    -webkit-animation: none;
+    animation: none;
+    border-color: #5cb85c;
+    transition: border opacity 500ms ease-out;
+}
+.success .status.draw:after {
+    animation-duration: 1.2s;
+    animation-timing-function: ease;
+    animation-name: checkmark;
+    transform: scaleX(-1) rotate(135deg);
+}
+.success .status:after {
+    opacity: 1;
+    height: 4em;
+    width: 2em;
+    transform-origin: left top;
+    border-right: 2px solid #5cb85c;
+    border-top: 2px solid #5cb85c;
+    content: '';
+    left: 1.8095238095em;
+    top: 4em;
+    position: absolute;
+}
+.failed {
+    -webkit-animation: none;
+    animation: none;
+    border-color: #f00;
+    transition: border opacity 500ms ease-out;
+}
+.failed .status {
+    top: 50%;
+    left: 50%;
+    position: absolute;
+}
+.failed .status.draw:before, .failed .status.draw:after {
+    animation-duration: 1.2s;
+    animation-timing-function: ease;
+    animation-name: crossmark;
+}
+.failed .status.draw:before {
+    transform: scaleX(-1) rotate(45deg);
+}
+.failed .status.draw:after {
+    transform: scaleX(-1) rotate(225deg);
+}
+.failed .status:before, .failed .status:after {
+    opacity: 1;
+    height: 2em;
+    width: 2em;
+    transform-origin: left top;
+    border-right: 2px solid #f00;
+    border-top: 2px solid #f00;
+    content: '';
+    position: absolute;
+}
+.failed .status:before {
+    left: calc(1.656854259em - 4px);
+    top: calc(4px - 1.656854259em);
+}
+.failed .status:after {
+    left: calc(5.656854259px - 1.656854259em);
+    top: calc(1.656854259em - 2.8284271295px);
+}
+@keyframes loader-spin {
+    0% {
+        transform: rotate(0deg);
+   }
+    100% {
+        transform: rotate(360deg);
+   }
+}
+@keyframes checkmark {
+    0% {
+        height: 0;
+        width: 0;
+        opacity: 1;
+   }
+    20% {
+        height: 0;
+        width: 2em;
+        opacity: 1;
+   }
+    40% {
+        height: 4em;
+        width: 2em;
+        opacity: 1;
+   }
+    100% {
+        height: 4em;
+        width: 2em;
+        opacity: 1;
+   }
+}
+@keyframes crossmark {
+    0% {
+        height: 0;
+        width: 0;
+        opacity: 1;
+   }
+    20% {
+        height: 0;
+        width: 2em;
+        opacity: 1;
+   }
+    40% {
+        height: 2em;
+        width: 2em;
+        opacity: 1;
+   }
+    100% {
+        height: 2em;
+        width: 2em;
+        opacity: 1;
+   }
+}
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+   }
+    100% {
+        opacity: 1;
+   }
+}
 </style>
 
-<section class="h-100 h-custom" style="background-color: #d2c9ff;">
-  <div class="container py-5 h-100">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-      <div class="col-12">
-        <div class="card card-registration card-registration-2" style="border-radius: 15px;">
-          <div class="card-body p-0">
-            <div class="row g-0">
-              <div class="col-lg-8">
-                <div class="p-5">
-                  <div class="d-flex justify-content-between align-items-center mb-5">
-                    <h1 class="fw-bold mb-0 text-black">Shopping Cart</h1>
-                    <h6 class="mb-0 text-muted">3 items</h6>
-                  </div>
-                  <hr class="my-4">
-
-                  <div class="row mb-4 d-flex justify-content-between align-items-center">
-                    <div class="col-md-2 col-lg-2 col-xl-2">
-                      <img
-                        src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-shopping-carts/img5.webp"
-                        class="img-fluid rounded-3" alt="Cotton T-shirt">
-                    </div>
-                    <div class="col-md-3 col-lg-3 col-xl-3">
-                      <h6 class="text-muted">Shirt</h6>
-                      <h6 class="text-black mb-0">Cotton T-shirt</h6>
-                    </div>
-                    <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
-                      <button class="btn btn-link px-2"
-                        onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
-                        <i class="fas fa-minus"></i>
-                      </button>
-
-                      <input id="form1" min="0" name="quantity" value="1" type="number"
-                        class="form-control form-control-sm" disabled />
-
-                      <button class="btn btn-link px-2"
-                        onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
-                        <i class="fas fa-plus"></i>
-                      </button>
-                    </div>
-                    <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-                      <h6 class="mb-0">€ 44.00</h6>
-                    </div>
-                    <div class="col-md-1 col-lg-1 col-xl-1 text-end">
-                      <a href="#!" class="text-muted"><i class="fas fa-times"></i></a>
-                    </div>
-                  </div>
-
-                  <hr class="my-4">
-
-                  <div class="pt-5">
-                    <h6 class="mb-0"><a href="/products" class="text-body"><strong><i class="fas fa-long-arrow-alt-left me-2"></i>Back to shop</strong></a></h6>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-4 bg-grey">
-                <div class="p-5">
-                  <h3 class="fw-bold mb-5 mt-2 pt-1">Summary</h3>
-                  <hr class="my-4">
-
-                  <div class="d-flex justify-content-between mb-4">
-                    <h5 class="text-uppercase">items 3</h5>
-                    <h5>€ 132.00</h5>
-                  </div>
-
-                  <h5 class="text-uppercase mb-3">Shipping</h5>
-
-                  <div class="mb-4 pb-2">
-                    <select class="select">
-                      <option value="1">Standard-Delivery- €5.00</option>
-                      <option value="2">Two</option>
-                      <option value="3">Three</option>
-                      <option value="4">Four</option>
-                    </select>
-                  </div>
-
-                  <h5 class="text-uppercase mb-3">Give code</h5>
-
-                  <div class="mb-5">
-                    <div class="form-outline">
-                      <input type="text" id="form3Examplea2" class="form-control form-control-lg" />
-                      <label class="form-label" for="form3Examplea2">Enter your code</label>
-                    </div>
-                  </div>
-
-                  <hr class="my-4">
-
-                  <div class="d-flex justify-content-between mb-5">
-                    <h5 class="text-uppercase">Total price</h5>
-                    <h5>€ 137.00</h5>
-                  </div>
-
-                  <button type="button" class="btn btn-dark btn-block btn-lg"
-                    data-mdb-ripple-color="dark">Comprar</button>
-
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<div class="circle-loader">
+  <div class="status draw"></div>
+</div>

@@ -96,9 +96,8 @@
             item.addEventListener('click', async() =>{
                 const user = await checkLogin()
                 if(user.status)
-                    addToCart(await checkUserInfo().cartID, item.dataset.value)
+                    addToCart(item.dataset.value)
                 else{
-                    document.cookie = "user_data= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
                     window.location.href = '/login'
                 }
             });
@@ -114,8 +113,8 @@
         const response = await data.json()
         return response
     }
-    async function addToCart(uid, product){
-        const data = await fetch(`/api/carrito/${uid}/producto/${product}`,{
+    async function addToCart(product){
+        const data = await fetch(`/api/carrito/producto/${product}`,{
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -146,13 +145,6 @@
                 child.innerHTML += `<span class="new">new</span>`;
             }
         }
-    }
-    function checkUserInfo(){
-        const value = document.cookie.split("; ").reduce((a,c)=>{
-            let [n,v]=c.split("=");
-            return {...a,[n]:decodeURIComponent(v)};
-        },{});
-        return JSON.parse(value.user_data.substring(2));
     }
     checkNewProduct()
 </script>

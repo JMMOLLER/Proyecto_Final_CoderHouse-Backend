@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { CarritoModel } = require("../models/CarritoModel");
+const { BD_Productos } = require('./Productos.daos');
 
 class Carrito{
 
@@ -43,11 +44,14 @@ class Carrito{
         }
     }
 
-    async getByUserId(id){
+    async getCartByUserID(UID){
         try{
             this.mongodb(this.url);
-            const doc = await CarritoModel.findOne({owner:id});
-            if(doc==null){throw new Error()}
+            let doc = await CarritoModel.findOne({owner:UID});
+            if(doc==null){
+                await this.createCarrito(UID)
+                doc = await CarritoModel.findOne({owner:UID});
+            }
             return doc;
         }catch(err){
             console.log(err);
@@ -55,15 +59,31 @@ class Carrito{
         }
     }
 
-    async getIDcart(id){
+    async getIDcartByUserID(UID){
         try{
             this.mongodb(this.url);
-            let doc = await CarritoModel.findOne({owner:id});
+            let doc = await CarritoModel.findOne({owner:UID});
             if(doc==null){
-                await this.createCarrito(id)
-                doc = await CarritoModel.findOne({owner:id});
+                await this.createCarrito(UID)
+                doc = await CarritoModel.findOne({owner:UID});
             }
             return doc._id.toString();
+        }catch(err){
+            console.log(err);
+            return false;
+        }
+    }
+
+    async getInfoProducts(id_productos){
+        try{
+            const array_cart = []
+            for (let index = 0; index < id_productos.length; index++) {
+                const element = id_productos[index];
+                const doc = await BD_Productos.getById(element.id);
+                doc.quantity = element.quantity;
+                array_cart.push(doc);
+            }
+            return array_cart;
         }catch(err){
             console.log(err);
             return false;
@@ -95,7 +115,7 @@ class Carrito{
      * @param id_producto - id of the product
      * @returns a boolean value.
      */
-    async setProduct(id_carrito, id_producto){
+    async setProduct({id_carrito, id_producto}){
         try{
             this.mongodb(this.url);
             if(!await this.getById(id_carrito)){return false;}
@@ -130,7 +150,7 @@ class Carrito{
     async deleteProduct(id_carrito, id_producto){
         try{
             if(!await this.getById(id_carrito)){throw new Error()}
-            await this.mongodb(this.url);
+            this.mongodb(this.url);
             let productos_carrito = [];
             let cantidad = 0;
             await this.getById(id_carrito).then(
@@ -166,7 +186,7 @@ class Carrito{
      */
     async deleteByID(id) {
         try{
-            await this.mongodb(this.url);
+            this.mongodb(this.url);
             await CarritoModel.findByIdAndDelete(id);
             return true;
         }catch(err){

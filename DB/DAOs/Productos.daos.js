@@ -21,7 +21,7 @@ class Productos {
     async getById(id){
         try{
             this.mongodb(this.url);
-            return await ProductModel.findById(id);
+            return await ProductModel.findById(id).lean();
         }catch(err){
             console.log(err);
             return false;

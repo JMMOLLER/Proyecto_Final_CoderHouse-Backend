@@ -2,6 +2,7 @@ const express = require('express');
 const API_Carrito = express.Router();
 const { BD_Carrito } = require('../DB/DAOs/Carrito.daos.js');
 const { BD_Productos } = require('../DB/DAOs/Productos.daos.js');
+const { BD_Autores_Local } = require('../DB/DAOs/Usuarios_Local.js');
 
 /* ============ FUNCTIONS ============ */
 
@@ -72,14 +73,16 @@ API_Carrito.post('/', isLogged, async(req, res) => {
 
 /* MÉTODO PARA AGREGAR UN ID DE PRODUCTO AL CARRITO POR ID */
 
-API_Carrito.post('/:id1/producto/:id2', async(req, res) => {
+API_Carrito.post('/producto/:id2', isLogged, async(req, res) => {
     try{
-        const status = await BD_Carrito.setProduct(req.params.id1, req.params.id2);
+        const id_carrito = await BD_Carrito.getIDcartByUserID(req.session.passport.user)
+        const id_producto = req.params.id2;
+        const status = await BD_Carrito.setProduct({id_carrito, id_producto});
         !status
             ? res.json({status: 'ERROR - ID Carrito no existe'})
             : res.json({status: 'OK'});
     }catch{
-        res.json({status: 'ERROR - an error was encountered while processing the request'});
+        res.json({status: 'ERROR', message: 'an error was encountered while processing the request'});
     }
 });
 

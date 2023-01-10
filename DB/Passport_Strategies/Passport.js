@@ -5,7 +5,7 @@ const fs = require('fs-extra');
 const mongoose = require('mongoose');
 const LocalStrategy = require('passport-local').Strategy;
 const { UserModel } = require('../models/UsuariosModel');
-const { sendMail } = require('../../NodeMailer/NodeMailer');
+const { sendMail } = require('../../Dependencies/NodeMailer');
 //const { BD_Autores_Local } = require('../DAOs/Usuarios_Local');
 const bCrypt = require('bcrypt');
 
