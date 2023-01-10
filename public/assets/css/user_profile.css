@@ -1,5 +1,10 @@
 .padding {
-    padding: 3rem !important
+    padding: 3rem !important;
+    padding-left: 300px !important;
+}
+
+body {
+    background-color: aqua;
 }
 
 .user-card-full {
@@ -12,6 +17,11 @@
     box-shadow: 0 1px 20px 0 rgba(69,90,100,0.08);
     border: none;
     margin-bottom: 30px;
+    width: 900px;
+}
+
+.row.m-l-0.m-r-0{
+    height: 500px;
 }
 
 .m-r-0 {
@@ -43,8 +53,17 @@
     margin-bottom: 25px;
 }
 
+.card-block.text-center.text-white {
+    padding-top: 70px;
+}
+
 .img-radius {
-    border-radius: 5px;
+    border-radius: 50%;
+    border: 3px solid #fff !important;
+    border: 3px;
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
 }
 
 

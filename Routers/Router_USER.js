@@ -54,7 +54,18 @@ Route.get('/products', async(req, res) => {
 
 /* USER */
 Route.get('/user/profile', isLogged, async(req, res) => {
-    res.render('index', {title: 'Perfil', layout: 'user_profile', user: req.isAuthenticated()});
+    const user = await BD_Autores_Local.getById(req.session.passport.user);
+    res.render('index', {
+        title: 'Perfil', 
+        layout: 'user_profile', 
+        user: req.isAuthenticated(),
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        age: user.age,
+        address: user.address,
+        phone_number: user.phone_number,
+    });
 });
 
 Route.get('/user/cart', isLogged, async(req, res) => {
@@ -64,7 +75,6 @@ Route.get('/user/cart', isLogged, async(req, res) => {
     products.forEach(product => {
         total += product.price * product.quantity;
     });
-    console.log(products);
     res.render('index', {
         title: 'Carrito', 
         layout: 'user_cart', 
