@@ -23,11 +23,15 @@ buyBTN.addEventListener('click', async() => {
     if(response.status){
         changeStatus('success');
         setTimeout(() => {
-        window.location.href = '/';
+            window.location.href = '/';
         }, "3500")
     }else{
         changeStatus('failed');
-        alert('No se pudo realizar la compra');
+        setTimeout(() => {
+            const elemment = document.querySelector('.sucess_purchase');
+            elemment.style.display = 'none';
+        }, "2500")
+        validateTotal();
     }
 });
 
@@ -43,3 +47,17 @@ function changeStatus(status){
     el.classList.add('circle-loader');
     el.classList.add(status);
 }
+
+function validateTotal(){
+    const value = Number(document.querySelector('#total').textContent.substr(1));
+    const quantity = Number(document.querySelector('#quantity').textContent.substr(0,1)).toFixed();
+    const btn_ship = document.querySelector('#type_shipping');
+    const btn_buy = document.querySelector('#buy');
+    if (value <= 0 && quantity <= 0){
+        btn_ship.setAttribute('disabled', '');
+        btn_ship.style.cursor = 'not-allowed';
+        btn_buy.setAttribute('disabled', '');
+    }
+}
+
+validateTotal();

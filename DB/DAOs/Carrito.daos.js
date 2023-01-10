@@ -67,7 +67,8 @@ class Carrito{
                 await this.createCarrito(UID)
                 doc = await CarritoModel.findOne({owner:UID});
             }
-            return doc._id.toString();
+            doc._id = doc._id.toString();
+            return doc;
         }catch(err){
             console.log(err);
             return false;

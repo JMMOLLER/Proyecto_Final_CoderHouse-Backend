@@ -52,8 +52,10 @@
   #fname{
     height: 3.5rem;
     width: 95%;
-    border: 2px solid black;
+    color: #68676e;
+    border-color: rgb(0 0 0 / 15%);
     border-radius: 1rem;
+    background-color: #ece9ff;
   }
 
   .placeholder-text{

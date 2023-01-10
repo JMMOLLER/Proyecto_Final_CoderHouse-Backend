@@ -44,7 +44,11 @@ API_USER.get('/login', function (req, res) {
 API_USER.post('/buy', isLogged, async(req, res) => {
     const cartID = await BD_Carrito.getIDcartByUserID(req.session.passport.user);
     const USER = await BD_Autores_Local.getById(req.session.passport.user);
-    if(await BD_Carrito.deleteByID(cartID)){
+    if(cartID.productos.length==0){
+        res.json({status: false, message: "No hay productos en el carrito"});
+        return;
+    }
+    if(await BD_Carrito.deleteByID(cartID._id)){
         await sendMessages(USER);
         res.json({status: true,message: "OK"})
     }else{

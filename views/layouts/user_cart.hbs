@@ -19,7 +19,7 @@
                   <div class="p-5">
                     <div class="d-flex justify-content-between align-items-center mb-5">
                       <h1 class="fw-bold mb-0 text-black">Carrito de Compra</h1>
-                      <h6 class="mb-0 text-muted">{{cant}} items</h6>
+                      <h6 class="mb-0 text-muted" id="quantity">{{cant}} items</h6>
                     </div>
                     <hr class="my-4">
 
@@ -61,7 +61,7 @@
                     {{/each}}
 
                     <div class="pt-5">
-                      <h6 class="mb-0"><a href="/products" class="text-body"><strong><i class="fas fa-long-arrow-alt-left me-2"></i>Back to shop</strong></a></h6>
+                      <h6 class="mb-0"><a href="/products" class="text-body"><strong><i class="fas fa-long-arrow-alt-left me-2"></i>Regresar a la tienda</strong></a></h6>
                     </div>
                   </div>
                 </div>
@@ -72,13 +72,13 @@
 
                     <div class="d-flex justify-content-between mb-4">
                       <h5 class="text-uppercase">items {{cant}}</h5>
-                      <h5>$ {{total}}</h5>
+                      <h5 id="total">$ {{total}}</h5>
                     </div>
 
                     <h5 class="text-uppercase mb-3">Envío</h5>
 
                     <div class="mb-4 pb-2">
-                      <select class="select">
+                      <select class="select" id="type_shipping">
                         <option value="1">Recoger en Tienda - $0.00</option>
                         <option value="2">Envío - Normal - $5.00</option>
                         <option value="3">Envío - Rápido - $10.00</option>
