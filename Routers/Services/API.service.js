@@ -23,7 +23,7 @@ async function deleteUserImg(USER){
 }
 
 async function newUserEmail(user_data){
-    return sendMail({
+    return await sendMail({
         from: 'Servidor Node.js',
         to: process.env.MAIL_USER,
         subject: 'Nuevo Registro',
