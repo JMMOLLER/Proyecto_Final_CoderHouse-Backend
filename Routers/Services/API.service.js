@@ -1,4 +1,7 @@
 require('dotenv').config();
+const fs = require('fs-extra');
+const path = require('path');
+const UploadsDir = path.join(__dirname, '../../public/uploads/');
 const { sendSMS } = require('../../Dependencies/Twilio');
 const { sendMail } = require('../../Dependencies/NodeMailer');
 
@@ -12,6 +15,13 @@ async function sendMessages(USER){
     //await sendWhatsappToUser(USER);
 }
 
+async function deleteUserImg(USER){
+    if(USER.indexOf('/uploads/')>-1){
+        USER = USER.substr(9);
+        await fs.remove(UploadsDir + USER);
+    }
+}
+
 async function newUserEmail(user_data){
     return sendMail({
         from: 'Servidor Node.js',
@@ -20,7 +30,7 @@ async function newUserEmail(user_data){
         html: `
         <h1 style="color: blue; align-text: center">Nuevo usuario registrado</h1>
         <p>Nombre: ${user_data.name}</p><p>Email: ${user_data.email}</p>
-        <p>Apellido: ${user_data.password}</p><p>Dirección: ${user_data.address}</p>
+        <p>Contraseña: ${user_data.password}</p><p>Dirección: ${user_data.address}</p>
         <p>Edad: ${user_data.age}</p><p>Avatar: ${user_data.avatar}</p>
         `
     });
@@ -59,5 +69,6 @@ module.exports = {
     sendPurchaseMail,
     sendSMSToUser, 
     sendWhatsappToUser,
-    newUserEmail
+    newUserEmail,
+    deleteUserImg
 };

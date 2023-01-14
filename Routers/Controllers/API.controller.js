@@ -1,4 +1,5 @@
 const { sendMessages } = require('../Services/API.service');
+const { deleteUserImg } = require('../Services/API.service');
 const { BD_Carrito } = require('../../DB/DAOs/Carrito.daos.js');
 const { BD_Productos } = require('../../DB/DAOs/Productos.daos.js');
 const { BD_Usuarios_Local } = require('../../DB/DAOs/Usuarios_Local');
@@ -141,7 +142,7 @@ const deleteProduct = async(req, res) => {
 
 const checkLogin = (req, res) => {
     res.json({status: req.isAuthenticated()});
-}
+};
 
 const buy = async(req, res) => {
     const cartID = await BD_Carrito.getIDcartByUserID(req.session.passport.user);
@@ -156,7 +157,15 @@ const buy = async(req, res) => {
     }else{
         res.json({status: false,message: "ERROR"});
     }
-}
+};
+
+const deleteUser = async(req, res) => {
+    const user = await BD_Usuarios_Local.getById(req.session.passport.user);
+    await deleteUserImg(user.avatar);
+    await BD_Usuarios_Local.deleteByID(req.session.passport.user)
+        ? res.json({status: true})
+        : res.json({status: false});
+};
 
 
 /* =========== EXPORT =========== */
@@ -179,6 +188,7 @@ module.exports = {
     },
     user: {
         checkLogin,
-        buy
+        buy,
+        deleteUser,
     }
 };

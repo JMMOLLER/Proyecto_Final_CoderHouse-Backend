@@ -8,4 +8,6 @@ API_USER.get('/login', controller.user.checkLogin);
 
 API_USER.post('/buy', auth.isLogged, controller.user.buy);
 
+API_USER.delete('/', auth.isLogged, controller.user.deleteUser);
+
 module.exports = { API_USER }; 
