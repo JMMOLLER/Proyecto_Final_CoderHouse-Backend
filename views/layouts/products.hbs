@@ -1,0 +1,150 @@
+{{> navbar}}
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css'>
+<link rel="stylesheet" href="assets/css/products.css">
+<style>
+{{#if products}}
+{{#each products}}
+    .section-products #product-{{this.code}} .part-1::before {
+        background: url({{this.thumbnail}}) no-repeat center;
+        background-size: cover;
+            transition: all 0.3s;
+    }
+{{/each}}
+{{/if}}
+</style>
+<section class="section-products">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+                <div class="col-md-8 col-lg-6">
+                        <div class="header">
+                                <h3>Featured Product</h3>
+                                <h2>Popular Products</h2>
+                        </div>
+                </div>
+        </div>
+        {{#if products}}
+            <div class="row">
+                {{#each products}}
+                    <!-- Single Product -->
+                    <div class="col-md-6 col-lg-4 col-xl-3">
+                        <div id="product-{{this.code}}" class="single-product">
+                            <div class="part-1">
+                                <ul>
+                                    <li><a href="#" class="cart-button" data-value={{this._id}}><i class="fas fa-shopping-cart"></i></a></li>
+                                    <li><a href="#"><i class="fas fa-heart"></i></a></li>
+                                    <li><a href="#"><i class="fas fa-plus"></i></a></li>
+                                    <li><a href="#"><i class="fas fa-expand"></i></a></li>
+                                </ul>
+                            </div>
+                            <div class="part-2">
+                                <h3 class="product-title">{{this.title}}</h3>
+                                <h4 class="product-price">${{this.price}}</h4>
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+                {{!-- <!-- Single Product -->
+                <div class="col-md-6 col-lg-4 col-xl-3">
+                        <div id="product-2" class="single-product">
+                                <div class="part-1">
+                                        <span class="discount">15% off</span>
+                                        <ul>
+                                                <li><a href="#"><i class="fas fa-shopping-cart"></i></a></li>
+                                                <li><a href="#"><i class="fas fa-heart"></i></a></li>
+                                                <li><a href="#"><i class="fas fa-plus"></i></a></li>
+                                                <li><a href="#"><i class="fas fa-expand"></i></a></li>
+                                        </ul>
+                                </div>
+                                <div class="part-2">
+                                        <h3 class="product-title">Here Product Title</h3>
+                                        <h4 class="product-price">$49.99</h4>
+                                </div>
+                        </div>
+                </div>
+                <!-- Single Product -->
+                <div class="col-md-6 col-lg-4 col-xl-3">
+                        <div id="product-4" class="single-product">
+                                <div class="part-1">
+                                        <span class="new">new</span>
+                                        <ul>
+                                                <li><a href="#"><i class="fas fa-shopping-cart"></i></a></li>
+                                                <li><a href="#"><i class="fas fa-heart"></i></a></li>
+                                                <li><a href="#"><i class="fas fa-plus"></i></a></li>
+                                                <li><a href="#"><i class="fas fa-expand"></i></a></li>
+                                        </ul>
+                                </div>
+                                <div class="part-2">
+                                        <h3 class="product-title">Here Product Title</h3>
+                                        <h4 class="product-price">$49.99</h4>
+                                </div>
+                        </div>
+                </div> --}}
+            </div>
+        {{else}}
+            <div class="row">
+                <div class="col-md-12 no-products">
+                    <h3>No hay productos</h3>
+                </div>
+            </div>
+        {{/if}}
+    </div>
+</section>
+<script>
+    window.onload= () => {
+        const items = document.querySelectorAll('.cart-button');
+        items.forEach(item => {
+            item.addEventListener('click', async() =>{
+                const user = await checkLogin()
+                if(user.status)
+                    addToCart(item.dataset.value)
+                else{
+                    window.location.href = '/login'
+                }
+            });
+        });
+    }
+    async function checkLogin(){
+        const data = await fetch('/api/user/login', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            },
+        })
+        const response = await data.json()
+        return response
+    }
+    async function addToCart(product){
+        const data = await fetch(`/api/carrito/producto/${product}`,{
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+            },
+        })
+        const response = await data.json()
+        if(response.status == "OK"){
+            alert('Producto agregado al carrito')
+        }
+    }
+    async function getProducts(){
+        const data = await fetch('/api/productos',{
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            },
+        })
+        const response = await data.json()
+        return response
+    }
+    async function checkNewProduct(product){
+        const products = await getProducts();
+        const currentDay = new Date().getDate()+"/"+(new Date().getMonth()+1)+"/"+new Date().getFullYear();
+        for(let i = 0; i < products.length; i++){
+            if(currentDay === products[i].timestamp){
+                const element = document.getElementById(`product-${products[i].code}`);
+                const child = element.getElementsByClassName('part-1')[0];
+                child.innerHTML += `<span class="new">new</span>`;
+            }
+        }
+    }
+    checkNewProduct()
+</script>

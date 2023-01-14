@@ -1,0 +1,86 @@
+{{> navbar}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Registro</title>
+
+    <link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/86493703?s=400&u=ce146a9b40bd46e6621e2ff745c13b9d82228a7e&v=4"/>
+    <!-- Font Icon -->
+    <link rel="stylesheet" href="assets/fonts/Linearicons-Free-v1.0.0/icon-font.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+    <!-- Twilio -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <!-- Main css -->
+    <link rel="stylesheet" href="assets\css\style-register.css">
+</head>
+<body>
+
+    
+
+    <div class="main">
+
+        <section class="signup">
+            <!-- <img src="images/signup-bg.jpg" alt=""> -->
+            <div class="container">
+                <div class="signup-content">
+                    <form method="POST" id="signup-form" class="login100-form validate-form flex-sb flex-w"  enctype="multipart/form-data">
+                        <h2 class="form-title" style="color: #555555 !important;">Crear Una Cuenta</h2>
+                        <div class="form-group validate-input" data-validate = "Ingrese su Nombre">
+                            <input type="text" class="form-input input100" name="name" id="name" placeholder="Nombre"/>
+                        </div>
+                        <div class="form-group validate-input" data-validate = "Ingrese su Email">
+                            <input type="email" class="form-input input100" name="email" id="email" placeholder="Email"/>
+                        </div>
+                        <div class="form-group validate-input" data-validate = "Ingrese su Contraseña">
+                            <input type="text" class="form-input input100" name="password" id="password" placeholder="Contraseña"/>
+                        </div>
+                        <div class="form-group validate-input" data-validate = "Contraseña no coincide">
+                            <input type="password" class="form-input input100" name="re_password" id="re_password" placeholder="Confirmar Contraseña"/>
+                        </div>
+                        <div class="form-group validate-input" data-validate = "Ingrese su Dirección">
+                            <input type="text" class="form-input input100" name="address" id="address" placeholder="Dirección"/>
+                        </div>
+                        <div class="form-group validate-input" data-validate = "Ingrese su Edad">
+                            <input type="number" class="form-input input100" name="age" id="age" min="10" max="79" placeholder="Edad"/>
+                        </div>
+                        <div class="container validate-input" style="margin-bottom: 20px; width: 100%;" data-validate = "Ingrese su Número">
+                            <input id="phone" class="form-input input100" type="tel" name="phone_number"/>
+                            <div class="alert alert-info" style="display: none;"></div>
+                        </div>
+                        <div class="form-selector" id="form-option">
+                            <div class="form-option">
+                                <label for="selector" class="label-sel" style="display: none;">Tipo de Imagen</label>
+                                <select name="avatar_type" id="selector" class="form-selec">
+                                    <option value="0" class="option-sel">URL</option>
+                                    <option value="1">Archivo</option>
+                                </select>
+                                <div class="arrow" id="arrow"></div>
+                            </div>
+                            <input type="text" class="input-avatar" name="avatar" id="avatar_input" placeholder="URL"/>
+                        </div>
+                        <div class="container-login100-form-btn m-t-17">
+                            <button class="login100-form-btn">
+                                Registrarse
+                            </button>
+                        </div>
+                    </form>
+                    <p class="loginhere">
+                        ¿Ya tienes una cuenta? <a href="/login" class="loginhere-link" style="color: #999999 !important;">Inicia Sesión</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- JS -->
+    <script src="assets\vendor\jquery\jquery-3.2.1.min.js"></script>
+    <script src="assets\js\phone-prefix.js"></script>
+    <script src="assets\js\main-register.js"></script>
+    <script src="assets\js\main-login.js"></script>
+</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
+</html>
