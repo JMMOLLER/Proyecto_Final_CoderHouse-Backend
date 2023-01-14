@@ -136,7 +136,7 @@ p {
 }
 
 .m-t-40 {
-    margin-top: 20px;
+    margin-top: 110px;
 }
 
 .user-card-full .social-link li {
@@ -150,4 +150,11 @@ p {
     transition: all 0.3s ease-in-out;
 }
 
-
+.delete_user {
+    background: red;
+    border: none;
+    border-radius: 5px;
+    height: 27px;
+    margin-left: 8cm;
+    color: white;
+}
