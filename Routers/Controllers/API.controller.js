@@ -44,7 +44,7 @@ const getCartProducts = async(req, res) => {
 }
 
 const createCart = async(req, res) => {
-    const new_carrito = await BD_Carrito.createCarrito(req.session.passport.user);
+    const new_carrito = await BD_Carrito.createCarrito(req.session.passport.user.id);
     !new_carrito
         ? res.json({status: 'ERROR - while creating carrito'})
         : res.send(new_carrito)
@@ -52,15 +52,26 @@ const createCart = async(req, res) => {
 
 const addProductOnCart = async(req, res) => {
     try{
-        const id_carrito = await BD_Carrito.getIDcartByUserID(req.session.passport.user)
-        const id_producto = req.params.id2;
+        const id_carrito = await BD_Carrito.getIDcartByUserID(req.session.passport.user.id)
+        const id_producto = req.params.prod;
         const status = await BD_Carrito.setProduct({id_carrito, id_producto});
         !status
-            ? res.json({status: 'ERROR - ID Carrito no existe'})
-            : res.json({status: 'OK'});
+            ? res.json({status: 'ERROR', value: false})
+            : res.json({status: 'OK', value: true});
     }catch{
         res.json({status: 'ERROR', message: 'an error was encountered while processing the request'});
     }
+}
+
+const consultQuantityOnPorduct = async(req, res) => {
+    const data = {};
+    data.product_id = req.params.id;
+    data.cant = req.params.cant;
+    if(data.cant == "++")
+        data.user_cart = await BD_Carrito.getCartByUserID(req.session.passport.user.id);
+    await BD_Productos.checkStock(data)
+        ? res.status(200).json({status: 'OK', value: true})
+        : res.status(200).json({status: 'ERROR', value: false})
 }
 
 const deleteCart = async(req, res) => {
@@ -74,17 +85,29 @@ const deleteCart = async(req, res) => {
     }
 }
 
-const deleteProductOnCart = async(req, res) => {
+const decreaseQuantityOnCart = async(req, res) => {
     try{
-        const status = await BD_Carrito.deleteProduct(req.params.id, req.params.id_prod);
+        const CartID = await BD_Carrito.getIDcartByUserID(req.session.passport.user.id);
+        const status = await BD_Carrito.decreaseProduct(CartID, req.params.id_prod);
         status.length == 2
-            ? res.json({status: 'ERROR - ID Carrito no existe'})
-            : res.json({status: 'OK'});
+            ? res.json({status: 'ERROR', value: false})
+            : res.json({status: 'OK', value: true});
     }catch{
         res.json({status: 'ERROR - an error was encountered while processing the request'});
     }
 }
 
+const deleteProductOnCart = async(req, res) => {
+    try{
+        const CartID = await BD_Carrito.getIDcartByUserID(req.session.passport.user.id);
+        const status = await BD_Carrito.deleteProduct(CartID, req.params.id_prod);
+        status.length == 2
+            ? res.json({status: 'ERROR', value: false})
+            : res.json({status: 'OK', value: true});
+    }catch{
+        res.json({status: 'ERROR - an error was encountered while processing the request'});
+    }
+}
 
 
 /* API PRODUCTOS */
@@ -103,7 +126,6 @@ const byProductId = async(req, res) => {
 }
 
 const createProduct = async (req, res) => {
-    console.log(req.body);
     if(BD_Productos.validateProduct(req.body)){
         const status = await BD_Productos.setProduct(req.body);
         !status
@@ -145,8 +167,8 @@ const checkLogin = (req, res) => {
 };
 
 const buy = async(req, res) => {
-    const cartID = await BD_Carrito.getIDcartByUserID(req.session.passport.user);
-    const USER = await BD_Usuarios_Local.getById(req.session.passport.user);
+    const cartID = await BD_Carrito.getIDcartByUserID(req.session.passport.user.id);
+    const USER = await BD_Usuarios_Local.getById(req.session.passport.user.id);
     if(cartID.productos.length==0){
         res.json({status: false, message: "No hay productos en el carrito"});
         return;
@@ -159,10 +181,31 @@ const buy = async(req, res) => {
     }
 };
 
+const user_update = async(req, res) => {
+    let oldAvatar;
+    const data = {
+        email: req.body.email,
+        age: req.body.age,
+        address: req.body.address,
+        phone_number: req.body.phone_number
+    }
+    if(req.file){
+        data.avatar = "/uploads/"+req.file.filename
+        oldAvatar = await BD_Usuarios_Local.getAvatar(req.session.passport.user.id)
+    }
+    if(await BD_Usuarios_Local.updateUser(req.session.passport.user.id, data)){
+        await deleteUserImg(oldAvatar);
+        req.session.passport.user.avatar = data.avatar;
+        res.status(200).json({msg: "ok", status: 200})
+    }else{
+        res.status(500).json({msg: "error", status: 200});
+    }
+};
+
 const deleteUser = async(req, res) => {
-    const user = await BD_Usuarios_Local.getById(req.session.passport.user);
+    const user = await BD_Usuarios_Local.getById(req.session.passport.user.id);
     await deleteUserImg(user.avatar);
-    await BD_Usuarios_Local.deleteByID(req.session.passport.user)
+    await BD_Usuarios_Local.deleteByID(req.session.passport.user.id)
         ? res.json({status: true})
         : res.json({status: false});
 };
@@ -177,6 +220,8 @@ module.exports = {
         createCart,
         addProductOnCart,
         deleteCart,
+        decreaseQuantityOnCart,
+        consultQuantityOnPorduct,
         deleteProductOnCart
     },
     products: {
@@ -184,11 +229,12 @@ module.exports = {
         byProductId,
         createProduct,
         updateProduct,
-        deleteProduct
+        deleteProduct,
     },
     user: {
         checkLogin,
         buy,
         deleteUser,
+        user_update,
     }
 };

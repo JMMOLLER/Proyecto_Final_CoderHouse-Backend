@@ -12,13 +12,18 @@
 {{/each}}
 {{/if}}
 </style>
+<div class="container_change spinner-hidden">
+    <div class="spinner-border text-ligth" role="status" style="margin-left: 50%;margin-top: 20%;">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
 <section class="section-products">
     <div class="container">
         <div class="row justify-content-center text-center">
                 <div class="col-md-8 col-lg-6">
                         <div class="header">
-                                <h3>Featured Product</h3>
-                                <h2>Popular Products</h2>
+                                <h3>Productos Destacados</h3>
+                                <h2>Los Productos más Populares</h2>
                         </div>
                 </div>
         </div>
@@ -30,10 +35,9 @@
                         <div id="product-{{this.code}}" class="single-product">
                             <div class="part-1">
                                 <ul>
-                                    <li><a href="#" class="cart-button" data-value={{this._id}}><i class="fas fa-shopping-cart"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-heart"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-plus"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-expand"></i></a></li>
+                                    <li><a class="cart-button" data-value={{this._id}}><i class="fas fa-shopping-cart"></i></a></li>
+                                    <li><a><i class="fas fa-share"></i></a></li>
+                                    <li><a><i class="fas fa-heart"></i></a></li>
                                 </ul>
                             </div>
                             <div class="part-2">
@@ -43,42 +47,6 @@
                         </div>
                     </div>
                 {{/each}}
-                {{!-- <!-- Single Product -->
-                <div class="col-md-6 col-lg-4 col-xl-3">
-                        <div id="product-2" class="single-product">
-                                <div class="part-1">
-                                        <span class="discount">15% off</span>
-                                        <ul>
-                                                <li><a href="#"><i class="fas fa-shopping-cart"></i></a></li>
-                                                <li><a href="#"><i class="fas fa-heart"></i></a></li>
-                                                <li><a href="#"><i class="fas fa-plus"></i></a></li>
-                                                <li><a href="#"><i class="fas fa-expand"></i></a></li>
-                                        </ul>
-                                </div>
-                                <div class="part-2">
-                                        <h3 class="product-title">Here Product Title</h3>
-                                        <h4 class="product-price">$49.99</h4>
-                                </div>
-                        </div>
-                </div>
-                <!-- Single Product -->
-                <div class="col-md-6 col-lg-4 col-xl-3">
-                        <div id="product-4" class="single-product">
-                                <div class="part-1">
-                                        <span class="new">new</span>
-                                        <ul>
-                                                <li><a href="#"><i class="fas fa-shopping-cart"></i></a></li>
-                                                <li><a href="#"><i class="fas fa-heart"></i></a></li>
-                                                <li><a href="#"><i class="fas fa-plus"></i></a></li>
-                                                <li><a href="#"><i class="fas fa-expand"></i></a></li>
-                                        </ul>
-                                </div>
-                                <div class="part-2">
-                                        <h3 class="product-title">Here Product Title</h3>
-                                        <h4 class="product-price">$49.99</h4>
-                                </div>
-                        </div>
-                </div> --}}
             </div>
         {{else}}
             <div class="row">
@@ -90,16 +58,30 @@
     </div>
 </section>
 <script>
-    window.onload= () => {
+    window.onload= async() => {
+        await checkNewProduct()
         const items = document.querySelectorAll('.cart-button');
         items.forEach(item => {
             item.addEventListener('click', async() =>{
+                console.log("agregando al carrito 0")
+                const spinner = document.querySelector('.container_change');
+                spinner.classList.remove('spinner-hidden');
+                document.body.style.overflow = "hidden";
                 const user = await checkLogin()
-                if(user.status)
-                    addToCart(item.dataset.value)
-                else{
+                if(user.status){
+                    const data = {id: item.dataset.value, cant: "++"}
+                    console.log(data)
+                    console.log("agregando al carrito")
+                    if(await checkStock(data)){
+                        await addToCart(item.dataset.value)
+                    }else{
+                        alert('No hay stock suficiente')
+                    }
+                }else{
                     window.location.href = '/login'
                 }
+                spinner.classList.add('spinner-hidden');
+                document.body.style.overflow = "auto"
             });
         });
     }
@@ -115,15 +97,26 @@
     }
     async function addToCart(product){
         const data = await fetch(`/api/carrito/producto/${product}`,{
-            method: 'POST',
+            method: 'PUT',
             headers: {
                 'Accept': 'application/json',
             },
         })
         const response = await data.json()
-        if(response.status == "OK"){
-            alert('Producto agregado al carrito')
+        if(response.status != "OK"){
+            alert('Error al agregar al carrito')
         }
+    }
+    async function checkStock({id, cant}) {
+        console.log("validando stock")
+        const response = await fetch(`/api/carrito/producto/${id}/${cant}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+        })
+        const data = await response.json()
+        return data.value
     }
     async function getProducts(){
         const data = await fetch('/api/productos',{
@@ -137,14 +130,13 @@
     }
     async function checkNewProduct(product){
         const products = await getProducts();
-        const currentDay = new Date().getDate()+"/"+(new Date().getMonth()+1)+"/"+new Date().getFullYear();
+        const currentDay = new Date().toISOString().slice(0, 10);
         for(let i = 0; i < products.length; i++){
-            if(currentDay === products[i].timestamp){
+            if(currentDay === (products[i].timestamp).slice(0, 10)){
                 const element = document.getElementById(`product-${products[i].code}`);
                 const child = element.getElementsByClassName('part-1')[0];
                 child.innerHTML += `<span class="new">new</span>`;
             }
         }
     }
-    checkNewProduct()
 </script>

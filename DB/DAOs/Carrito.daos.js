@@ -86,7 +86,7 @@ class Carrito{
             }
             return array_cart;
         }catch(err){
-            console.log(err);
+            console.log('\x1b[31m%s\x1b[0m',err);
             return false;
         }
     }
@@ -148,18 +148,17 @@ class Carrito{
      * @param id_producto - id of the product to be deleted
      * @returns The result of the operation.
      */
-    async deleteProduct(id_carrito, id_producto){
+    async decreaseProduct(id_carrito, id_producto){
         try{
-            if(!await this.getById(id_carrito)){throw new Error()}
             this.mongodb(this.url);
             let productos_carrito = [];
             let cantidad = 0;
-            await this.getById(id_carrito).then(
-                element => element.productos.map(
-                    producto => {
-                        productos_carrito.push(producto);
-                    }
-                )
+            const carritoDoc = await this.getById(id_carrito)
+            if(!carritoDoc){return [false, "El carrito no existe"];}
+            carritoDoc.productos.map(
+                producto => {
+                    productos_carrito.push(producto);
+                }
             );
             const index = productos_carrito.findIndex(producto => producto.id === id_producto);
             if(index > -1){
@@ -168,9 +167,29 @@ class Carrito{
                     ? productos_carrito = productos_carrito.filter(producto => producto.id!=id_producto)
                     : productos_carrito[index].quantity = cantidad;
             }
-            const doc = await CarritoModel.findById(id_carrito);
-            doc.productos = productos_carrito;
-            doc.save();
+            carritoDoc.productos = productos_carrito;
+            await CarritoModel.findByIdAndUpdate(id_carrito, carritoDoc);
+            return [true];
+        }catch(err){
+            console.log(err);
+            return [false, err];
+        }
+    }
+
+    async deleteProduct(id_carrito, id_producto){
+        try{
+            this.mongodb(this.url);
+            let productos_carrito = [];
+            const carritoDoc = await this.getById(id_carrito)
+            if(!carritoDoc){return [false, "El carrito no existe"];}
+            carritoDoc.productos.map(
+                producto => {
+                    productos_carrito.push(producto);
+                }
+            );
+            productos_carrito = productos_carrito.filter(producto => producto.id!=id_producto);
+            carritoDoc.productos = productos_carrito;
+            await CarritoModel.findByIdAndUpdate(id_carrito, carritoDoc);
             return [true];
         }catch(err){
             console.log(err);

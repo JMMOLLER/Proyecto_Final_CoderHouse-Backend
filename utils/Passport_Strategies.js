@@ -4,9 +4,8 @@ const BaseDir = path.join(__dirname, '../');
 const fs = require('fs-extra');
 const mongoose = require('mongoose');
 const LocalStrategy = require('passport-local').Strategy;
-const { UserModel } = require('../models/UsuariosModel');
-const { newUserEmail } = require('../../Routers/Services/API.service');
-//const { BD_Usuarios_Local } = require('../DAOs/Usuarios_Local');
+const { UserModel } = require('../DB/models/UsuariosModel');
+const { newUserEmail } = require('../Routers/Services/API.service');
 const bCrypt = require('bcrypt');
 
 /* ========= FUNCTIONS ========= */
@@ -43,12 +42,14 @@ Passport.use('local', new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password'
 }, (username, password, done) => {
+
     console.log(username + '<-- DATOS -->' + password);
     mongoose.connect(process.env.MONGODB_URI);
+
     UserModel.findOne({email:username}, (err, user) => {
         if(err)return done(err);
         if(!user){
-            console.log('Usuario no encontrado '+email);
+            console.log('Usuario no encontrado '+username);
             return done(null, false);
         }if(!isValidPassword(user, password)){
             console.log('Contraseña invalida');
@@ -56,6 +57,7 @@ Passport.use('local', new LocalStrategy({
         }
         return done(null, user);
     });
+    
 }));
 
 Passport.use('signup', new LocalStrategy({
@@ -63,6 +65,7 @@ Passport.use('signup', new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password'
 }, (req, username, password, done) => {
+
     mongoose.connect(process.env.MONGODB_URI);
     UserModel.findOne({ email: req.body.email }, async(error, mail) => {
         if (error) {
@@ -96,16 +99,16 @@ Passport.use('signup', new LocalStrategy({
         });
     });
 
-}
-));
+}));
 
 
 /* SERIALIZE & DESERIALIZE */
 Passport.serializeUser((user, done) => {
-    process.nextTick(() => done(null, user.id));
+    /* A function that is executed asynchronously as soon as the current function is completed. */
+    process.nextTick(() => done(null, {id: user._id, avatar: user.avatar}));
 });
 
-Passport.deserializeUser((id, done) => {
+Passport.deserializeUser((user, done) => {
     mongoose.connect(process.env.MONGODB_URI);
-    UserModel.findById(id, done);
+    UserModel.findById(user.id, done);
 });

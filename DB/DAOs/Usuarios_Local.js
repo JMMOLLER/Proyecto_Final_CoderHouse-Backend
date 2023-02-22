@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { UserModel } = require("../models/UsuariosModel");
 mongoose.set('strictQuery', true);
 
-class Autores{
+class UsuariosDAO{
 
     /**
      * It connects to the database.
@@ -36,11 +36,29 @@ class Autores{
     async getById(id){
         try{
             this.mongodb(this.url);
-            const doc = await UserModel.findById(id).lean();
-            if(doc==null){return false;}
+            const doc = await UserModel.findById(id);
+            if(doc==false){throw new Error('No se encontro el usuario')}
             return doc;
         }catch(err){
             console.log(err);
+            return false;
+        }
+    }
+
+    async updateUser(id, data){
+        try {
+            this.mongodb(this.url);
+            const doc = await this.getById(id);
+            if(doc==false){throw new Error('No se encontro el usuario')}
+            doc.email = data.email;
+            doc.age = data.age;
+            doc.address = data.address;
+            doc.phone_number = data.phone_number;
+            if(data.avatar){doc.avatar = data.avatar;}
+            await doc.save();
+            return true;
+        } catch (error) {
+            console.log(error);
             return false;
         }
     }
@@ -77,6 +95,18 @@ class Autores{
         }
     }
 
+    async getAvatar(id){
+        try{
+            this.mongodb(this.url);
+            const doc = await UserModel.findById(id).lean();
+            if(doc==null){return false;}
+            return doc.avatar;
+        }catch(err){
+            console.log(err);
+            return false;
+        }
+    }
+
     /**
      * It deletes a row from a JSON file
      * @param id - The id of the cart to be deleted
@@ -96,6 +126,6 @@ class Autores{
     }
 }
 
-const BD_Usuarios_Local = new Autores();
+const BD_Usuarios_Local = new UsuariosDAO();
 
 module.exports = { BD_Usuarios_Local };

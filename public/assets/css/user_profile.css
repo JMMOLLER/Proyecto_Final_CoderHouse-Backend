@@ -65,9 +65,14 @@ body {
     width: 200px;
     height: 200px;
     object-fit: cover;
+    margin-bottom: 20px;
 }
 
-
+.uploadFile {
+    display: none;
+    width: 61%;
+    margin-left: 22%;
+}
  
 h6 {
     font-size: 14px;
@@ -156,5 +161,15 @@ p {
     border-radius: 5px;
     height: 27px;
     margin-left: 8cm;
+    color: white;
+}
+
+.saveCahnges_user {
+    display: none;
+    background: rgb(47, 47, 219);
+    border: none;
+    border-radius: 5px;
+    height: 27px;
+    margin-left: 7.9cm;
     color: white;
 }

@@ -49,7 +49,7 @@ function changeStatus(status){
 }
 
 function validateTotal(){
-    const value = Number(document.querySelector('#total').textContent.substr(1));
+    const value = Number(document.querySelector('#subtotal').textContent.substr(1));
     const quantity = Number(document.querySelector('#quantity').textContent.substr(0,1)).toFixed();
     const btn_ship = document.querySelector('#type_shipping');
     const btn_buy = document.querySelector('#buy');

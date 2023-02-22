@@ -149,3 +149,29 @@ a:hover {
     text-align: center;
     margin-top: 2cm;
 }
+
+@keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+}
+
+.container_change {
+    position: absolute;
+    z-index: 1;
+    backdrop-filter: blur(10px);
+    width: 100%;
+    height: 100%;
+    animation: fadeIn 1s;
+}
+  
+.spinner-hidden {
+    display: none;
+}
+
+a {
+    cursor: pointer;
+}

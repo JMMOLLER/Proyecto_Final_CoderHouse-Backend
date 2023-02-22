@@ -22,14 +22,22 @@ API_Carrito.post('/', auth.isLogged, controller.cart.createCart);
 
 /* MÉTODO PARA AGREGAR UN ID DE PRODUCTO AL CARRITO POR ID */
 
-API_Carrito.post('/producto/:id2', auth.isLogged, controller.cart.addProductOnCart);
+API_Carrito.put('/producto/:prod', auth.isLogged, controller.cart.addProductOnCart);
+
+/* MÉTODO PARA VALIDAR APROBACIÓN DE AUMENTO DE CANTIDAD DE PEDIDO DE UN PRODUCTO */
+
+API_Carrito.put('/producto/:id/:cant', auth.isLogged, controller.cart.consultQuantityOnPorduct);
 
 /* MÉTODO PARA ELIMINAR UN CARRITO POR ID */
 
-API_Carrito.delete('/api/carrito/:id', controller.cart.deleteCart);
+API_Carrito.delete(':id', controller.cart.deleteCart);
 
-/* MÉTODO PARA ELIMINAR UN PRODUCTO DEL CARRITO */
+/* MÉTODO PARA ELIMINAR EL PRODUCTO DE UN CARRITO */
 
-API_Carrito.delete('/api/carrito/:id/producto/:id_prod', controller.cart.deleteProductOnCart);
+API_Carrito.delete('/producto/all/:id_prod', controller.cart.deleteProductOnCart);
+
+/* MÉTODO PARA ELIMINAR UNA CANTIDAD DE PRODUCTO DEL CARRITO */
+
+API_Carrito.delete('/producto/:id_prod', controller.cart.decreaseQuantityOnCart);
 
 module.exports = { API_Carrito };

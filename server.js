@@ -7,8 +7,9 @@ const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-ac
 const Handlebars = require('handlebars');
 const MongoStore = require('connect-mongo');
 const Passport = require('passport');
+const ms = require('ms');
 
-require('./DB/Passport_Strategies/Passport');
+require('./utils/Passport_Strategies');
 const { API_Carrito } = require('./Routers/API_Carrito');
 const { API_Producto } = require('./Routers/API_Producto');
 const { API_USER } = require('./Routers/API_USER');
@@ -38,7 +39,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 90*10000,
+        maxAge: ms('2h'),
     }
 }));
 app.use(Passport.initialize());

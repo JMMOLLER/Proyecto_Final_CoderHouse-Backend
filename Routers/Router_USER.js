@@ -1,17 +1,9 @@
 const express = require('express');
 const multer = require('multer');
 const Route = express.Router();
-const path = require('path');
-const BaseDir = path.join(__dirname, '../');
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, BaseDir + '/public/uploads');
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
-});
-const upload = multer({ storage: storage });
+const Passport = require('passport');
+const { storage } = require('../utils/MulterStorage');
+const upload = multer({ storage });
 const controller = require('../Routers/Controllers/USER.controller');
 const auth = require('../Routers/middleware-authentication/USER.auth');
 Route.use(express.json());
@@ -46,8 +38,8 @@ Route.get('/test', (req, res) => {
     res.render('index', {title: 'Test', layout: 'test'});
 });
 
-Route.post('/test', (req, res) => {
-    res.json(req.body);
+Route.post('/test', Passport.authenticate('jwt', {session: false}), (req, res) => {
+    res.send(req.user);
 });
 
 /* LOGOUT */

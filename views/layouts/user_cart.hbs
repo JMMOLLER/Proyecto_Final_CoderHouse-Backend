@@ -1,14 +1,18 @@
 {{> navbar}}
 <link rel="stylesheet" href="/assets/css/user_cart.css">
+<title>{{title}}</title>
 <div style="position: relative;">
-
   <div class="sucess_purchase">
     <div class="circle-loader">
       <div class="status draw"></div>
     </div>
   </div>
-
-  <section class="h-100 h-custom" style="position: absolute;">
+  <div class="container_change spinner-hidden">
+    <div class="spinner-border text-dark" role="status" style="margin-left: 50%;margin-top: 25%;">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  <section class="h-100 h-custom" style="position: relative;">
     <div class="container py-5 h-100">
       <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col-12">
@@ -16,7 +20,7 @@
             <div class="card-body p-0">
               <div class="row g-0">
                 <div class="col-lg-8">
-                  <div class="p-5">
+                  <div class="p-5" id="all_products">
                     <div class="d-flex justify-content-between align-items-center mb-5">
                       <h1 class="fw-bold mb-0 text-black">Carrito de Compra</h1>
                       <h6 class="mb-0 text-muted" id="quantity">{{cant}} items</h6>
@@ -25,27 +29,25 @@
 
                     {{#each products}}
 
-                    <div class="row mb-4 d-flex justify-content-between align-items-center">
+                    <div class="row mb-4 d-flex justify-content-between align-items-center" id="{{this._id}}">
                       <div class="col-md-2 col-lg-2 col-xl-2">
                         <img
                           src="{{this.thumbnail}}"
                           class="img-fluid rounded-3" alt="Cotton T-shirt">
                       </div>
                       <div class="col-md-3 col-lg-3 col-xl-3">
-                        <h6 class="text-muted">{{this.title}}</h6>
-                        <h6 class="text-black mb-0">Cotton T-shirt</h6>
+                        <h6 class="text-muted">{{this.brand}}</h6>
+                        <h6 class="text-black mb-0">{{this.title}}</h6>
                       </div>
                       <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
-                        <button class="btn btn-link px-2"
-                          onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                        <button class="btn btn-link px-2" onclick="quantityDown(this)" data-target="{{this._id}}">
                           <i class="fas fa-minus"></i>
                         </button>
 
                         <input id="form1" min="0" name="quantity" value="{{this.quantity}}" type="number"
                           class="form-control form-control-sm" disabled />
 
-                        <button class="btn btn-link px-2"
-                          onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                        <button class="btn btn-link px-2" onclick="quantityUp(this)" data-target="{{this._id}}">
                           <i class="fas fa-plus"></i>
                         </button>
                       </div>
@@ -53,10 +55,10 @@
                         <h6 class="mb-0">$ {{this.price}}</h6>
                       </div>
                       <div class="col-md-1 col-lg-1 col-xl-1 text-end">
-                        <a href="#!" class="text-muted"><i class="fas fa-times"></i></a>
+                        <a class="text-muted"><i class="fas fa-times" onclick="deleteProduct(this)" data-target="{{this._id}}"></i></a>
                       </div>
                     </div>
-                    <hr class="my-4">
+                    <hr class="my-4 hr-products">
 
                     {{/each}}
 
@@ -72,27 +74,25 @@
 
                     <div class="d-flex justify-content-between mb-4">
                       <h5 class="text-uppercase">items {{cant}}</h5>
-                      <h5 id="total">$ {{total}}</h5>
+                      <h5 id="subtotal">$ {{total}}</h5>
                     </div>
 
                     <h5 class="text-uppercase mb-3">Envío</h5>
 
                     <div class="mb-4 pb-2">
                       <select class="select" id="type_shipping">
-                        <option value="1">Recoger en Tienda - $0.00</option>
-                        <option value="2">Envío - Normal - $5.00</option>
-                        <option value="3">Envío - Rápido - $10.00</option>
+                        <option value="0">Recoger en Tienda - $0.00</option>
+                        <option value="5">Envío - Normal - $5.00</option>
+                        <option value="10">Envío - Rápido - $10.00</option>
                       </select>
                     </div>
 
                     <h5 class="text-uppercase mb-3">Código de Descuento</h5>
 
-                    <div class="mb-5">
-                      <div class="input-contain">
-                        <input type="text" id="fname" name="fname" autocomplete="off" value="" aria-labelledby="placeholder-fname">
-                        <label class="placeholder-text" for="fname" id="placeholder-fname">
-                          <div class="text">Código</div>
-                        </label>
+                    <div class="mb-5" style="margin-top: 1.5rem !important;margin-bottom: 2rem !important;">
+                      <div class="form-outline">
+                        <input type="text" id="form12" style="height: 45px;" class="form-control" />
+                        <label class="form-label" style="padding-top: 10px;" for="form12">Código</label>
                       </div>
                     </div>
 
@@ -100,7 +100,7 @@
 
                     <div class="d-flex justify-content-between mb-5">
                       <h5 class="text-uppercase">Precio Total</h5>
-                      <h5>$ {{total}}</h5>
+                      <h5 id="total">$ {{total}}</h5>
                     </div>
 
                     <button type="button" class="btn btn-dark btn-block btn-lg"
@@ -116,4 +116,141 @@
     </div>
   </section>
 </div>
+<script type="text/javascript" src="/assets/js/mdb.min.js"></script>
 <script src="/assets/js/user_cart.js"></script>
+<script>
+  
+  document.getElementById('type_shipping').addEventListener('change', updatePrice)
+
+  function calculateSubTotal(){
+    const subTotal = document.getElementById('subtotal')
+    const quantity = document.getElementById('quantity')
+    const products = document.getElementsByClassName('hr-products')
+    let subTotal_price = 0
+    let total_quantity = 0
+    for(let i = 0; i < products.length; i++){
+      const price = Number(products[i].previousElementSibling.childNodes[7].innerText.split('$')[1])
+      const quantity = Number(products[i].previousElementSibling.querySelector('input[type=number]').value)
+      subTotal_price += price * quantity
+      total_quantity += quantity
+    }
+    subTotal.innerText = '$ ' + subTotal_price.toFixed(2)
+    quantity.innerText = total_quantity + ' items'
+    return Number(subTotal_price.toFixed(2))
+  }
+
+  function updatePrice(){
+    const total = calculateSubTotal()
+    const shipping = document.getElementById('type_shipping')
+    const shipping_price = Number(shipping.options[shipping.selectedIndex].value)
+    const total_price = Number(total + shipping_price)
+    document.getElementById('total').innerText = '$ ' + total_price.toFixed(2)
+  }
+
+  function changeAnimation(isLoading){
+    const el = document.getElementsByClassName('container_change')[0]
+    if(isLoading){
+      el.classList.remove('spinner-hidden')
+      el.style.height = window.innerHeight + 'px'
+    }else{
+      el.classList.add('spinner-hidden')
+    }
+  }
+
+  async function quantityUp(e) {
+    changeAnimation(true)
+    const id = e.dataset.target
+    const cant = Number((e.parentNode.querySelector('input[type=number]')).value)+1
+    if(await checkStock({id, cant})){
+      if(await updateCart(id)){
+        e.parentNode.querySelector('input[type=number]').stepUp()
+        updatePrice()
+      }else{
+        alert('Se generó un error al actualizar el carrito')
+      }
+    }else{
+      alert('No hay stock suficiente')
+    }
+    changeAnimation(false)
+  }
+
+  async function quantityDown(e) {
+    if(Number(e.parentNode.querySelector('input[type=number]').value) > 1){
+      changeAnimation(true)
+      const id = e.dataset.target
+      if(await decreaseQuantityCart(id)){
+        e.parentNode.querySelector('input[type=number]').stepDown()
+        updatePrice()
+      }else{
+        alert('Se generó un error al actualizar el carrito');
+      }
+      changeAnimation(false)
+    }
+  }
+
+  async function deleteProduct(e) {
+    changeAnimation(true)
+    let hrIndex;
+    const id = e.dataset.target
+    const element = e.parentNode.parentNode.parentNode;
+    const container = document.getElementById('all_products').children
+    for (let i = 0; i < container.length; i++) {
+      if(container[i].id == id){
+        hrIndex = i
+      }
+    }
+    if(await reqDeleteProduct(id)){
+      element.remove();
+      container[hrIndex].remove()
+    }else{
+      alert('Se generó un error al actualizar el carrito')
+    }
+    updatePrice()
+    changeAnimation(false)
+  }
+
+  async function reqDeleteProduct(id) {
+    const response = await fetch(`/api/carrito/producto/all/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    const data = await response.json()
+    return data.value
+  }
+
+  async function checkStock({id, cant}) {
+    const response = await fetch(`/api/carrito/producto/${id}/${cant}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    const data = await response.json()
+    return data.value
+  }
+
+  async function updateCart(product){
+    const data = await fetch(`/api/carrito/producto/${product}`,{
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+        },
+    })
+    const response = await data.json()
+    return response.value
+  }
+
+  async function decreaseQuantityCart(id_prod) {
+    const data = await fetch(`/api/carrito/producto/${id_prod}`,{
+      method: 'DELETE',
+      headers: {
+        'Accept': 'application/json',
+      },
+    })
+    const response = await data.json()
+    console.log(response)
+    return response.value
+  }
+</script>

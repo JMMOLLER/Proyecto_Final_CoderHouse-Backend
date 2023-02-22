@@ -2,8 +2,8 @@ require('dotenv').config();
 const fs = require('fs-extra');
 const path = require('path');
 const UploadsDir = path.join(__dirname, '../../public/uploads/');
-const { sendSMS } = require('../../Dependencies/Twilio');
-const { sendMail } = require('../../Dependencies/NodeMailer');
+const { sendSMS } = require('../../utils/Twilio');
+const { sendMail } = require('../../utils/NodeMailer');
 
 async function sendMessages(USER){
     /* FOR NODEMAILER */
@@ -15,10 +15,10 @@ async function sendMessages(USER){
     //await sendWhatsappToUser(USER);
 }
 
-async function deleteUserImg(USER){
-    if(USER.indexOf('/uploads/')>-1){
-        USER = USER.substr(9);
-        await fs.remove(UploadsDir + USER);
+async function deleteUserImg(currentUserImg){
+    if(currentUserImg.indexOf('/uploads/')>-1 && currentUserImg.indexOf('default')==-1){
+        currentUserImg = currentUserImg.substr(9);
+        await fs.remove(UploadsDir + currentUserImg);
     }
 }
 

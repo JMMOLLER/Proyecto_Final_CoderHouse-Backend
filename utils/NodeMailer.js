@@ -4,7 +4,7 @@ const { createTransport } = require('nodemailer');
 const TEST_MAIL = process.env.MAIL_USER;
 
 const transporter = createTransport({
-    host: process.env.MAIL_HOST,
+    service: process.env.MAIL_SERVICE,
     port: process.env.MAIL_PORT,
     auth: {
         user: TEST_MAIL,

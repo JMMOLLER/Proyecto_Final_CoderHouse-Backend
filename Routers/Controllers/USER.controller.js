@@ -4,17 +4,36 @@ const { BD_Usuarios_Local } = require('../../DB/DAOs/Usuarios_Local');
 const { BD_Carrito } = require('../../DB/DAOs/Carrito.daos');
 
 /* =========== ROUTES =========== */
-const home = (req, res) => {
-    res.render('index', {title: 'Home', layout: 'index', user: req.isAuthenticated()});
+const home = async(req, res) => {
+    if (req.isAuthenticated()) {
+        res.render('index', {title: 'Home', layout: 'index', user: req.isAuthenticated(), avatar: req.session.passport.user.avatar});
+    }else {
+        res.render('index', {title: 'Home', layout: 'index', user: req.isAuthenticated()});
+    }
 };
 
 const products = async(req, res) => {
     const products= await BD_Productos.getAll();
-    res.render('index', {title: 'Productos', layout: 'products', products: products, user: req.isAuthenticated()});
+    if (req.isAuthenticated()) {
+        res.render('index', {
+            title: 'Productos',
+            layout: 'products',
+            products: products,
+            user: req.isAuthenticated(),
+            avatar: req.session.passport.user.avatar
+        });
+    }else {
+        res.render('index', {
+            title: 'Productos', 
+            layout: 'products', 
+            products: products, 
+            user: req.isAuthenticated()
+        });
+    }
 };
 
 const user_profile = async(req, res) => {
-    const user = await BD_Usuarios_Local.getById(req.session.passport.user);
+    const user = await BD_Usuarios_Local.getById(req.session.passport.user.id);
     res.render('index', {
         title: 'Perfil', 
         layout: 'user_profile', 
@@ -29,20 +48,31 @@ const user_profile = async(req, res) => {
 };
 
 const user_cart = async(req, res) => {
-    const cart = await BD_Carrito.getCartByUserID(req.session.passport.user);
-    const products = await BD_Carrito.getInfoProducts(cart.productos);
-    let total = 0
-    products.forEach(product => {
-        total += product.price * product.quantity;
-    });
-    res.render('index', {
-        title: 'Carrito', 
-        layout: 'user_cart', 
-        user: req.isAuthenticated(), 
-        products: products,
-        cant: products.length,
-        total: total.toFixed(2)
-    });
+    try {
+        const cart = await BD_Carrito.getCartByUserID(req.session.passport.user.id);
+        const products = await BD_Carrito.getInfoProducts(cart.productos);
+        let total = 0
+        products.forEach(product => {
+            total += product.price * product.quantity;
+        });
+        res.render('index', {
+            title: 'Carrito', 
+            layout: 'user_cart', 
+            user: req.isAuthenticated(), 
+            products: products,
+            cant: products.length,
+            total: total.toFixed(2),
+            avatar: req.session.passport.user.avatar,
+        });
+    } catch (error) {
+        console.log('\x1b[31m%s\x1b[0m',error);
+        res.render('index', { 
+            title: 'Carrito', 
+            layout: 'user_cart',
+            user: req.isAuthenticated(),
+            avatar: req.session.passport.user.avatar
+        });
+    }
 };
 
 const login_get = (req, res) => {
