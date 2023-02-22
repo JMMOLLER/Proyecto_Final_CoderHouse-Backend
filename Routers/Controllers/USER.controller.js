@@ -12,6 +12,10 @@ const home = async(req, res) => {
     }
 };
 
+const chat = async(req, res) => {
+    res.render('index', {title: 'Chat', layout: 'chat', user: req.isAuthenticated(), avatar: req.session.passport.user.avatar});
+};
+
 const products = async(req, res) => {
     const products= await BD_Productos.getAll();
     if (req.isAuthenticated()) {
@@ -114,6 +118,7 @@ const logout = (req, res) => {
 module.exports = {
     home,
     products,
+    chat,
     user_profile,
     user_cart,
     login_get,

@@ -14,6 +14,8 @@ Route.get('/', controller.home);
 
 Route.get('/products', controller.products);
 
+Route.get('/chat', auth.isLogged, controller.chat);
+
 /* USER */
 Route.get('/user/profile', auth.isLogged, controller.user_profile);
 

@@ -178,6 +178,19 @@ const checkLogin = (req, res) => {
     res.json({status: 'OK',value: req.isAuthenticated()});
 };
 
+const userInfo = (req, res) => {
+    res.json(req.session.passport.user);
+};
+
+const Info = async(req, res) => {
+    const info = await BD_Usuarios_Local.getById(req.params.id)
+    if(info){
+        res.json(info);
+    }else{
+        res.json({status: 'ERROR - ID not exists'});
+    }
+};
+
 const purchase = async(req, res) => {
     const cartInfo = await BD_Carrito.getCartByUserID(req.session.passport.user.id);
     const userInfo = await BD_Usuarios_Local.getById(req.session.passport.user.id);
@@ -248,5 +261,7 @@ module.exports = {
         buy: purchase,
         deleteUser,
         user_update,
+        userInfo,
+        Info,
     }
 };

@@ -1,0 +1,51 @@
+{{>navbar}}
+<!-- Font Awesome -->
+	<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+	rel="stylesheet"
+	/>
+	<!-- Google Fonts -->
+	<link
+	href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+	rel="stylesheet"
+	/>
+	<!-- MDB -->
+	<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.1.0/mdb.min.css"
+	rel="stylesheet"
+	/>
+	<link href="/assets/css/chat.css" rel="stylesheet">
+	<title>{{title}}</title>
+<!--Coded With Love By Mutiullah Samim-->
+<body>
+	<div class="container-fluid" style="margin-top: 2%; height: 22cm;">
+		<div class="card chat_opened">
+			<div class="card-header msg_head">
+				<div class="d-flex bd-highlight">
+					<div class="img_cont">
+						<img src="{{avatar}}" class="rounded-circle user_img">
+						<span class="online_icon"></span>
+					</div>
+					<div class="user_info">
+						<span>Chat Global</span>
+						<p>17 usuarios</p>
+					</div>
+				</div>
+			</div>
+			<div class="card-body msg_card_body" id="messages_container"></div>
+			<div class="card-footer">
+				<div class="input-group">
+					<div class="input-group-append">
+						<span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span>
+					</div>
+					<input name="" class="form-control type_msg" placeholder="Type your message..." id="message_input" style="resize: none;"></input>
+					<div class="input-group-append" onclick="sendNewMessage()">
+						<span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="/assets/js/chat.js"></script>
+</body>

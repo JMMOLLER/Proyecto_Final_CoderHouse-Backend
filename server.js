@@ -1,21 +1,23 @@
 require('dotenv').config();
+require('./utils/Passport_Strategies');
 const express = require('express');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
-const { engine } = require('express-handlebars');
-const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 const Handlebars = require('handlebars');
 const MongoStore = require('connect-mongo');
 const Passport = require('passport');
-const ms = require('ms');
-
-require('./utils/Passport_Strategies');
+const { Server } = require('http');
+const { engine } = require('express-handlebars');
+const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 const { API_Carrito } = require('./Routers/API_Carrito');
 const { API_Producto } = require('./Routers/API_Producto');
 const { API_USER } = require('./Routers/API_USER');
 const { Route } = require('./Routers/Router_USER');
+const ms = require('ms');
 const app = express();
 const PORT = 8080;
+const httpServer = new Server(app);
+require('./utils/SocketIO').socket(httpServer);
 const sessionStore = MongoStore.create({
     mongoUrl: process.env.MONGODB_URI,
     ttl: 90*60
@@ -58,8 +60,8 @@ app.use((req, res) =>{
 });
 
 /* ============ SERVER ============ */
-const server = app.listen(PORT, () => {
+const ExpressServer = httpServer.listen(PORT, () => {
     console.log("Servidor iniciado en: http://localhost:"+PORT);
 });
 
-server.on('error', (e) => console.log("Se ha generado un error: " + e));
+ExpressServer.on('error', (e) => console.log("Se ha generado un error: " + e));

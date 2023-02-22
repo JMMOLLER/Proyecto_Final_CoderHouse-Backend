@@ -43,7 +43,7 @@ Passport.use('local', new LocalStrategy({
     passwordField: 'password'
 }, (username, password, done) => {
 
-    console.log(username + '<-- DATOS -->' + password);
+    console.log('\x1b[36m%s\x1b[0m', "Nueva autenticacion");
     mongoose.connect(process.env.MONGODB_URI);
 
     UserModel.findOne({email:username}, (err, user) => {
