@@ -3,7 +3,11 @@ const { deleteUserImg } = require('../Services/API.service');
 const { BD_Carrito } = require('../../DB/DAOs/Carrito.daos.js');
 const { BD_Productos } = require('../../DB/DAOs/Productos.daos.js');
 const { BD_Usuarios_Local } = require('../../DB/DAOs/Usuarios_Local');
-
+const errJSON = {
+    status: 'ERROR',
+    msg: 'an error was encountered while processing the request',
+    value: false
+}
 /* =========== ROUTES =========== */
 
 /* API CARRITO */
@@ -39,7 +43,7 @@ const getCartProducts = async(req, res) => {
         }
     }catch(e){
         console.log(e);
-        res.json({status: 'ERROR - an error was encountered while processing the request'});
+        res.json(errJSON);
     }
 }
 
@@ -52,14 +56,14 @@ const createCart = async(req, res) => {
 
 const addProductOnCart = async(req, res) => {
     try{
-        const id_carrito = await BD_Carrito.getIDcartByUserID(req.session.passport.user.id)
+        const id_carrito = await BD_Carrito.getCartByUserID(req.session.passport.user.id)
         const id_producto = req.params.prod;
-        const status = await BD_Carrito.setProduct({id_carrito, id_producto});
-        !status
-            ? res.json({status: 'ERROR', value: false})
-            : res.json({status: 'OK', value: true});
+        const status = await BD_Carrito.addProduct({id_carrito: id_carrito._id, id_producto});
+        status
+            ? res.json({status: 'OK', value: true})
+            : res.json({status: 'ERROR', value: false});
     }catch{
-        res.json({status: 'ERROR', message: 'an error was encountered while processing the request'});
+        res.json(errJSON);
     }
 }
 
@@ -81,31 +85,31 @@ const deleteCart = async(req, res) => {
             ? res.json({status: 'ERROR - ID Carrito no existe'})
             : res.json({status: 'OK'});
     }catch{
-        res.json({status: 'ERROR - an error was encountered while processing the request'});
+        res.json(errJSON);
     }
 }
 
 const decreaseQuantityOnCart = async(req, res) => {
     try{
-        const CartID = await BD_Carrito.getIDcartByUserID(req.session.passport.user.id);
-        const status = await BD_Carrito.decreaseProduct(CartID, req.params.id_prod);
+        const CartID = await BD_Carrito.getCartByUserID(req.session.passport.user.id);
+        const status = await BD_Carrito.decreaseProduct(CartID._id, req.params.id_prod);
         status.length == 2
             ? res.json({status: 'ERROR', value: false})
             : res.json({status: 'OK', value: true});
     }catch{
-        res.json({status: 'ERROR - an error was encountered while processing the request'});
+        res.json(errJSON);
     }
 }
 
 const deleteProductOnCart = async(req, res) => {
     try{
-        const CartID = await BD_Carrito.getIDcartByUserID(req.session.passport.user.id);
-        const status = await BD_Carrito.deleteProduct(CartID, req.params.id_prod);
+        const CartID = await BD_Carrito.getCartByUserID(req.session.passport.user.id);
+        const status = await BD_Carrito.deleteProduct(CartID._id, req.params.id_prod);
         status.length == 2
             ? res.json({status: 'ERROR', value: false})
             : res.json({status: 'OK', value: true});
     }catch{
-        res.json({status: 'ERROR - an error was encountered while processing the request'});
+        res.json(errJSON);
     }
 }
 
@@ -115,7 +119,15 @@ const deleteProductOnCart = async(req, res) => {
 
 
 const allProducts = async(req, res) => {
-    res.json(await BD_Productos.getAll());
+    const productos = await BD_Productos.getAll();
+    if(productos)
+        return res.json({status: 'OK', value: true, productos});
+    else
+        return res.json({
+            status: 'ERROR', 
+            msg: 'an error was encountered while processing the request', 
+            value: false
+        });
 }
 
 const byProductId = async(req, res) => {
@@ -163,21 +175,21 @@ const deleteProduct = async(req, res) => {
 
 
 const checkLogin = (req, res) => {
-    res.json({status: req.isAuthenticated()});
+    res.json({status: 'OK',value: req.isAuthenticated()});
 };
 
-const buy = async(req, res) => {
-    const cartID = await BD_Carrito.getIDcartByUserID(req.session.passport.user.id);
-    const USER = await BD_Usuarios_Local.getById(req.session.passport.user.id);
-    if(cartID.productos.length==0){
-        res.json({status: false, message: "No hay productos en el carrito"});
-        return;
+const purchase = async(req, res) => {
+    const cartInfo = await BD_Carrito.getCartByUserID(req.session.passport.user.id);
+    const userInfo = await BD_Usuarios_Local.getById(req.session.passport.user.id);
+    cartInfo.shipping = req.body.shipping;
+    if(cartInfo.productos.length==0){
+        return res.json({status: false, message: "No hay productos en el carrito"});
     }
-    if(await BD_Carrito.deleteByID(cartID._id)){
-        await sendMessages(USER);
-        res.json({status: true,message: "OK"})
+    else if(await BD_Carrito.deleteByID(cartInfo._id)){
+        await sendMessages({userInfo, cartInfo});
+        return res.json({status: true, message: "OK"})
     }else{
-        res.json({status: false,message: "ERROR"});
+        return res.json({status: false, message: "ERROR"});
     }
 };
 
@@ -233,7 +245,7 @@ module.exports = {
     },
     user: {
         checkLogin,
-        buy,
+        buy: purchase,
         deleteUser,
         user_update,
     }

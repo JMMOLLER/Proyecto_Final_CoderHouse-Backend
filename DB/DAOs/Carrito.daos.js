@@ -59,22 +59,6 @@ class Carrito{
         }
     }
 
-    async getIDcartByUserID(UID){
-        try{
-            this.mongodb(this.url);
-            let doc = await CarritoModel.findOne({owner:UID});
-            if(doc==null){
-                await this.createCarrito(UID)
-                doc = await CarritoModel.findOne({owner:UID});
-            }
-            doc._id = doc._id.toString();
-            return doc;
-        }catch(err){
-            console.log(err);
-            return false;
-        }
-    }
-
     async getInfoProducts(id_productos){
         try{
             const array_cart = []
@@ -116,25 +100,19 @@ class Carrito{
      * @param id_producto - id of the product
      * @returns a boolean value.
      */
-    async setProduct({id_carrito, id_producto}){
+    async addProduct({id_carrito, id_producto}){
         try{
             this.mongodb(this.url);
-            if(!await this.getById(id_carrito)){return false;}
+            const carritoDoc = await this.getById(id_carrito);
+            if(!carritoDoc){return false;}
             const productos_carrito = []
-            await this.getById(id_carrito).then(
-                element => element.productos.map(
-                    producto => { 
-                        productos_carrito.push(producto);
-                    }
-                )
-            );
+            carritoDoc.productos.map(producto => productos_carrito.push(producto))
             const index = productos_carrito.findIndex(producto => producto.id === id_producto);
             index > -1 
                 ? productos_carrito[index].quantity = productos_carrito[index].quantity+1 
                 : productos_carrito.push({id:id_producto, quantity:1})
-            const doc = await CarritoModel.findById(id_carrito);
-            doc.productos = productos_carrito;
-            doc.save();
+            carritoDoc.productos = productos_carrito;
+            await CarritoModel.findByIdAndUpdate(id_carrito, carritoDoc);
             return true;
         }catch(err){
             console.log(err);

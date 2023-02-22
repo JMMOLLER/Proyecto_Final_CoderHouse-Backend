@@ -51,6 +51,7 @@ class Productos {
                         cant=element.quantity+1;
                     }
                 });
+                if(cant=="++"){cant=1};
             }
             if(data_to_check.stock>=cant){return true};
             return false;

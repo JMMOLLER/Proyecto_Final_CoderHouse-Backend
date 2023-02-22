@@ -16,17 +16,17 @@ API_Carrito.get('/:id', controller.cart.byCartId);
 
 API_Carrito.get('/:id/productos', controller.cart.getCartProducts);
 
+/* MÉTODO PARA VALIDAR APROBACIÓN DE AUMENTO DE CANTIDAD DE PEDIDO DE UN PRODUCTO */
+
+API_Carrito.get('/stock/producto/:id/:cant', auth.isLogged, controller.cart.consultQuantityOnPorduct);
+
 /* MÉTODO PARA CREAR UN CARRITO */
 
 API_Carrito.post('/', auth.isLogged, controller.cart.createCart);
 
 /* MÉTODO PARA AGREGAR UN ID DE PRODUCTO AL CARRITO POR ID */
 
-API_Carrito.put('/producto/:prod', auth.isLogged, controller.cart.addProductOnCart);
-
-/* MÉTODO PARA VALIDAR APROBACIÓN DE AUMENTO DE CANTIDAD DE PEDIDO DE UN PRODUCTO */
-
-API_Carrito.put('/producto/:id/:cant', auth.isLogged, controller.cart.consultQuantityOnPorduct);
+API_Carrito.put('/add/producto/:prod', auth.isLogged, controller.cart.addProductOnCart);
 
 /* MÉTODO PARA ELIMINAR UN CARRITO POR ID */
 

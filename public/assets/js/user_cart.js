@@ -5,12 +5,13 @@ input_element.addEventListener("keyup", () => {
     input_element.setAttribute("value", input_element.value);
 })
 
-async function purchase(){
+async function purchase(shipping_value){
     const data = await fetch('/api/user/buy', {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({shipping: shipping_value})
     });
     const response = await data.json();
     return response;
@@ -18,7 +19,9 @@ async function purchase(){
 
 buyBTN.addEventListener('click', async() => {
     purchaseAnimation()
-    const response = await purchase();
+    const shipping = document.getElementById('type_shipping')
+    const shipping_value = Number(shipping.options[shipping.selectedIndex].value)
+    const response = await purchase(shipping_value);
     console.log(response);
     if(response.status){
         changeStatus('success');

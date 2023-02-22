@@ -20,13 +20,22 @@ const client = require('twilio')(accountSID, authToken);
 // .done();
 
 let sendSMS = async (sendElement) => {
-    try {
-        await client.messages.create(sendElement).then(
-            message => console.log(`Nuevo mensaje enviado: ${message.sid}`)
-        ).done();
-    } catch (err) {
-        console.log(err);
-    }
+    new Promise((resolve, reject) => {
+        try{
+            client.messages.create(sendElement).then(
+                message => resolve(console.log("Se envió el sms de compra con ID:" + message.sid))
+            ).done();
+        }catch(err){
+            reject(err);
+        }
+    });
 }
 
+// try {
+//     await client.messages.create(sendElement).then(
+//         message => console.log(`Nuevo mensaje enviado: ${message.sid}`)
+//     ).done();
+// } catch (err) {
+//     console.log(err);
+// }
 module.exports = { sendSMS };

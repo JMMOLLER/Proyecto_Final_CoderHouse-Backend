@@ -217,40 +217,51 @@
       }
     })
     const data = await response.json()
+    if(!data.value){
+      console.log(data)
+    }
     return data.value
   }
 
   async function checkStock({id, cant}) {
-    const response = await fetch(`/api/carrito/producto/${id}/${cant}`, {
-      method: 'PUT',
+    const response = await fetch(`/api/carrito/stock/producto/${id}/${cant}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       }
     })
     const data = await response.json()
+    if(!data.value){
+      console.log(data)
+    }
     return data.value
   }
 
   async function updateCart(product){
-    const data = await fetch(`/api/carrito/producto/${product}`,{
-        method: 'PUT',
-        headers: {
-            'Accept': 'application/json',
-        },
+    const response = await fetch(`/api/carrito/add/producto/${product}`,{
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+      },
     })
-    const response = await data.json()
-    return response.value
+    const data = await response.json()
+    if(!data.value){
+      console.log(data)
+    }
+    return data.value
   }
 
   async function decreaseQuantityCart(id_prod) {
-    const data = await fetch(`/api/carrito/producto/${id_prod}`,{
+    const response = await fetch(`/api/carrito/producto/${id_prod}`,{
       method: 'DELETE',
       headers: {
         'Accept': 'application/json',
       },
     })
-    const response = await data.json()
-    console.log(response)
-    return response.value
+    const data = await response.json()
+    if(!data.value){
+      console.log(data)
+    }
+    return data.value
   }
 </script>

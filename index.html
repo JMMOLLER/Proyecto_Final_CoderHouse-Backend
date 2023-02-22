@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <style>
+        table, th {
+            border-bottom: 1px solid black;
+            border-collapse: collapse;
+        }.footer, .SubTotal td {
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+        }th, td {
+            padding: 10px 30px;
+            text-align: center;
+        }
+    </style>
+    <table>
+        <tr>
+            <th>Productos</th>
+            <th>Cantidad</th>
+            <th>Precio por UND.</th>
+        </tr>
+        <tr>
+            <td>Pringles sabor Original</td>
+            <td>x2</td>
+            <td>3.5</td>
+        </tr>
+        <tr>
+            <td>Inca Kola sabor original</td>
+            <td>x3</td>
+            <td>0.5</td>
+        </tr>
+        <tr class="footer">
+            <th>SubTotal</th>
+            <th></th>
+            <td>15.08</td>
+        </tr>
+        <tr class="footer">
+            <th>Envío</th>
+            <th></th>
+            <td>0.00</td>
+        </tr>
+        <tr class="footer">
+            <th>Total</th>
+            <th></th>
+            <th>15.08</th>
+        </tr>
+    </table>
+</body>
+</html>
