@@ -62,7 +62,7 @@
 					</div>
 
 					<div class="container-login100-form-btn m-t-17">
-						<button class="login100-form-btn" id="btnLogin">
+						<button class="login100-form-btn">
 							<span class="spinner-border spinner-border-sm" id="spinnerBtn" style="height: 30px;width: 30px;display: none;" role="status" aria-hidden="true"></span>
 							<span id="spanBtnText">Iniciar sesión</span>
 						</button>
@@ -99,10 +99,3 @@
 	<script src="assets/vendor/countdowntime/countdowntime.js"></script>
 <!--================================================================================================-->
 	<script src="assets/js/main-login.js"></script>
-
-	<script>
-		document.getElementById("btnLogin").addEventListener("click", function(){
-			document.getElementById("spinnerBtn").style.display = "inline-block";
-			document.getElementById("spanBtnText").classList.add("visually-hidden");
-		})
-	</script>
