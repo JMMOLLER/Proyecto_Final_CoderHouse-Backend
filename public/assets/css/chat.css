@@ -12,7 +12,8 @@ html {
     margin-bottom: auto;
 }
 .card {
-    height: 95%;
+    height: 100% !important;
+    position: static !important;
     border-radius: 15px !important;
     background-color: rgba(0, 0, 0, 0.4) !important;
 }
@@ -36,16 +37,6 @@ html {
 .container {
     align-content: center;
 }
-.search {
-    border-radius: 15px 0 0 15px !important;
-    background-color: rgba(0, 0, 0, 0.3) !important;
-    border: 0 !important;
-    color: white !important;
-}
-.search:focus {
-    box-shadow: none !important;
-    outline: 0px !important;
-}
 .type_msg {
     background-color: rgba(0, 0, 0, 0.3) !important;
     border: 0 !important;
@@ -58,6 +49,7 @@ html {
     outline: 0px !important;
 }
 .attach_btn {
+    height: 100% !important;
     border-radius: 15px 0 0 15px !important;
     background-color: rgba(0, 0, 0, 0.3) !important;
     border: 0 !important;
@@ -65,27 +57,12 @@ html {
     cursor: pointer;
 }
 .send_btn {
+    height: 100% !important;
     border-radius: 0 15px 15px 0 !important;
     background-color: rgba(0, 0, 0, 0.3) !important;
     border: 0 !important;
     color: white !important;
     cursor: pointer;
-}
-.search_btn {
-    border-radius: 0 15px 15px 0 !important;
-    background-color: rgba(0, 0, 0, 0.3) !important;
-    border: 0 !important;
-    color: white !important;
-    cursor: pointer;
-}
-.contacts {
-    list-style: none;
-    padding: 0;
-}
-.contacts li {
-    width: 100% !important;
-    padding: 5px 10px;
-    margin-bottom: 15px !important;
 }
 .active {
     background-color: rgba(0, 0, 0, 0.3);
@@ -155,6 +132,8 @@ html {
     position: relative;
 }
 .msg_cotainer_send {
+    min-width: 69px;
+    text-align: center;
     margin-top: auto;
     margin-bottom: auto;
     margin-right: 10px;
@@ -176,9 +155,6 @@ html {
     bottom: -15px;
     color: rgba(255, 255, 255, 0.5);
     font-size: 10px;
-}
-.msg_head {
-    position: relative;
 }
 #action_menu_btn {
     position: absolute;
@@ -226,4 +202,41 @@ html {
     .contacts_card {
         margin-bottom: 15px !important;
     }
+}
+.loader {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin-top: 12%;
+    margin-left: 47.1%;
+    margin-bottom: 10px;
+}
+
+.loader:before,
+.loader:after {
+    content: "";
+    border-radius: 50%;
+    position: absolute;
+    inset: 0;
+    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.3) inset;
+}
+.loader:after {
+    box-shadow: 0 2px 0 #ff3d00 inset;
+    animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+.spinner-visible {
+    text-align: center;
+    color:white
+}
+.spinner-hidden {
+    display: none;
 }

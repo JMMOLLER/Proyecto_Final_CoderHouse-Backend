@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { MessageModel } = require('../models/MessagesModel');
+const { UserModel } = require('../models/UsuariosModel');
 
 class Mensajes {
 
@@ -28,8 +29,28 @@ class Mensajes {
             console.log('leyendo mensajes en mongo');
             this.mongodb(this.url);
             const messages = await MessageModel.find().lean();
-            return messages;
+            return await this.setFromInfo(messages);
         } catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
+
+    async setFromInfo(doc){
+        try{
+            const messages = [];
+            let i = 0;
+            while(doc.length>i){
+                const user = await UserModel.findById(doc[i].from).lean();
+                delete user.password;
+                delete user.address;
+                delete user.phone_number;
+                doc[i].from = user;
+                messages.push(doc[i]);
+                i++;
+            }
+            return messages;
+        }catch(err){
             console.log(err);
             return [];
         }
