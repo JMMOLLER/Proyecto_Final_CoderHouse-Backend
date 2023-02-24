@@ -9,6 +9,7 @@ function isUnlogged(req, res, next) {
 function isLogged(req, res, next) {
     if (req.isAuthenticated())
         return next();
+    req.session.returnTo = req.route.path;
     res.redirect('/login');
 }
 

@@ -39,10 +39,10 @@ function checkUserAvatar(req){
 /* ========= PASSPORT ========= */
 
 Passport.use('local', new LocalStrategy({
+    passReqToCallback: true,
     usernameField: 'email',
     passwordField: 'password'
-}, (username, password, done) => {
-
+}, (req, username, password, done) => {
     console.log('\x1b[36m%s\x1b[0m', "Nueva autenticacion");
     mongoose.connect(process.env.MONGODB_URI);
 
@@ -55,6 +55,7 @@ Passport.use('local', new LocalStrategy({
             console.log('Contraseña invalida');
             return done(null, false);
         }
+        user.returnTo = req.session.returnTo;
         return done(null, user);
     });
     
@@ -105,7 +106,9 @@ Passport.use('signup', new LocalStrategy({
 /* SERIALIZE & DESERIALIZE */
 Passport.serializeUser((user, done) => {
     /* A function that is executed asynchronously as soon as the current function is completed. */
-    process.nextTick(() => done(null, {id: user._id, avatar: user.avatar}));
+    process.nextTick(() => {
+        done(null, {id: user._id, avatar: user.avatar, returnTo: user.returnTo})
+    });
 });
 
 Passport.deserializeUser((user, done) => {

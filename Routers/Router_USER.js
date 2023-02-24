@@ -24,7 +24,9 @@ Route.get('/user/cart', auth.isLogged, controller.user_cart);
 /* LOGIN */
 Route.get('/login', auth.isUnlogged, controller.login_get);
 
-Route.post('/login', auth.isUnlogged, controller.login_post);
+Route.post('/login', auth.isUnlogged, Passport.authenticate('local', {
+    failureRedirect: '/fail_login',
+}), controller.login_post);
 
 Route.get('/fail_login', controller.fail_login);
 

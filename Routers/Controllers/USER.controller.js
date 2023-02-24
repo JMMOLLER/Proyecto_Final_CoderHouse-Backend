@@ -13,6 +13,7 @@ const home = async(req, res) => {
 };
 
 const chat = async(req, res) => {
+    console.log(req.session.passport.user.returnTo)
     res.render('index', {title: 'Chat', layout: 'chat', user: req.isAuthenticated(), avatar: req.session.passport.user.avatar});
 };
 
@@ -83,10 +84,9 @@ const login_get = (req, res) => {
     res.render('index', {title: 'Login', layout: 'login'});
 };
 
-const login_post = Passport.authenticate('local', {
-    successRedirect: '/user/profile',
-    failureRedirect: '/fail_login',
-});
+const login_post = (req, res) => {
+    res.redirect(req.session.passport.user.returnTo || '/user/profile');
+};
 
 const fail_login = (req, res) => {
     res.render('index',{layout: 'error_template', err: true});
