@@ -8,6 +8,8 @@
     var input = $('.validate-input .input100');
     
     $('.validate-form').on('submit',function(){
+        console.log("hello");
+        buttonSpinner(true);
         let check = true;
         let isRegister = false;
         for(var i=0; i<input.length; i++) {
@@ -24,6 +26,7 @@
         }
         if(check && isRegister)
             process(event);
+        buttonSpinner(check);
         return check;
     });
 
@@ -33,6 +36,16 @@
            hideValidate(this);
         });
     });
+
+    function buttonSpinner(isLoading){
+        if(isLoading){
+            document.getElementById("spinnerBtn").style.display = "inline-block";
+            document.getElementById("spanBtnText").classList.add("visually-hidden");
+        }else{
+            document.getElementById("spinnerBtn").style.display = "none";
+            document.getElementById("spanBtnText").classList.remove("visually-hidden");
+        }
+    }
 
     function validate (input) {
         if($(input).attr('type') == 'email' || $(input).attr('name') == 'email') {

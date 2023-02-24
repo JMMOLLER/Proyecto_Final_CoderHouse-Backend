@@ -13,7 +13,6 @@ const home = async(req, res) => {
 };
 
 const chat = async(req, res) => {
-    console.log(req.session.passport.user.returnTo)
     res.render('index', {title: 'Chat', layout: 'chat', user: req.isAuthenticated(), avatar: req.session.passport.user.avatar});
 };
 
