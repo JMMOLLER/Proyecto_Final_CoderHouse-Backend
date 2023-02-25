@@ -10,14 +10,6 @@ const bCrypt = require('bcrypt');
 
 /* ========= FUNCTIONS ========= */
 
-function createHash(password){
-	return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null);
-}
-
-function isValidPassword(user, password){
-	return bCrypt.compareSync(password, user.password);
-}
-
 async function deleteUploadImg(req){
     if(req.body.avatar_type!="0"){
         req.body.avatar = req.file.filename;
@@ -51,7 +43,7 @@ Passport.use('local', new LocalStrategy({
         if(!user){
             console.log('Usuario no encontrado '+username);
             return done(null, false);
-        }if(!isValidPassword(user, password)){
+        }if(!user.isValidPassword(password)){ //La funcion isValidPassword esta definida en el modelo de usuario
             console.log('Contraseña invalida');
             return done(null, false);
         }
@@ -79,9 +71,10 @@ Passport.use('signup', new LocalStrategy({
             return done(null, false);
         }
         checkUserAvatar(req);
+        // La conversión de la contraseña a hash se hace en el modelo de usuario
         const newUser = {
             address: req.body.address,
-            password: createHash(req.body.password),
+            password: req.body.password,
             email: req.body.email,
             name: req.body.name,
             age: req.body.age,
