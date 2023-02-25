@@ -6,7 +6,6 @@ const mongoose = require('mongoose');
 const LocalStrategy = require('passport-local').Strategy;
 const { UserModel } = require('../DB/models/UsuariosModel');
 const { newUserEmail } = require('../Routers/Services/API.service');
-const bCrypt = require('bcrypt');
 
 /* ========= FUNCTIONS ========= */
 
