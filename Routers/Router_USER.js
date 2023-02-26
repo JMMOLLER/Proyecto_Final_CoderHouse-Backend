@@ -1,7 +1,6 @@
 const express = require('express');
 const multer = require('multer');
 const Route = express.Router();
-const Passport = require('passport');
 const { storage } = require('../utils/MulterStorage');
 const upload = multer({ storage });
 const controller = require('../Routers/Controllers/USER.controller');
@@ -22,28 +21,39 @@ Route.get('/user/profile', auth.isLogged, controller.user_profile);
 Route.get('/user/cart', auth.isLogged, controller.user_cart);
 
 /* LOGIN */
-Route.get('/login', auth.isUnlogged, controller.login_get);
+Route.get('/login', auth.isUnLogged, controller.login_get);
 
-Route.post('/login', auth.isUnlogged, Passport.authenticate('local', {
-    failureRedirect: '/fail_login',
-}), controller.login_post);
+Route.post('/login', auth.isUnLogged, controller.login_post);
 
 Route.get('/fail_login', controller.fail_login);
 
 /* REGISTRO */
-Route.get('/register', auth.isUnlogged, controller.register_get);
+Route.get('/register', auth.isUnLogged, controller.register_get);
 
-Route.post('/register', auth.isUnlogged, upload.single('avatar'), controller.register_post);
+Route.post('/register', auth.isUnLogged, upload.single('avatar'), controller.register_post);
 
 Route.get('/fail_register', controller.fail_register);
 
 /* TEST */
 Route.get('/test', (req, res) => {
-    res.render('index', {title: 'Test', layout: 'test'});
+    res.send('test');
 });
 
-Route.post('/test', Passport.authenticate('jwt', {session: false}), (req, res) => {
-    res.send(req.user);
+Route.post('/test', (req, res) => {
+    res.send(req.body);
+});
+
+Route.get('/protected', auth.isLogged, (req, res) => {
+    res.send('this is protected')
+})
+
+Route.get('/auth', auth.isLogged, (req, res) => {
+    res.json({
+        msg: 'you are Authenticated',
+        returnTo: req.returnTo,
+        user: req.user,
+        token: req.session.jwt
+    });
 });
 
 /* LOGOUT */

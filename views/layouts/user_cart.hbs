@@ -217,7 +217,9 @@
       }
     })
     const data = await response.json()
-    if(!data.value){
+    if(data.status == 401){
+      window.location.href = '/login'
+    }if(!data.value){
       console.log(data)
     }
     return data.value
@@ -225,12 +227,15 @@
 
   async function checkStock({id, cant}) {
     const response = await fetch(`/api/carrito/stock/producto/${id}/${cant}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
     const data = await response.json()
+    if(data.status == 401){
+      window.location.href = '/login'
+    }
     if(!data.value){
       console.log(data)
     }
@@ -245,7 +250,9 @@
       },
     })
     const data = await response.json()
-    if(!data.value){
+    if(data.status == 401){
+      window.location.href = '/login'
+    }if(!data.value){
       console.log(data)
     }
     return data.value
@@ -259,7 +266,9 @@
       },
     })
     const data = await response.json()
-    if(!data.value){
+    if(data.status == 401){
+      window.location.href = '/login'
+    }if(!data.value){
       console.log(data)
     }
     return data.value

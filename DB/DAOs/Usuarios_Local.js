@@ -50,7 +50,6 @@ class UsuariosDAO{
             this.mongodb(this.url);
             const doc = await this.getById(id);
             if(doc==false){throw new Error('No se encontro el usuario')}
-            doc.email = data.email;
             doc.age = data.age;
             doc.address = data.address;
             doc.phone_number = data.phone_number;

@@ -1,21 +1,30 @@
+const Passport = require('passport');
+
 /* ============ FUNCTIONS ============ */
 
-function isUnlogged(req, res, next) {
-    if (req.isUnauthenticated())
-        return next();
-    res.redirect('/');
+function isLogged(req, res, next) {
+    Passport.authenticate('jwt', { session: false }, (err, tokenInfo, info) => {
+        if(err || tokenInfo){
+            req.user = tokenInfo;
+            return next();
+        }
+        req.session.returnTo = req.route.path;
+        return res.redirect('/login');
+    })(req, res);
 }
 
-function isLogged(req, res, next) {
-    if (req.isAuthenticated())
-        return next();
-    req.session.returnTo = req.route.path;
-    res.redirect('/login');
+function isUnLogged(req, res, next) {
+    Passport.authenticate('jwt', { session: false }, (err, tokenInfo, info) => {
+        if(err || !tokenInfo){
+            return next();
+        }
+        return res.redirect('/');
+    })(req, res);
 }
 
 
 /* =========== EXPORT =========== */
 module.exports = {
-    isUnlogged,
-    isLogged
+    isLogged,
+    isUnLogged
 };

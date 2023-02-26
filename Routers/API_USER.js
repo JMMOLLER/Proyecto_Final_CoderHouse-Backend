@@ -7,8 +7,6 @@ const { storage } = require('../utils/MulterStorage');
 const upload = multer({ storage });
 
 
-API_USER.get('/login', controller.user.checkLogin);
-
 API_USER.get('/', auth.isLogged, controller.user.userInfo);
 
 API_USER.get('/:id', controller.user.Info);

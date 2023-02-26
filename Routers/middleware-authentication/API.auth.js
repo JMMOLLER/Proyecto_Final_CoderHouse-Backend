@@ -1,17 +1,30 @@
+const Passport = require('passport');
 let isLoggedIn = false;
 
 /* ============ FUNCTIONS ============ */
 
 function isUnlogged(req, res, next) {
-    if (req.isUnauthenticated())
-        return next();
-    res.redirect('/');
+    Passport.authenticate('jwt', { session: false }, (err, tokenInfo, info) => {
+        if(err || !tokenInfo){
+            return next();
+        }
+        return res.redirect('/');
+    })(req, res);
 }
 
 function isLogged(req, res, next) {
-    if (req.isAuthenticated())
-        return next();
-    res.json({error: -1, description: {route: req.originalUrl, method: req.method}, status: 'No autorizado'});
+    Passport.authenticate('jwt', { session: false }, (err, tokenInfo, info) => {
+        if(err || tokenInfo){
+            req.user = tokenInfo;
+            return next();
+        }
+        return res.json({
+            status: 401, 
+            description: {route: req.originalUrl, method: req.method}, 
+            msg: 'No autorizado',
+            value: false,
+        });
+    })(req, res);
 }
 
 /**

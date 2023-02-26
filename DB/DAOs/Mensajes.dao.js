@@ -42,6 +42,10 @@ class Mensajes {
             let i = 0;
             while(doc.length>i){
                 const user = await UserModel.findById(doc[i].from).lean();
+                if(!user){
+                    i++;
+                    continue;
+                }
                 delete user.password;
                 delete user.address;
                 delete user.phone_number;

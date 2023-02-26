@@ -4,6 +4,7 @@ const BaseDir = path.join(__dirname, '../');
 const fs = require('fs-extra');
 const mongoose = require('mongoose');
 const LocalStrategy = require('passport-local').Strategy;
+const JWTStrategy = require('passport-jwt').Strategy;
 const { UserModel } = require('../DB/models/UsuariosModel');
 const { newUserEmail } = require('../Routers/Services/API.service');
 
@@ -29,27 +30,29 @@ function checkUserAvatar(req){
 
 /* ========= PASSPORT ========= */
 
-Passport.use('local', new LocalStrategy({
+Passport.use('login', new LocalStrategy({
     passReqToCallback: true,
     usernameField: 'email',
     passwordField: 'password'
-}, (req, username, password, done) => {
-    console.log('\x1b[36m%s\x1b[0m', "Nueva autenticacion");
-    mongoose.connect(process.env.MONGODB_URI);
+}, async(req, email, password, done) => {
+    try{
+        console.log('\x1b[36m%s\x1b[0m', "Nueva autenticacion");
+        mongoose.connect(process.env.MONGODB_URI);
 
-    UserModel.findOne({email:username}, (err, user) => {
-        if(err)return done(err);
+        const user = await UserModel.findOne({email});
         if(!user){
-            console.log('Usuario no encontrado '+username);
-            return done(null, false);
+            console.log('Usuario no encontrado '+email);
+            return done(null, false, {message: 'Usuario no encontrado'});
         }if(!user.isValidPassword(password)){ //La funcion isValidPassword esta definida en el modelo de usuario
             console.log('Contraseña invalida');
-            return done(null, false);
+            return done(null, false, {message: 'Contraseña invalida'});
         }
-        user.returnTo = req.session.returnTo;
+        req.returnTo = req.session.returnTo;
         return done(null, user);
-    });
-    
+    }catch(err){
+        console.log(err);
+        return done(err);
+    }
 }));
 
 Passport.use('signup', new LocalStrategy({
@@ -94,16 +97,20 @@ Passport.use('signup', new LocalStrategy({
 
 }));
 
+const cookieExtractor = (req) => {
+    let token = null;
+    if (req && req.cookies)
+        token = req.session.jwt;
+    return token;
+}
 
-/* SERIALIZE & DESERIALIZE */
-Passport.serializeUser((user, done) => {
-    /* A function that is executed asynchronously as soon as the current function is completed. */
-    process.nextTick(() => {
-        done(null, {id: user._id, avatar: user.avatar, returnTo: user.returnTo})
-    });
-});
-
-Passport.deserializeUser((user, done) => {
-    mongoose.connect(process.env.MONGODB_URI);
-    UserModel.findById(user.id, done);
-});
+Passport.use(new JWTStrategy({
+    secretOrKey: process.env.COOKIE_SECRET,
+    jwtFromRequest:  cookieExtractor,
+}, async (token, done) => {
+    try {
+        return done(null, token.user)
+    } catch (err) {
+        done(err);
+    }
+}))

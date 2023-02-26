@@ -7,7 +7,7 @@ socket.on('messages', async (data) => {
 async function getAuthenticateUserInfo() {
     const response = await fetch(`/api/user/`);
     const data = await response.json();
-    userId = data.id;
+    userId = data._id;
     return data;
 }
 function renderMessages(messages) {

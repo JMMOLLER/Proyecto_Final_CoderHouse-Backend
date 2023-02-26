@@ -1,59 +1,54 @@
 const Passport = require('passport');
 const { BD_Productos } = require('../../DB/DAOs/Productos.daos');
-const { BD_Usuarios_Local } = require('../../DB/DAOs/Usuarios_Local');
 const { BD_Carrito } = require('../../DB/DAOs/Carrito.daos');
+const jwt = require('jsonwebtoken');
 
 /* =========== ROUTES =========== */
 const home = async(req, res) => {
-    if (req.isAuthenticated()) {
-        res.render('index', {title: 'Home', layout: 'index', user: req.isAuthenticated(), avatar: req.session.passport.user.avatar});
-    }else {
-        res.render('index', {title: 'Home', layout: 'index', user: req.isAuthenticated()});
-    }
+    Passport.authenticate('jwt', { session: false }, (err, user, info) => {
+        if (err || !user) {
+            res.render('index', {title: 'Home', layout: 'index'});
+        }else {
+            res.render('index', {title: 'Home', layout: 'index', user});
+        }
+    })(req, res);
 };
 
 const chat = async(req, res) => {
-    res.render('index', {title: 'Chat', layout: 'chat', user: req.isAuthenticated(), avatar: req.session.passport.user.avatar});
+    res.render('index', {title: 'Chat', layout: 'chat', user: req.user});
 };
 
 const products = async(req, res) => {
-    const products= await BD_Productos.getAll();
-    if (req.isAuthenticated()) {
-        res.render('index', {
-            title: 'Productos',
-            layout: 'products',
-            products: products,
-            user: req.isAuthenticated(),
-            avatar: req.session.passport.user.avatar
-        });
-    }else {
-        res.render('index', {
-            title: 'Productos', 
-            layout: 'products', 
-            products: products, 
-            user: req.isAuthenticated()
-        });
-    }
+    Passport.authenticate('jwt', { session: false }, async(err, user, info) => {
+        const products= await BD_Productos.getAll();
+        if (err || !user) {
+            res.render('index', {
+                title: 'Productos', 
+                layout: 'products', 
+                products: products
+            });
+        }else {
+            res.render('index', {
+                title: 'Productos',
+                layout: 'products',
+                products: products,
+                user
+            });
+        }
+    })(req, res);
 };
 
 const user_profile = async(req, res) => {
-    const user = await BD_Usuarios_Local.getById(req.session.passport.user.id);
     res.render('index', {
         title: 'Perfil', 
         layout: 'user_profile', 
-        user: req.isAuthenticated(),
-        name: user.name,
-        email: user.email,
-        avatar: user.avatar,
-        age: user.age,
-        address: user.address,
-        phone_number: user.phone_number,
+        user: req.user,
     });
 };
 
 const user_cart = async(req, res) => {
     try {
-        const cart = await BD_Carrito.getCartByUserID(req.session.passport.user.id);
+        const cart = await BD_Carrito.getCartByUserID(req.user._id);
         const products = await BD_Carrito.getInfoProducts(cart.productos);
         let total = 0
         products.forEach(product => {
@@ -62,19 +57,17 @@ const user_cart = async(req, res) => {
         res.render('index', {
             title: 'Carrito', 
             layout: 'user_cart', 
-            user: req.isAuthenticated(), 
             products: products,
             cant: products.length,
             total: total.toFixed(2),
-            avatar: req.session.passport.user.avatar,
+            user: req.user
         });
     } catch (error) {
         console.log('\x1b[31m%s\x1b[0m',error);
         res.render('index', { 
             title: 'Carrito', 
             layout: 'user_cart',
-            user: req.isAuthenticated(),
-            avatar: req.session.passport.user.avatar
+            user: req.user
         });
     }
 };
@@ -84,7 +77,14 @@ const login_get = (req, res) => {
 };
 
 const login_post = (req, res) => {
-    res.redirect(req.session.passport.user.returnTo || '/user/profile');
+    Passport.authenticate('login', { session: false }, (err, user, info) => {
+        if(err || !user){
+          return res.status(400).render('index', {layout: 'error_template', err: true})
+        }
+        const token = jwt.sign({ user }, process.env.COOKIE_SECRET)
+        req.session.jwt = token
+        return res.redirect(req.returnTo || '/user/profile')
+    })(req, res)
 };
 
 const fail_login = (req, res) => {
@@ -96,6 +96,7 @@ const register_get = (req, res) => {
 };
 
 const register_post = Passport.authenticate('signup', {
+    session: false,
     successRedirect: '/user/profile',
     failureRedirect: '/fail_register',
 });

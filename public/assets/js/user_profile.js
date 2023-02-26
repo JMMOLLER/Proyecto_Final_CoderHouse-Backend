@@ -5,7 +5,7 @@ async function deleteUser(){
         });
         const responseJSON = await response.json();
         if(responseJSON.status){
-            window.location.href = '/login';
+            location.href = '/logout';
         }else{
             alert('Error al eliminar el usuario');
         }

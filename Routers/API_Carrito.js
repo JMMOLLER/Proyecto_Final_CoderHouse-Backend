@@ -34,10 +34,10 @@ API_Carrito.delete(':id', controller.cart.deleteCart);
 
 /* MÉTODO PARA ELIMINAR EL PRODUCTO DE UN CARRITO */
 
-API_Carrito.delete('/producto/all/:id_prod', controller.cart.deleteProductOnCart);
+API_Carrito.delete('/producto/all/:id_prod', auth.isLogged, controller.cart.deleteProductOnCart);
 
 /* MÉTODO PARA ELIMINAR UNA CANTIDAD DE PRODUCTO DEL CARRITO */
 
-API_Carrito.delete('/producto/:id_prod', controller.cart.decreaseQuantityOnCart);
+API_Carrito.delete('/producto/:id_prod', auth.isLogged, controller.cart.decreaseQuantityOnCart);
 
 module.exports = { API_Carrito };

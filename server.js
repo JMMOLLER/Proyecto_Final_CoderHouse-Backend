@@ -44,9 +44,6 @@ app.use(session({
         maxAge: ms('2h'),
     }
 }));
-app.use(Passport.initialize());
-app.use(Passport.session());
-app.use(Passport.authenticate('session'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
