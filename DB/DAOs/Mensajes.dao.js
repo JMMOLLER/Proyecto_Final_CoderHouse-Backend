@@ -16,7 +16,10 @@ class Mensajes {
             this.mongodb(this.url);
             const newMessage = new MessageModel(message);
             await newMessage.save();
-            return newMessage;
+            const messageTmp = newMessage.toObject();
+            const userInfo = await UserModel.findOne({ _id: messageTmp.from }).select('-password -address -phone_number -__v').lean();
+            messageTmp.from = userInfo
+            return messageTmp;
         } catch (err) {
             console.log(err);
             return null;
@@ -41,14 +44,17 @@ class Mensajes {
             const messages = [];
             let i = 0;
             while(doc.length>i){
-                const user = await UserModel.findById(doc[i].from).lean();
+                const user = await UserModel.findById(doc[i].from).select('-password -address -phone_number -__v').lean();
                 if(!user){
+                    doc[i].from = {
+                        _id: doc[i].from,
+                        name: 'Usuario anonimo',
+                        avatar: '/uploads/default.png'
+                    };
+                    messages.push(doc[i]);
                     i++;
                     continue;
                 }
-                delete user.password;
-                delete user.address;
-                delete user.phone_number;
                 doc[i].from = user;
                 messages.push(doc[i]);
                 i++;

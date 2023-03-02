@@ -30,26 +30,40 @@ function checkUserAvatar(req){
 
 /* ========= PASSPORT ========= */
 
+/*
+    NOTA: La función isValidPassword() se encuentra en el modelo 
+        de usuario al igual que el método para convertir la 
+        contraseña en hash.
+*/
+
 Passport.use('login', new LocalStrategy({
     passReqToCallback: true,
     usernameField: 'email',
     passwordField: 'user_password'
 }, async(req, email, user_password, done) => {
     try{
+
         console.log('\x1b[36m%s\x1b[0m', "Nueva autenticacion");
         mongoose.connect(process.env.MONGODB_URI);
 
         const user = await UserModel.findOne({email});
+
         if(!user){
+
             console.log('Usuario no encontrado '+email);
             return done(null, false, {message: 'Usuario no encontrado'});
-        }if(!user.isValidPassword(user_password)){ //La funcion isValidPassword esta definida en el modelo de usuario
+
+        }if(!user.isValidPassword(user_password)){
+
             console.log('Contraseña invalida');
             return done(null, false, {message: 'Contraseña invalida'});
+
         }
+
         req.returnTo = req.session.returnTo;
         const { password, __v, ...userData } = user._doc;
         return done(null, userData);
+
     }catch(err){
         console.log(err);
         return done(err);
@@ -65,25 +79,33 @@ Passport.use('signup', new LocalStrategy({
     try{
         mongoose.connect(process.env.MONGODB_URI);
         const userExist = await UserModel.findOne({ email });
+
         if(userExist){
             await deleteUploadImg(req);
             console.log('Email ya registrado');
             return done(null, false, {message: 'Email ya registrado'});
         }
+
         checkUserAvatar(req);
-        // La conversión de la contraseña a hash se hace en el modelo de usuario
+        
         const {re_password, ...newUserData} = {...req.body};
+        
         newUserData['password'] = user_password;
         delete newUserData['user_password'];
+        
         const newUser = await UserModel.create(newUserData);
+
         const { password, __v, ...userData } = newUser._doc;
+
         sendEmail(userData);//No lleva await porque considero que no es necesario esperar a que se envie el correo para continuar
+        
         return done(null, userData);
     }catch(err){
         await deleteUploadImg(req);
         console.log(err);
         return done(err);
     }
+
 }));
 
 const cookieExtractor = (req) => {

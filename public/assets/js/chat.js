@@ -39,6 +39,7 @@ function renderMessages(messages) {
         }
         if(document.getElementsByClassName('spinner-visible')[0]){
             removeSpinner(spinner);
+            document.getElementById('message_input').removeAttribute('disabled');
         }
         messagesContainer.appendChild(div);
     });
