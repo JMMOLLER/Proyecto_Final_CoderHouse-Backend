@@ -3,6 +3,7 @@ const { deleteUserImg } = require('../Services/API.service');
 const { BD_Carrito } = require('../../DB/DAOs/Carrito.daos.js');
 const { BD_Productos } = require('../../DB/DAOs/Productos.daos.js');
 const { BD_Usuarios_Local } = require('../../DB/DAOs/Usuarios_Local');
+const jwt = require('jsonwebtoken');
 const errJSON = {
     status: 501,
     msg: 'an error was encountered while processing the request',
@@ -211,21 +212,34 @@ const purchase = async(req, res) => {
 };
 
 const user_update = async(req, res) => {
-    let oldAvatar;
-    const data = {
-        age: req.body.age,
-        address: req.body.address,
-        phone_number: req.body.phone_number
-    }
-    if(req.file){
-        data.avatar = "/uploads/"+req.file.filename
-        oldAvatar = await BD_Usuarios_Local.getAvatar(req.user._id)
-    }
-    if(await BD_Usuarios_Local.updateUser(req.user._id, data)){
-        if(oldAvatar) {await deleteUserImg(oldAvatar)};
-        res.status(200).json({status: 204, msg: "OK", value: true})
-    }else{
-        res.status(500).json({status: 500, msg: "ERROR", value: false});
+    try{
+        let oldAvatar;
+        
+        const data = {
+            age: req.body.age,
+            address: req.body.address,
+            phone_number: req.body.phone_number
+        }
+        if(req.file){
+            data.avatar = "/uploads/"+req.file.filename
+            oldAvatar = await BD_Usuarios_Local.getAvatar(req.user._id)
+        }
+        if(await BD_Usuarios_Local.updateUser(req.user._id, data)){
+
+            if(oldAvatar) {await deleteUserImg(oldAvatar)};
+            
+            const user = await BD_Usuarios_Local.getById(req.user._id);
+
+            req.session.jwt = jwt.sign({ user }, process.env.COOKIE_SECRET);
+
+            res.status(200).json({status: 204, msg: "OK", value: true})
+
+        }else{
+            res.status(500).json({status: 500, msg: "ERROR", value: false});
+        }
+    }catch(e){
+        console.log(e);
+        res.json(errJSON);
     }
 };
 

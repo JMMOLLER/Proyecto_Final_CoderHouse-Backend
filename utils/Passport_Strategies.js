@@ -33,8 +33,8 @@ function checkUserAvatar(req){
 Passport.use('login', new LocalStrategy({
     passReqToCallback: true,
     usernameField: 'email',
-    passwordField: 'password'
-}, async(req, email, password, done) => {
+    passwordField: 'user_password'
+}, async(req, email, user_password, done) => {
     try{
         console.log('\x1b[36m%s\x1b[0m', "Nueva autenticacion");
         mongoose.connect(process.env.MONGODB_URI);
@@ -43,12 +43,13 @@ Passport.use('login', new LocalStrategy({
         if(!user){
             console.log('Usuario no encontrado '+email);
             return done(null, false, {message: 'Usuario no encontrado'});
-        }if(!user.isValidPassword(password)){ //La funcion isValidPassword esta definida en el modelo de usuario
+        }if(!user.isValidPassword(user_password)){ //La funcion isValidPassword esta definida en el modelo de usuario
             console.log('Contraseña invalida');
             return done(null, false, {message: 'Contraseña invalida'});
         }
         req.returnTo = req.session.returnTo;
-        return done(null, user);
+        const { password, __v, ...userData } = user._doc;
+        return done(null, userData);
     }catch(err){
         console.log(err);
         return done(err);

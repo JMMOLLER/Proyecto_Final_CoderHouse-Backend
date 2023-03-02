@@ -6,6 +6,11 @@
     <link rel="stylesheet" href="/assets/css/user_profile.css">
     <title>{{title}}</title>
 </head>
+<div class="container_change spinner-hidden">
+    <div class="spinner-border text-ligth" role="status" style="margin-left: 50%;margin-top: 20%;">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
 <div class="page-content page-container" id="page-content">
     <div class="padding">
         <div class="row container d-flex justify-content-center">
@@ -100,7 +105,17 @@
             phone_input.style.border = 'none';
         }
     }
+    function spinnerAnimation(isLoading){
+        const spinner = document.getElementsByClassName('container_change')[0];
+        if(isLoading){
+            document.body.style.overflow = 'hidden';
+            spinner.classList.remove('spinner-hidden');
+        }else{
+            spinner.classList.add('spinner-hidden');
+        }
+    }
     async function saveChanges() {
+        spinnerAnimation(true);
         const phone_number = document.getElementById('input_phone').innerHTML;
         const address = document.getElementById('input_address').innerHTML;
         const age = document.getElementById('input_age').innerHTML;
@@ -116,7 +131,7 @@
         }).then(res => res.json()).then(data => {
             if(data.status === 204){
                 alert('Cambios guardados');
-                location.href = '/logout';
+                location.reload();
             }else{
                 alert('Error al guardar los cambios');
             }
@@ -124,6 +139,7 @@
             console.log(err);
             alert('Error al guardar los cambios');
         });
+        spinnerAnimation(false);
     }
 </script>
 </html>

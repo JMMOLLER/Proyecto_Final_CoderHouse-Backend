@@ -36,7 +36,7 @@ class UsuariosDAO{
     async getById(id){
         try{
             this.mongodb(this.url);
-            const doc = await UserModel.findById(id);
+            const doc = await UserModel.findById(id).select('-password -__v');
             if(doc==false){throw new Error('No se encontro el usuario')}
             return doc;
         }catch(err){
