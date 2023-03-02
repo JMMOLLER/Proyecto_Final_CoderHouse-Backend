@@ -95,11 +95,16 @@ const register_get = (req, res) => {
     res.render('index', {title: 'Regristro', layout: 'register'});
 };
 
-const register_post = Passport.authenticate('signup', {
-    session: false,
-    successRedirect: '/user/profile',
-    failureRedirect: '/fail_register',
-});
+const register_post = (req, res, next) => {
+    Passport.authenticate('signup', { session: false }, (err, user, info) => {
+        if(err || !user){
+          return res.status(400).render('index', {layout: 'error_template', err: false})
+        }
+        const token = jwt.sign({ user }, process.env.COOKIE_SECRET)
+        req.session.jwt = token
+        return res.redirect(req.returnTo || '/user/profile')
+    })(req, res, next)
+};
 
 const fail_register = (req, res) => {
     res.render('index',{layout: 'error_template'});
