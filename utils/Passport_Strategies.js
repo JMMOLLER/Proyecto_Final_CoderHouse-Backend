@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const LocalStrategy = require('passport-local').Strategy;
 const JWTStrategy = require('passport-jwt').Strategy;
 const { UserModel } = require('../DB/models/UsuariosModel');
-const { newUserEmail } = require('../Routers/Services/API.service');
+const { sendEmail } = require('../Routers/Services/API.service');
 
 /* ========= FUNCTIONS ========= */
 
@@ -59,43 +59,31 @@ Passport.use('login', new LocalStrategy({
 Passport.use('signup', new LocalStrategy({
     passReqToCallback: true,
     usernameField: 'email',
-    passwordField: 'password'
-}, (req, username, password, done) => {
+    passwordField: 'user_password'
+}, async(req, email, user_password, done) => {
 
-    mongoose.connect(process.env.MONGODB_URI);
-    UserModel.findOne({ email: req.body.email }, async(error, mail) => {
-        if (error) {
-            await deleteUploadImg(req);
-            console.log('Error con el registro ' + error);
-            return done(err);
-        } if (mail) {
+    try{
+        mongoose.connect(process.env.MONGODB_URI);
+        const userExist = await UserModel.findOne({ email });
+        if(userExist){
             await deleteUploadImg(req);
             console.log('Email ya registrado');
-            return done(null, false);
+            return done(null, false, {message: 'Email ya registrado'});
         }
         checkUserAvatar(req);
         // La conversión de la contraseña a hash se hace en el modelo de usuario
-        const newUser = {
-            address: req.body.address,
-            password: req.body.password,
-            email: req.body.email,
-            name: req.body.name,
-            age: req.body.age,
-            avatar: req.body.avatar,
-            phone_number: req.body.phone_number
-        };
-        UserModel.create(newUser, async(err, userWithID) => {
-            if (err) {
-                console.log('Error al guardar el usuario: ' + err);
-                await deleteUploadImg(req);
-                return done(err);
-            }
-            console.log('Registro de usuario completo');
-            await newUserEmail(userWithID);
-            return done(null, userWithID);
-        });
-    });
-
+        const {re_password, ...newUserData} = {...req.body};
+        newUserData['password'] = user_password;
+        delete newUserData['user_password'];
+        const newUser = await UserModel.create(newUserData);
+        const { password, __v, ...userData } = newUser._doc;
+        sendEmail(userData);//No lleva await porque considero que no es necesario esperar a que se envie el correo para continuar
+        return done(null, userData);
+    }catch(err){
+        await deleteUploadImg(req);
+        console.log(err);
+        return done(err);
+    }
 }));
 
 const cookieExtractor = (req) => {

@@ -23,7 +23,7 @@ async function deleteUserImg(currentUserImg){
     }
 }
 
-async function newUserEmail(user_data){
+async function sendEmail(user_data){
     try{
         return await sendMail({
             from: 'Servidor Node.js',
@@ -32,7 +32,6 @@ async function newUserEmail(user_data){
             html: `<h1 style="color: blue; align-text: center">Nuevo usuario registrado</h1>
                 <p>Nombre: ${user_data.name}</p>
                 <p>Email: ${user_data.email}</p>
-                <p>Contraseña: ${user_data.password}</p>
                 <p>Dirección: ${user_data.address}</p>
                 <p>Edad: ${user_data.age}</p>
                 <p>Avatar: ${user_data.avatar}</p>`,
@@ -154,6 +153,6 @@ module.exports = {
     sendPurchaseMail,
     sendSMSToUser, 
     sendWhatsappToUser,
-    newUserEmail,
+    sendEmail,
     deleteUserImg
 };
