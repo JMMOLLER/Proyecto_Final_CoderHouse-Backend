@@ -3,7 +3,7 @@ const multer = require('multer');
 const Route = express.Router();
 const { storage } = require('../utils/MulterStorage');
 const upload = multer({ storage });
-const controller = require('../Routers/Controllers/USER.controller');
+const controller = require('./Controllers/Client.controller');
 const auth = require('./auth/auth');
 Route.use(express.json());
 
