@@ -17,9 +17,13 @@ async function sendMessages({userInfo, cartInfo}){
 }
 
 async function deleteUserImg(currentUserImg){
-    if(currentUserImg.indexOf('/uploads/')>-1 && currentUserImg.indexOf('default')==-1){
-        currentUserImg = currentUserImg.substr(9);
-        await fs.remove(UploadsDir + currentUserImg);
+    try{
+        if(currentUserImg.indexOf('/uploads/')>-1 && currentUserImg.indexOf('default')==-1){
+            currentUserImg = currentUserImg.substr(9);
+            await fs.remove(UploadsDir + currentUserImg);
+        }
+    }catch(err){
+        console.log(err);
     }
 }
 

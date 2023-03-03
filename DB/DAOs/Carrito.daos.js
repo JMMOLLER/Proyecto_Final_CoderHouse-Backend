@@ -18,7 +18,7 @@ class Carrito{
      */
     async getAll(){
         try{
-            await this.mongodb(this.url);
+            this.mongodb(this.url);
             return await CarritoModel.find();
         }catch(err){
             console.log(err);
@@ -49,7 +49,7 @@ class Carrito{
             this.mongodb(this.url);
             let doc = await CarritoModel.findOne({owner:UID});
             if(doc==null){
-                await this.createCarrito(UID)
+                await this.createCarrito({ownerId:UID})
                 doc = await CarritoModel.findOne({owner:UID});
             }
             return doc;
@@ -79,14 +79,16 @@ class Carrito{
      * It creates a new carrito (cart) in the database.
      * @returns The newCarrito object is being returned.
      */
-    async createCarrito(id){
+    async createCarrito({ ownerId }){
         try{
             this.mongodb(this.url);
-            const newCarrito = new CarritoModel({
-                timestamp:this.setTimestamp(new Date()), 
-                owner:id
-            });
-            return await newCarrito.save()
+            const newCarrito = {};
+            newCarrito.cart = await CarritoModel.findOne({owner: ownerId});
+            if(!newCarrito.cart){
+                newCarrito.cart = new CarritoModel({owner: ownerId});
+                await newCarrito.cart.save()
+            }
+            return newCarrito.cart;
         }catch(err){
             console.log(err);
             return false;
@@ -101,22 +103,52 @@ class Carrito{
      * @returns a boolean value.
      */
     async addProduct({id_carrito, id_producto}){
+        const response = {};
         try{
             this.mongodb(this.url);
+
             const carritoDoc = await this.getById(id_carrito);
-            if(!carritoDoc){return false;}
-            const productos_carrito = []
-            carritoDoc.productos.map(producto => productos_carrito.push(producto))
-            const index = productos_carrito.findIndex(producto => producto.id === id_producto);
-            index > -1 
-                ? productos_carrito[index].quantity = productos_carrito[index].quantity+1 
-                : productos_carrito.push({id:id_producto, quantity:1})
-            carritoDoc.productos = productos_carrito;
-            await CarritoModel.findByIdAndUpdate(id_carrito, carritoDoc);
-            return true;
+            const productoDoc = await BD_Productos.getById(id_producto);
+            if(!carritoDoc){
+                response.value = false;
+                response.message = 'Cart ID not found';
+                response.status = 404;
+                return response;
+            }
+            if(!productoDoc){
+                response.value = false;
+                response.message = 'Product ID not found';
+                response.status = 404;
+                return response;
+            }
+
+            const productos_carrito = carritoDoc.productos;//guarda los productos del carrito
+            const index = productos_carrito.findIndex(producto => producto.id == id_producto);//busca el id del producto recibido en el carrito
+            if(index > -1){
+                //consulta si hay stock disponible
+                const isAvailable = await BD_Productos.checkStock({product_id: id_producto, cant: "++", user_cart: carritoDoc})
+                if(!isAvailable.value){
+                    response.value = false;
+                    response.message = isAvailable.message;
+                    response.status = 409;
+                    return response;
+                }
+                productos_carrito[index].quantity = productos_carrito[index].quantity+1//si el producto ya existe en el carrito, aumenta la cantidad en 1
+            }else{
+                productos_carrito.push({id: id_producto, quantity: 1})//si el producto no existe en el carrito, lo agrega
+            }
+            carritoDoc.productos = productos_carrito;//actualiza los productos del carrito
+            await CarritoModel.findByIdAndUpdate(id_carrito, carritoDoc);//actualiza el carrito en la base de datos
+
+            response.value = true;
+            response.content = carritoDoc;
+            return response;
         }catch(err){
             console.log(err);
-            return false;
+            response.value = false;
+            response.message = err.message;
+            response.status = 500;
+            return response;
         }
     }
 
@@ -126,19 +158,17 @@ class Carrito{
      * @param id_producto - id of the product to be deleted
      * @returns The result of the operation.
      */
-    async decreaseProduct(id_carrito, id_producto){
+    async decreaseProduct(user_id, id_producto){
         try{
             this.mongodb(this.url);
             let productos_carrito = [];
             let cantidad = 0;
-            const carritoDoc = await this.getById(id_carrito)
-            if(!carritoDoc){return [false, "El carrito no existe"];}
-            carritoDoc.productos.map(
-                producto => {
-                    productos_carrito.push(producto);
-                }
-            );
-            const index = productos_carrito.findIndex(producto => producto.id === id_producto);
+            const carritoDoc = await this.getCartByUserID(user_id)
+
+            if(!carritoDoc){return false;}
+
+            productos_carrito = carritoDoc.productos
+            const index = productos_carrito.findIndex(producto => producto.id == id_producto);
             if(index > -1){
                 cantidad = productos_carrito[index].quantity-1;
                 cantidad == 0 
@@ -146,32 +176,28 @@ class Carrito{
                     : productos_carrito[index].quantity = cantidad;
             }
             carritoDoc.productos = productos_carrito;
-            await CarritoModel.findByIdAndUpdate(id_carrito, carritoDoc);
-            return [true];
+            await CarritoModel.findByIdAndUpdate(carritoDoc._id, carritoDoc);
+            return carritoDoc; 
         }catch(err){
             console.log(err);
-            return [false, err];
+            return false;
         }
     }
 
-    async deleteProduct(id_carrito, id_producto){
+    async deleteProduct(user_id, id_producto){
         try{
             this.mongodb(this.url);
             let productos_carrito = [];
-            const carritoDoc = await this.getById(id_carrito)
-            if(!carritoDoc){return [false, "El carrito no existe"];}
-            carritoDoc.productos.map(
-                producto => {
-                    productos_carrito.push(producto);
-                }
-            );
+            const carritoDoc = await this.getCartByUserID(user_id)
+            if(!carritoDoc){return false}
+            productos_carrito = carritoDoc.productos;
             productos_carrito = productos_carrito.filter(producto => producto.id!=id_producto);
             carritoDoc.productos = productos_carrito;
-            await CarritoModel.findByIdAndUpdate(id_carrito, carritoDoc);
-            return [true];
+            await CarritoModel.findByIdAndUpdate(carritoDoc._id, carritoDoc);
+            return carritoDoc;
         }catch(err){
             console.log(err);
-            return [false, err];
+            return false;
         }
     }
 
@@ -185,8 +211,7 @@ class Carrito{
     async deleteByID(id) {
         try{
             this.mongodb(this.url);
-            await CarritoModel.findByIdAndDelete(id);
-            return true;
+            return await CarritoModel.findByIdAndDelete(id);;
         }catch(err){
             console.log(err);
             return false;

@@ -61,7 +61,7 @@ function validateAdmin(req, res, next) {
         isLoggedIn = true;
         next();
     }else{
-        res.json({
+        res.status(401).json({
             status: 401,
             description: {
                 route: req.url,

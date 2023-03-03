@@ -8,7 +8,6 @@
     var input = $('.validate-input .input100');
     
     $('.validate-form').on('submit',function(){
-        console.log("hello");
         buttonSpinner(true);
         let check = true;
         let isRegister = false;

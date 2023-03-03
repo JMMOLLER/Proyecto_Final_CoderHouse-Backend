@@ -2,9 +2,12 @@ const { ObjectId } = require("mongodb");
 const mongoose = require("mongoose");
 
 const carritoSchema = new mongoose.Schema({
-    timestamp: String,
-    productos: Array,
-    owner: String
+    timestamp: { type: Date, default: Date.now },
+    owner: { type: ObjectId, ref: 'usuarios' },
+    productos: [{
+        id: { type: ObjectId, ref: 'productos' },
+        quantity: { type: Number, default: 1 }
+    }]
 });
 
 const CarritoModel = mongoose.model('carrito', carritoSchema);

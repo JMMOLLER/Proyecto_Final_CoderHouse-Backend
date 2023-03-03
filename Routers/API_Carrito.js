@@ -4,6 +4,8 @@ const auth = require('./auth/auth');
 
 /* ============ API CARRITO ============= */
 
+API_Carrito.use(auth.validateAdmin)// Middleware para validar en todas las rutas que el usuario sea administrador
+
 /* MÉTODO PARA MOSTRAR TODOS LOS CARRITOS */
 
 API_Carrito.get('/all', controller.cart.allCarts);
@@ -18,7 +20,7 @@ API_Carrito.get('/:id/productos', controller.cart.getCartProducts);
 
 /* MÉTODO PARA VALIDAR APROBACIÓN DE AUMENTO DE CANTIDAD DE PEDIDO DE UN PRODUCTO */
 
-API_Carrito.get('/stock/producto/:id/:cant', auth.isLogged, controller.cart.consultQuantityOnPorduct);
+API_Carrito.get('/stock/producto/:product_id/:cant', auth.isLogged, controller.cart.consultQuantityOnPorduct);
 
 /* MÉTODO PARA CREAR UN CARRITO */
 
@@ -30,7 +32,7 @@ API_Carrito.put('/add/producto/:prod', auth.isLogged, controller.cart.addProduct
 
 /* MÉTODO PARA ELIMINAR UN CARRITO POR ID */
 
-API_Carrito.delete(':id', controller.cart.deleteCart);
+API_Carrito.delete('/:id', controller.cart.deleteCart);
 
 /* MÉTODO PARA ELIMINAR EL PRODUCTO DE UN CARRITO */
 

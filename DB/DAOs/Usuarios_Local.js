@@ -50,9 +50,11 @@ class UsuariosDAO{
             this.mongodb(this.url);
             const doc = await this.getById(id);
             if(doc==false){throw new Error('No se encontro el usuario')}
+
             doc.age = data.age;
             doc.address = data.address;
             doc.phone_number = data.phone_number;
+            
             if(data.avatar){doc.avatar = data.avatar;}
             await doc.save();
             return true;
@@ -116,7 +118,8 @@ class UsuariosDAO{
     async deleteByID(id) {
         try{
             this.mongodb(this.url);
-            await UserModel.findByIdAndDelete(id);
+            const user = await UserModel.findByIdAndDelete(id);
+            if(!user){throw new Error('No se encontro el usuario')}
             return true;
         }catch(err){
             console.log(err);
