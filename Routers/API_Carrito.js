@@ -1,6 +1,6 @@
 const API_Carrito = require('express').Router();
 const controller = require('./Controllers/API.controller');
-const auth = require('./middleware-authentication/API.auth');
+const auth = require('./auth/auth');
 
 /* ============ API CARRITO ============= */
 

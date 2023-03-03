@@ -1,17 +1,19 @@
 const API_Producto = require('express').Router();
 const controller = require('./Controllers/API.controller');
-const auth = require('./middleware-authentication/API.auth');
+const auth = require('./auth/auth');
 
 /* API PRODUCTOS */
 
+API_Producto.use(auth.validateAdmin)// Middleware para validar en todas las rutas que el usuario sea administrador
+
 API_Producto.get('/', controller.products.allProducts);
 
-API_Producto.get('/:id', auth.validateAdmin, controller.products.byProductId);
+API_Producto.get('/:id', controller.products.byProductId);
 
-API_Producto.post('/', auth.validateAdmin, controller.products.createProduct);
+API_Producto.post('/', controller.products.createProduct);
 
-API_Producto.put('/:id', auth.validateAdmin, controller.products.updateProduct);
+API_Producto.put('/:id', controller.products.updateProduct);
 
-API_Producto.delete('/:id', auth.validateAdmin, controller.products.deleteProduct);
+API_Producto.delete('/:id', controller.products.deleteProduct);
 
 module.exports = { API_Producto };

@@ -1,7 +1,7 @@
 require('dotenv').config();
 const API_USER = require('express').Router();
 const controller = require('./Controllers/API.controller');
-const auth = require('./middleware-authentication/API.auth');
+const auth = require('./auth/auth');
 const multer = require('multer');
 const { storage } = require('../utils/MulterStorage');
 const upload = multer({ storage });

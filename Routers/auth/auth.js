@@ -3,6 +3,7 @@ let isLoggedIn = false;
 
 /* ============ FUNCTIONS ============ */
 
+/* FOR API */
 function isUnlogged(req, res, next) {
     Passport.authenticate('jwt', { session: false }, (err, tokenInfo, info) => {
         if(err || !tokenInfo){
@@ -27,6 +28,27 @@ function isLogged(req, res, next) {
     })(req, res);
 }
 
+/* FOR CLIENT */
+function clientIsLogged(req, res, next) {
+    Passport.authenticate('jwt', { session: false }, (err, tokenInfo, info) => {
+        if(err || tokenInfo){
+            req.user = tokenInfo;
+            return next();
+        }
+        req.session.returnTo = req.route.path;
+        return res.redirect('/login');
+    })(req, res);
+}
+
+function clientIsUnLogged(req, res, next) {
+    Passport.authenticate('jwt', { session: false }, (err, tokenInfo, info) => {
+        if(err || !tokenInfo){
+            return next();
+        }
+        return res.redirect('/');
+    })(req, res);
+}
+
 /**
  * If the query parameter "admin" is true, or if the user is logged in, then the user is allowed to
  * continue. Otherwise, the user is not allowed to continue.
@@ -40,11 +62,12 @@ function validateAdmin(req, res, next) {
         next();
     }else{
         res.json({
-            error: -1,
-            descripción: {ruta: req.url,
-                método: req.method,
+            status: 401,
+            description: {
+                route: req.url,
+                method: req.method,
             },
-            estado: 'No autorizado'
+            msg: 'No autorizado'
         });
     }
 }
@@ -53,5 +76,7 @@ function validateAdmin(req, res, next) {
 module.exports = {
     isUnlogged,
     isLogged,
+    clientIsLogged,
+    clientIsUnLogged,
     validateAdmin
 };
