@@ -36,15 +36,18 @@ Route.get('/fail_register', controller.fail_register);
 
 /* TEST */
 Route.get('/test', (req, res) => {
-    res.send('test');
+    res.send('test GET route is working successfully!!');
 });
 
 Route.post('/test', (req, res) => {
-    res.send(req.body);
+    res.json({
+        msg: 'test POST route is working successfully!!',
+        body: req.body
+    });
 });
 
 Route.get('/protected', auth.isLogged, (req, res) => {
-    res.send('this is protected')
+    res.send('this route is protected')
 })
 
 Route.get('/auth', auth.isLogged, (req, res) => {
