@@ -3,6 +3,7 @@ const { deleteUserImg } = require('../Services/API.service');
 const { BD_Carrito } = require('../../DB/DAOs/Carrito.daos.js');
 const { BD_Productos } = require('../../DB/DAOs/Productos.daos.js');
 const { BD_Usuarios_Local } = require('../../DB/DAOs/Usuarios_Local');
+const Passport = require('passport');
 const jwt = require('jsonwebtoken');
 const errJSON = (e) => {
     if(!e){
@@ -277,6 +278,87 @@ const deleteProduct = async(req, res) => {
 }
 
 
+/* API AUTH */
+
+const login = async(req, res) => {
+    Passport.authenticate('login', { session: false }, (err, user, info) => {
+        if(err){
+            return res.status(500).json({
+                status: 500,
+                msg: `ERROR - ${err.message}`,
+                value: false
+            })
+        }
+        if(!user){
+            if(info.message === 'Contraseña invalida'){
+                return res.status(401).json({
+                    status: 401,
+                    msg: `ERROR - ${info.message}`,
+                    value: false,
+                    returnTo: '/fail_login'
+                })
+            }else{
+                return res.status(404).json({
+                    status: 404,
+                    msg: `ERROR - ${info.message}`,
+                    value: false,
+                    returnTo: '/fail_login'
+                })
+            }
+        }
+        const token = jwt.sign({ user }, process.env.COOKIE_SECRET)
+        req.session.jwt = token
+        return res.status(202).json({
+            status: 202,
+            msg: 'ACEPTED',
+            value: true,
+            returnTo: req.returnTo || '/user/profile'
+        })
+    })(req, res)
+}
+
+const register = async(req, res) => {
+    Passport.authenticate('register', { session: false }, (err, user, info) => {
+        if(err){
+            return res.status(500).json({
+                status: 500,
+                msg: `ERROR - ${err.message}`,
+                value: false
+            })
+        }
+        if(!user){
+            return res.status(409).json({
+                status: 409,
+                msg: `ERROR - ${info.message}`,
+                value: false,
+                returnTo: '/fail_register'
+            })
+        }
+        const token = jwt.sign({ user }, process.env.COOKIE_SECRET)
+        req.session.jwt = token
+        return res.status(202).json({
+            status: 202,
+            msg: 'ACEPTED',
+            value: true,
+            returnTo: req.returnTo || '/user/profile'
+        })
+    })(req, res)
+}
+
+const logout = async(req, res) => {
+    res.clearCookie('session');
+    return req.session.destroy((err) =>{
+        if(err)
+            console.log(err);
+        return res.status(200).json({
+            status: 200,
+            msg: 'OK',
+            value: true,
+            returnTo: '/'
+        });
+    });
+}
+
 
 /* API USER */
 
@@ -409,6 +491,11 @@ module.exports = {
         createProduct,
         updateProduct,
         deleteProduct,
+    },
+    auth:{
+        login,
+        register,
+        logout,
     },
     user: {
         allUsers,

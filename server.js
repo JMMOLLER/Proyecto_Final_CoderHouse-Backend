@@ -13,6 +13,9 @@ const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-ac
 const { API_Carrito, API_Producto, API_USER } = require('./Routers/Router_API');
 const { USER_FRONT } = require('./Routers/Router_USER');
 const ms = require('ms');
+const swaggerUI = require("swagger-ui-express");
+const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerSpecs = swaggerJsDoc(require("./utils/SwaggerOptions"));
 const app = express();
 const httpServer = new Server(app);
 socket(httpServer);
@@ -53,6 +56,7 @@ app.use('/api/user', API_USER);
 app.use('/', USER_FRONT);
 app.use((req, res) =>{
     res.status(404).send({error: -2, description: {route: req.url, method: req.method}, status: 'Route not found'});
+app.use("/api/doc", swaggerUI.serve, swaggerUI.setup(swaggerSpecs));
 });
 
 /* ============ SERVER ============ */

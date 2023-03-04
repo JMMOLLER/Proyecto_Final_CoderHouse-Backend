@@ -96,7 +96,7 @@ const register_get = (req, res) => {
 };
 
 const register_post = (req, res, next) => {
-    Passport.authenticate('signup', { session: false }, (err, user, info) => {
+    Passport.authenticate('register', { session: false }, (err, user, info) => {
         if(err || !user){
           return res.status(400).render('index', {layout: 'error_template', err: false})
         }

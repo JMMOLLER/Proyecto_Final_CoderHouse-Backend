@@ -1,7 +1,8 @@
 require('dotenv').config();
 const API_USER = require('express').Router();
-const API_Carrito = require('express').Router();
-const API_Producto = require('express').Router();
+const API_AUTH = require('express').Router();
+const API_CART = require('express').Router();
+const API_PRODUCT = require('express').Router();
 const controller = require('./Controllers/API.controller');
 const auth = require('./auth/auth');
 const multer = require('multer');
@@ -12,59 +13,71 @@ const upload = multer({ storage });
 
 /* API CARRITO */
 
-API_Carrito.use(auth.validateAdmin)// Middleware para validar en todas las rutas que el usuario sea administrador
+API_CART.use(auth.validateAdmin)// Middleware para validar en todas las rutas que el usuario sea administrador
 
 /* MÉTODO PARA MOSTRAR TODOS LOS CARRITOS */
 
-API_Carrito.get('/all', controller.cart.allCarts);
+API_CART.get('/all', controller.cart.allCarts);
 
 /* MÉTODO PARA MOSTRAR UN CARRITO POR ID */
 
-API_Carrito.get('/:id', controller.cart.byCartId);
+API_CART.get('/:id', controller.cart.byCartId);
 
 /* MÉTODO PARA MOSTRAR LOS PRODUCTOS AGREGADOS EN UN CARRITO */
 
-API_Carrito.get('/:id/productos', controller.cart.getCartProducts);
+API_CART.get('/:id/productos', controller.cart.getCartProducts);
 
 /* MÉTODO PARA VALIDAR APROBACIÓN DE AUMENTO DE CANTIDAD DE PEDIDO DE UN PRODUCTO */
 
-API_Carrito.get('/stock/producto/:product_id/:cant', auth.isLogged, controller.cart.consultQuantityOnPorduct);
+API_CART.get('/stock/producto/:product_id/:cant', auth.isLogged, controller.cart.consultQuantityOnPorduct);
 
 /* MÉTODO PARA CREAR UN CARRITO */
 
-API_Carrito.post('/', auth.isLogged, controller.cart.createCart);
+API_CART.post('/', auth.isLogged, controller.cart.createCart);
 
 /* MÉTODO PARA AGREGAR UN ID DE PRODUCTO AL CARRITO POR ID */
 
-API_Carrito.put('/add/producto/:prod', auth.isLogged, controller.cart.addProductOnCart);
+API_CART.put('/add/producto/:prod', auth.isLogged, controller.cart.addProductOnCart);
 
 /* MÉTODO PARA ELIMINAR UN CARRITO POR ID */
 
-API_Carrito.delete('/:id', controller.cart.deleteCart);
+API_CART.delete('/:id', controller.cart.deleteCart);
 
 /* MÉTODO PARA ELIMINAR EL PRODUCTO DE UN CARRITO */
 
-API_Carrito.delete('/producto/all/:id_prod', auth.isLogged, controller.cart.deleteProductOnCart);
+API_CART.delete('/producto/all/:id_prod', auth.isLogged, controller.cart.deleteProductOnCart);
 
 /* MÉTODO PARA ELIMINAR UNA CANTIDAD DE PRODUCTO DEL CARRITO */
 
-API_Carrito.delete('/producto/:id_prod', auth.isLogged, controller.cart.decreaseQuantityOnCart);
+API_CART.delete('/producto/:id_prod', auth.isLogged, controller.cart.decreaseQuantityOnCart);
 
 
 /* API PRODUCTOS */
 
 
-API_Producto.use(auth.validateAdmin)// Middleware para validar en todas las rutas que el usuario sea administrador
+API_PRODUCT.use(auth.validateAdmin)// Middleware para validar en todas las rutas que el usuario sea administrador
 
-API_Producto.get('/', controller.products.allProducts);
+API_PRODUCT.get('/', controller.products.allProducts);
 
-API_Producto.get('/:id', controller.products.byProductId);
+API_PRODUCT.get('/:id', controller.products.byProductId);
 
-API_Producto.post('/', controller.products.createProduct);
+API_PRODUCT.post('/', controller.products.createProduct);
 
-API_Producto.put('/:id', controller.products.updateProduct);
+API_PRODUCT.put('/:id', controller.products.updateProduct);
 
-API_Producto.delete('/:id', controller.products.deleteProduct);
+API_PRODUCT.delete('/:id', controller.products.deleteProduct);
+
+
+/* API AUTH */
+
+API_AUTH.use(require('express').json());
+
+
+API_AUTH.post('/login', auth.isUnlogged, controller.auth.login);
+
+API_AUTH.post('/register', auth.isUnlogged, upload.single('avatar'), controller.auth.register);
+
+API_AUTH.get('/logout', auth.isLogged, controller.auth.logout);
 
 
 /* API USER */
@@ -82,7 +95,8 @@ API_USER.put('/update', auth.isLogged, upload.single('avatar'), controller.user.
 API_USER.delete('/', auth.isLogged, controller.user.deleteUser);
 
 module.exports = {
-    API_Carrito,
-    API_Producto,
+    API_CART,
+    API_PRODUCT,
+    API_AUTH,
     API_USER
 }; 

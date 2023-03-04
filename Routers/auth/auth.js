@@ -9,7 +9,15 @@ function isUnlogged(req, res, next) {
         if(err || !tokenInfo){
             return next();
         }
-        return res.redirect('/');
+        return res.status(403).json({
+            status: 403, 
+            description: {
+                route: req.originalUrl,
+                method: req.method
+            }, 
+            msg: 'Prohibido',
+            value: false,
+        });
     })(req, res);
 }
 
@@ -19,9 +27,12 @@ function isLogged(req, res, next) {
             req.user = tokenInfo;
             return next();
         }
-        return res.json({
+        return res.status(401).json({
             status: 401, 
-            description: {route: req.originalUrl, method: req.method}, 
+            description: {
+                route: req.originalUrl,
+                method: req.method
+            }, 
             msg: 'No autorizado',
             value: false,
         });
@@ -36,7 +47,7 @@ function clientIsLogged(req, res, next) {
             return next();
         }
         req.session.returnTo = req.route.path;
-        return res.redirect('/login');
+        return res.status(308).redirect('/login');
     })(req, res);
 }
 
@@ -45,7 +56,7 @@ function clientIsUnLogged(req, res, next) {
         if(err || !tokenInfo){
             return next();
         }
-        return res.redirect('/');
+        return res.status(308).redirect('/');
     })(req, res);
 }
 

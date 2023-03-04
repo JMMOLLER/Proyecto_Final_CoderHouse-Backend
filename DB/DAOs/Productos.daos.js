@@ -75,10 +75,13 @@ class Productos {
     async updateProduct(update, id_producto){
         try{
             this.mongodb(this.url);
+
             const data_to_update = this.getById(id_producto);
             if(!data_to_update){throw new Error('ID producto not exists')};
+
             update['timestamp']=new Date().toISOString();
-            return await ProductModel.findByIdAndUpdate(id_producto,update);
+            await ProductModel.findByIdAndUpdate(id_producto,update);
+            return update;
         }catch(err){
             console.log(err);
             return false;
