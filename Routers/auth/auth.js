@@ -64,7 +64,7 @@ function validateAdmin(req, res, next) {
         res.status(401).json({
             status: 401,
             description: {
-                route: req.url,
+                route: req.originalUrl,
                 method: req.method,
             },
             msg: 'No autorizado'
