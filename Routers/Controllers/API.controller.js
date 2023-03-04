@@ -185,9 +185,9 @@ const deleteCart = async(req, res) => {
 
 const allProducts = async(req, res) => {
     try{
-        const productos = await BD_Productos.getAll();
-        productos
-            ? res.status(200).json({status: 200, msg: 'OK', value: true, productos})
+        const products = await BD_Productos.getAll();
+        products
+            ? res.status(200).json({status: 200, msg: 'OK', value: true, products})
             : res.status(500).json(errJSON());
         return;
     }catch(e){
@@ -198,9 +198,9 @@ const allProducts = async(req, res) => {
 
 const byProductId = async(req, res) => {
     try{
-        const producto = await BD_Productos.getById(req.params.id);
-        producto
-            ? res.status(200).json({status: 200, msg: 'OK', value: true, producto})
+        const product = await BD_Productos.getById(req.params.id);
+        product
+            ? res.status(200).json({status: 200, msg: 'OK', value: true, product})
             : res.status(404).json({
                 status: 404, 
                 msg: 'ERROR - Product ID not found',
@@ -216,9 +216,9 @@ const byProductId = async(req, res) => {
 const createProduct = async (req, res) => {
     try{
         if(BD_Productos.validateProduct(req.body)){
-            const producto = await BD_Productos.setProduct(req.body);
-            producto
-                ? res.status(201).json({status: 201, msg: 'CREATED', value: true, producto})
+            const product = await BD_Productos.setProduct(req.body);
+            product
+                ? res.status(201).json({status: 201, msg: 'CREATED', value: true, product})
                 : res.status(500).json(errJSON('ERROR - Se generó un error mientras se añadia el producto'))
         } else {
             res.status(400).json({
