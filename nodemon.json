@@ -1,0 +1,6 @@
+{
+    "ext": "js,json,hbs,html,yaml,yml",
+    "ignore": [
+        "public/assets/*"
+    ]
+}
