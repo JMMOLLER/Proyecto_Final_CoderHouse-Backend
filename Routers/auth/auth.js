@@ -78,7 +78,8 @@ function validateAdmin(req, res, next) {
                 route: req.originalUrl,
                 method: req.method,
             },
-            msg: 'No autorizado'
+            msg: 'No autorizado',
+            value: false,
         });
     }
 }

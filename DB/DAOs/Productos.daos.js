@@ -21,7 +21,7 @@ class Productos {
     async getById(id){
         try{
             this.mongodb(this.url);
-            return await ProductModel.findById(id).lean();
+            return await ProductModel.findById(id).select('-__v').lean();
         }catch(err){
             console.log(err);
             return false;
@@ -44,25 +44,30 @@ class Productos {
         const response = {value:false, status:500};
         try{
             const data_to_check = await this.getById(product_id);
+            cant = parseInt(cant) || "++";
+            let current_cant = 0;
             if(!data_to_check){
                 response.status = 404;
                 response.message = 'ID product no found';
                 return response;
             };
+            for(const element of user_cart.productos){
+                if(element.id==product_id){
+                    current_cant=element.quantity;
+                }
+            };//Busco la cantidad de productos que ya tiene el usuario en el carrito y le suma 1
             if(cant=="++"){
-                user_cart.productos.forEach(element => {
-                    if(element.id==product_id){
-                        cant=element.quantity+1;
-                    }
-                });//Busco la cantidad de productos que ya tiene el usuario en el carrito y le suma 1
-                if(cant=="++"){cant=1};//Si no tiene ningun producto en el carrito, le asigna 1
+                cant=current_cant+1;
+                if(current_cant==0){cant=1};//Si no tiene ningun producto con el id recibido en el carrito, le asigna 1
+            }else{
+                cant=current_cant+cant;
             }
             if(data_to_check.stock>=cant){
                 response.value = true;
                 response.message = "Stock OK";
                 return response
             };//Si hay stock suficiente, devuelve true
-            response.message = "Stock insuficiente";
+            response.message = "Stock is not enough";
             response.status = 409;
             return response;
         }catch(err){

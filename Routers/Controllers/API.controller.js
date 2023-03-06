@@ -10,7 +10,7 @@ const errJSON = (e) => {
         e = "ERROR - An error has occurred while processing the request"
     }return {
         status: 500,
-        msg: e,
+        msg: "ERROR - " + e,
         value: false
     }
 }
@@ -95,7 +95,7 @@ const createCart = async(req, res) => {
     try{
         const cart = await BD_Carrito.createCarrito({ ownerId:req.user._id });
         cart
-            ? res.status(200).json({status: 200, msg: 'OK', value: true, cart})
+            ? res.status(201).json({status: 201, msg: 'CREATED', value: true, cart})
             : res.status(500).json({
                 status: 500,
                 msg: 'ERROR - while creating carrito',
@@ -108,35 +108,14 @@ const createCart = async(req, res) => {
     }
 }
 
-const consultQuantityOnPorduct = async(req, res) => {
-    try{
-        const data = req.params;//{id_prod, cant}
-        if(data.cant == "++")
-            data.user_cart = await BD_Carrito.getCartByUserID(req.user._id);
-        const response = await BD_Productos.checkStock(data)
-        response.value
-            ? res.status(200).json({status: 200, msg: 'OK', value: true})
-            : res.status(response.status).json({ 
-                status: response.status, 
-                mg: `ERROR - ${response.message}`, 
-                value: false
-            })
-        return;
-    }catch(e){
-        console.log(e);
-        return res.status(500).json(errJSON(e.message));
-    }
-}
-
-
 const decreaseQuantityOnCart = async(req, res) => {
     try{
         const response = await BD_Carrito.decreaseProduct(req.user._id, req.params.id_prod);
-        response
-            ? res.status(200).json({status: 200, msg: 'OK', value: true, cart: response})
-            : res.status(404).json({
-                status: 404, 
-                msg: 'ERR - Cart ID not found', 
+        response.value
+            ? res.status(200).json({status: 200, msg: 'OK', value: true, cart: response.cart})
+            : res.status(response.status).json({
+                status: response.status, 
+                msg: `ERR - ${response.message}`,
                 value: false
             });
         return;
@@ -148,12 +127,12 @@ const decreaseQuantityOnCart = async(req, res) => {
 
 const deleteProductOnCart = async(req, res) => {
     try{
-        const cart = await BD_Carrito.deleteProduct(req.user._id, req.params.id_prod);
-        cart
-            ? res.status(200).json({status:200, msg: 'OK', value: true, cart})
-            : res.status(404).json({
-                status: 404,
-                msg: 'ERROR - Cart ID not found',
+        const response = await BD_Carrito.deleteProduct(req.user._id, req.params.id_prod);
+        response.value
+            ? res.status(200).json({status:200, msg: 'OK', value: true, cart: response.cart})
+            : res.status(response.status).json({
+                status: response.status,
+                msg: `ERR - ${response.message}`,
                 value: false
             })
         return;
@@ -232,6 +211,31 @@ const createProduct = async (req, res) => {
     }catch(e){
         console.log(e);
         res.status(500).json(errJSON(e.message));
+    }
+}
+
+const consultQuantityOnPorduct = async(req, res) => {
+    try{
+        if(!parseInt(req.params.cant) && req.params.cant != "++"){
+            return res.status(400).json({status:400, msg: "ERROR - invalid quantity to consult", value: false});
+        }
+        if(req.params.cant < 1){
+            return res.status(400).json({status:400, msg: "ERROR - invalid quantity to consult", value: false});
+        }
+        const data = req.params;//{product_id, cant}
+        data.user_cart = await BD_Carrito.getCartByUserID(req.user._id);
+        const response = await BD_Productos.checkStock(data)
+        response.value
+            ? res.status(200).json({status: 200, msg: 'OK', value: true})
+            : res.status(response.status).json({ 
+                status: response.status, 
+                mg: `ERROR - ${response.message}`, 
+                value: false
+            })
+        return;
+    }catch(e){
+        console.log(e);
+        return res.status(500).json(errJSON(e.message));
     }
 }
 
@@ -336,9 +340,9 @@ const register = async(req, res) => {
         }
         const token = jwt.sign({ user }, process.env.COOKIE_SECRET)
         req.session.jwt = token
-        return res.status(202).json({
-            status: 202,
-            msg: 'ACEPTED',
+        return res.status(201).json({
+            status: 201,
+            msg: 'CREATED',
             value: true,
             returnTo: req.returnTo || '/user/profile'
         })
@@ -348,8 +352,14 @@ const register = async(req, res) => {
 const logout = async(req, res) => {
     res.clearCookie('session');
     return req.session.destroy((err) =>{
-        if(err)
-            console.log(err);
+        if(err){
+            return res.status(500).json({
+                status: 500,
+                msg: `ERROR - ${err.message}`,
+                value: false,
+                returnTo: '/'
+            });
+        }
         return res.status(200).json({
             status: 200,
             msg: 'OK',
@@ -483,13 +493,13 @@ module.exports = {
         addProductOnCart,
         deleteCart,
         decreaseQuantityOnCart,
-        consultQuantityOnPorduct,
         deleteProductOnCart
     },
     products: {
         allProducts,
         byProductId,
         createProduct,
+        consultQuantityOnPorduct,
         updateProduct,
         deleteProduct,
     },

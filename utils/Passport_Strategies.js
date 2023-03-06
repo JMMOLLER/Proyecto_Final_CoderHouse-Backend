@@ -21,17 +21,14 @@ function checkUserAvatar(req) {
 }
 
 const validateNewUser = (user) => {
-    if (
-        !user.name ||
-        !user.email ||
-        !user.user_password ||
-        !user.address ||
-        !user.phone_number ||
-        !user.avatar_type
-    )
-        return false;
-    if (user.user_password !== user.re_password) return false;
-    return true;
+    if(!user.name){ return { value: false, msg: "Missing name" } }
+    if(!user.email){ return { value: false, msg: "Missing email" } }
+    if(!user.user_password){ return { value: false, msg: "Missing password" } }
+    if(!user.address){ return { value: false, msg: "Missing address" } }
+    if(!user.phone_number){ return { value: false, msg: "Missing phone number" } }
+    if(!(user.avatar_type).toString()){ return { value: false, msg: "Missing avatar_type" } }
+    if (user.user_password !== user.re_password) { return { value: false, msg: "Passwords don't match" } }
+    return { value: true, msg: "User validated" };
 };
 
 /* ========= PASSPORT ========= */
@@ -100,19 +97,19 @@ Passport.use(
                     }
                     console.log("\x1b[31m%s\x1b[0m", "Email ya registrado");
                     return done(null, false, {
-                        message: "Email ya registrado",
+                        message: "Email already registered",
                     });
                 }
 
-                checkUserAvatar(req);
-
-                if (!validateNewUser(req.body)) {
+                checkUserAvatar(req);//Verifica si el usuario subio una imagen o una url
+                const response = validateNewUser(req.body)
+                if (!response.value) {
                     if(req.body.avatar_type != "0"){
                         await deleteUserImg("/uploads/" + req.file.filename);
                     }
-                    console.log("\x1b[31m%s\x1b[0m", "Datos incompletos");
+                    console.log("\x1b[31m%s\x1b[0m", response.msg);
                     return done(null, false, {
-                        message: "Missing credentials",
+                        message: response.msg,
                     });
                 }
 

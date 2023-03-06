@@ -27,10 +27,6 @@ API_CART.get('/:id', controller.cart.byCartId);
 
 API_CART.get('/:id/productos', controller.cart.getCartProducts);
 
-/* MÉTODO PARA VALIDAR APROBACIÓN DE AUMENTO DE CANTIDAD DE PEDIDO DE UN PRODUCTO */
-
-API_CART.get('/stock/producto/:product_id/:cant', auth.isLogged, controller.cart.consultQuantityOnPorduct);
-
 /* MÉTODO PARA CREAR UN CARRITO */
 
 API_CART.post('/', auth.isLogged, controller.cart.createCart);
@@ -62,6 +58,10 @@ API_PRODUCT.get('/', controller.products.allProducts);
 API_PRODUCT.get('/:id', controller.products.byProductId);
 
 API_PRODUCT.post('/', controller.products.createProduct);
+
+/* MÉTODO PARA VALIDAR APROBACIÓN DE AUMENTO DE CANTIDAD DE PEDIDO DE UN PRODUCTO */
+
+API_PRODUCT.get('/stock/:product_id/:cant', auth.isLogged, controller.products.consultQuantityOnPorduct);
 
 API_PRODUCT.put('/:id', controller.products.updateProduct);
 

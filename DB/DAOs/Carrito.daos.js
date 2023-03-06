@@ -19,7 +19,7 @@ class Carrito{
     async getAll(){
         try{
             this.mongodb(this.url);
-            return await CarritoModel.find();
+            return await CarritoModel.find().select('-__v');
         }catch(err){
             console.log(err);
             return false;
@@ -35,7 +35,7 @@ class Carrito{
     async getById(id){
         try{
             this.mongodb(this.url);
-            const doc = await CarritoModel.findById(id);
+            const doc = await CarritoModel.findById(id).select('-__v');
             if(doc==null){throw new Error()}
             return doc;
         }catch(err){
@@ -75,9 +75,12 @@ class Carrito{
         }
     }
 
+    
     /**
-     * It creates a new carrito (cart) in the database.
-     * @returns The newCarrito object is being returned.
+     * It creates a new cart for a user if the user doesn't have one, and if the user does have one, it
+     * returns the user's cart.
+     * </code>
+     * @returns The cart object.
      */
     async createCarrito({ ownerId }){
         try{
@@ -164,8 +167,10 @@ class Carrito{
             let productos_carrito = [];
             let cantidad = 0;
             const carritoDoc = await this.getCartByUserID(user_id)
+            const productoDoc = await BD_Productos.getById(id_producto);
 
-            if(!carritoDoc){return false;}
+            if(!carritoDoc){return {value: false, message: 'Cart ID not found', status: 404}}
+            if(!productoDoc){return {value: false, message: 'Product ID not found', status: 404}}
 
             productos_carrito = carritoDoc.productos
             const index = productos_carrito.findIndex(producto => producto.id == id_producto);
@@ -177,10 +182,10 @@ class Carrito{
             }
             carritoDoc.productos = productos_carrito;
             await CarritoModel.findByIdAndUpdate(carritoDoc._id, carritoDoc);
-            return carritoDoc; 
+            return {value: true, status: 200, cart:carritoDoc}; 
         }catch(err){
             console.log(err);
-            return false;
+            return {value: false, message: err.message, status: 500};
         }
     }
 
@@ -189,15 +194,17 @@ class Carrito{
             this.mongodb(this.url);
             let productos_carrito = [];
             const carritoDoc = await this.getCartByUserID(user_id)
-            if(!carritoDoc){return false}
+            const productoDoc = await BD_Productos.getById(id_producto);
+            if(!carritoDoc){return {value: false, message: 'Cart ID not found', status: 404}}
+            if(!productoDoc){return {value: false, message: 'Product ID not found', status: 404}}
             productos_carrito = carritoDoc.productos;
             productos_carrito = productos_carrito.filter(producto => producto.id!=id_producto);
             carritoDoc.productos = productos_carrito;
             await CarritoModel.findByIdAndUpdate(carritoDoc._id, carritoDoc);
-            return carritoDoc;
+            return {value: true, status: 200, cart:carritoDoc};
         }catch(err){
             console.log(err);
-            return false;
+            return {value: false, message: err.message, status: 500};
         }
     }
 
