@@ -2,10 +2,14 @@
 {{> navbar}}
 <head>
     <link href='https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/3.6.95/css/materialdesignicons.css' rel='stylesheet'>
-    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
     <link rel="stylesheet" href="/assets/css/user_profile.css">
     <title>{{title}}</title>
 </head>
+<div class="container_change spinner-hidden">
+    <div class="spinner-border text-ligth" role="status" style="margin-left: 50%;margin-top: 20%;">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
 <div class="page-content page-container" id="page-content">
     <div class="padding">
         <div class="row container d-flex justify-content-center">
@@ -15,10 +19,10 @@
                         <div class="col-sm-4 bg-c-lite-green user-profile">
                             <div class="card-block text-center text-white">
                                 <div class="m-b-25">
-                                    <img src="{{avatar}}" class="img-radius" alt="User-Profile-Image">
+                                    <img src="{{user.avatar}}" class="img-radius" alt="User-Profile-Image">
                                     <input type="file" id="uploadFile" title="avatar" class="uploadFile">
                                 </div>
-                                <h6 class="f-w-600">{{name}}</h6>
+                                <h6 class="f-w-600">{{user.name}}</h6>
                                 <p>Web Designer</p>
                                 <i onclick="EnableEditeMode()" style="cursor: pointer;" class=" mdi mdi-square-edit-outline feather icon-edit m-t-10 f-16"></i>
                             </div>
@@ -30,23 +34,23 @@
                                     <div class="col-sm-6">
                                         <p class="m-b-10 f-w-600">Email</p>
                                         <h6 class="text-muted f-w-400"
-                                        id="input_email">{{email}}</h6>
+                                        id="input_email">{{user.email}}</h6>
                                     </div>
                                     <div class="col-sm-6">
                                         <p class="m-b-10 f-w-600">Número Telefónico</p>
                                         <h6 class="text-muted f-w-400"
-                                        id="input_phone">{{phone_number}}</h6>
+                                        id="input_phone">{{user.phone_number}}</h6>
                                     </div>
                                 </div>
                                 <h6 class="m-b-20 m-t-40 p-b-5 b-b-default f-w-600">Información Privada</h6>
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <p class="m-b-10 f-w-600">Dirección</p>
-                                        <h6 class="text-muted f-w-400" id="input_address">{{address}}</h6>
+                                        <h6 class="text-muted f-w-400" id="input_address">{{user.address}}</h6>
                                     </div>
                                     <div class="col-sm-6">
                                         <p class="m-b-10 f-w-600">Edad</p>
-                                        <h6 class="text-muted f-w-400" id="input_age">{{age}}</h6>
+                                        <h6 class="text-muted f-w-400" id="input_age">{{user.age}}</h6>
                                     </div>
                                 </div>
                                 <ul class="social-link list-unstyled m-t-40 m-b-10">
@@ -77,7 +81,6 @@
         const addres_input = document.getElementById('input_address');
         const age_input = document.getElementById('input_age');
         const phone_input = document.getElementById('input_phone');
-        const email_input = document.getElementById('input_email');
         const uploadFile = document.getElementById('uploadFile');
         if(editMode){
             delete_btn.style.display = 'none';
@@ -86,11 +89,9 @@
             addres_input.contentEditable = true;
             age_input.contentEditable = true;
             phone_input.contentEditable = true;
-            email_input.contentEditable = true;
             addres_input.style.border = '1px solid #ccc';
             age_input.style.border = '1px solid #ccc';
             phone_input.style.border = '1px solid #ccc';
-            email_input.style.border = '1px solid #ccc';
         }else{
             delete_btn.style.display = 'block';
             btn_save.style.display = 'none';
@@ -98,32 +99,36 @@
             addres_input.contentEditable = false;
             age_input.contentEditable = false;
             phone_input.contentEditable = false;
-            email_input.contentEditable = false;
             addres_input.style.border = 'none';
             age_input.style.border = 'none';
             phone_input.style.border = 'none';
-            email_input.style.border = 'none';
+        }
+    }
+    function spinnerAnimation(isLoading){
+        const spinner = document.getElementsByClassName('container_change')[0];
+        if(isLoading){
+            document.body.style.overflow = 'hidden';
+            spinner.classList.remove('spinner-hidden');
+        }else{
+            spinner.classList.add('spinner-hidden');
         }
     }
     async function saveChanges() {
-        const email = document.getElementById('input_email').innerHTML;
+        spinnerAnimation(true);
         const phone_number = document.getElementById('input_phone').innerHTML;
         const address = document.getElementById('input_address').innerHTML;
         const age = document.getElementById('input_age').innerHTML;
         const avatar = document.getElementById('uploadFile').files[0];
         const data = new FormData();
-        data.append('email', email);
         data.append('phone_number', phone_number);
         data.append('address', address);
         data.append('age', age);
         data.append('avatar', avatar);
-        console.log(data);
         await fetch('/api/user/update', {
             method: 'PUT',
             body: data
         }).then(res => res.json()).then(data => {
-            console.log(data);
-            if(data.status === 200){
+            if(data.status === 204){
                 alert('Cambios guardados');
                 location.reload();
             }else{
@@ -133,6 +138,7 @@
             console.log(err);
             alert('Error al guardar los cambios');
         });
+        spinnerAnimation(false);
     }
 </script>
 </html>

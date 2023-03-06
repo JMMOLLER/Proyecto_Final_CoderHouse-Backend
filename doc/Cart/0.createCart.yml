@@ -1,0 +1,34 @@
+paths:
+  /api/carrito:
+    post:
+      tags: 
+        - Carrito
+      summary: Ruta para crear un nuevo carrito y asociarlo a la cuenta autenticada [Debes estar autenticado para acceder a esta ruta].
+      parameters:
+        - in: query
+          name: admin
+          value: true
+          type: boolean
+          description: La solicitud debe enviar el parametro **admin** en **true**
+          required: true
+      responses:
+        "201":
+          description: 'En caso de éxito o en caso de ya existir una carrito asociado al usuario la ruta devuelve un objeto con las siguientes claves y valores:'
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/newCart'
+        "401":
+          description: 'En caso de no enviar los parametros solicitados la ruta devuelve un objeto indicando que la petición no fue autorizada.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/UnAuthorizedError'
+        "500":
+          description: 'En caso de error interno la ruta devuelve un objeto indicando que se generó un error inesperado.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/InternalServerError'

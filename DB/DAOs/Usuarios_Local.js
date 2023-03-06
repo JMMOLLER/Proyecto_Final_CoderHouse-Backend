@@ -19,7 +19,7 @@ class UsuariosDAO{
     async getAll(){
         try{
             this.mongodb(this.url);
-            const data = await UserModel.find().lean();
+            const data = await UserModel.find().select('-__v').lean();
             return data;
         }catch(err){
             console.log(err);
@@ -36,7 +36,7 @@ class UsuariosDAO{
     async getById(id){
         try{
             this.mongodb(this.url);
-            const doc = await UserModel.findById(id);
+            const doc = await UserModel.findById(id).select('-password -__v');
             if(doc==false){throw new Error('No se encontro el usuario')}
             return doc;
         }catch(err){
@@ -50,10 +50,11 @@ class UsuariosDAO{
             this.mongodb(this.url);
             const doc = await this.getById(id);
             if(doc==false){throw new Error('No se encontro el usuario')}
-            doc.email = data.email;
+
             doc.age = data.age;
             doc.address = data.address;
             doc.phone_number = data.phone_number;
+            
             if(data.avatar){doc.avatar = data.avatar;}
             await doc.save();
             return true;
@@ -117,8 +118,9 @@ class UsuariosDAO{
     async deleteByID(id) {
         try{
             this.mongodb(this.url);
-            await UserModel.findByIdAndDelete(id);
-            return true;
+            const user = await UserModel.findByIdAndDelete(id).select('-password -__v');
+            if(!user){throw new Error('No se encontro el usuario')}
+            return user;
         }catch(err){
             console.log(err);
             return false;

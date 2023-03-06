@@ -17,13 +17,17 @@ async function sendMessages({userInfo, cartInfo}){
 }
 
 async function deleteUserImg(currentUserImg){
-    if(currentUserImg.indexOf('/uploads/')>-1 && currentUserImg.indexOf('default')==-1){
-        currentUserImg = currentUserImg.substr(9);
-        await fs.remove(UploadsDir + currentUserImg);
+    try{
+        if(currentUserImg.indexOf('/uploads/')>-1 && currentUserImg.indexOf('default')==-1){
+            currentUserImg = currentUserImg.substr(9);
+            await fs.remove(UploadsDir + currentUserImg);
+        }
+    }catch(err){
+        console.log(err);
     }
 }
 
-async function newUserEmail(user_data){
+async function sendEmail(user_data){
     try{
         return await sendMail({
             from: 'Servidor Node.js',
@@ -32,7 +36,6 @@ async function newUserEmail(user_data){
             html: `<h1 style="color: blue; align-text: center">Nuevo usuario registrado</h1>
                 <p>Nombre: ${user_data.name}</p>
                 <p>Email: ${user_data.email}</p>
-                <p>Contraseña: ${user_data.password}</p>
                 <p>Dirección: ${user_data.address}</p>
                 <p>Edad: ${user_data.age}</p>
                 <p>Avatar: ${user_data.avatar}</p>`,
@@ -126,11 +129,15 @@ async function createMessageMail({typeShipping, cartInfo}){
 
 async function sendSMSToUser(USER){
     try{
-        return await sendSMS({
-            body: `Su pedido ha sido recibido y se encuentra en proceso`,
-            messagingServiceSid: process.env.TWILIO_MESSAGE_SERVICE_SID,
-            to: `${USER.phone_number}`
-        });
+        if(validatePhoneE164(USER.phone_number)){
+            return await sendSMS({
+                body: `Su pedido ha sido recibido y se encuentra en proceso`,
+                messagingServiceSid: process.env.TWILIO_MESSAGE_SERVICE_SID,
+                to: `${USER.phone_number}`
+            });
+        }else{
+            console.log("\x1b[31m%s\x1b[0m", 'Invalid phone number');
+        }
     }catch(err){
         console.log(err);
     }
@@ -148,12 +155,19 @@ async function sendWhatsappToUser(USER){
     }
 }
 
+const validatePhoneE164 = (phoneNumber) => {
+    const regEx = /^\+[1-9]\d{10,14}$/;
+
+    return regEx.test(phoneNumber);
+};
+
 /* ========== EXPORT ========== */
 module.exports = { 
     sendMessages,
     sendPurchaseMail,
     sendSMSToUser, 
     sendWhatsappToUser,
-    newUserEmail,
-    deleteUserImg
+    sendEmail,
+    deleteUserImg,
+    validatePhoneE164,
 };

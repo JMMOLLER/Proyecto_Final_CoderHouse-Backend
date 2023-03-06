@@ -1,13 +1,17 @@
 async function deleteUser(){
     if(confirm('¿Está seguro de eliminar su cuenta?')){
-        const response = await fetch('/api/user', {
-            method: 'DELETE'
-        });
-        const responseJSON = await response.json();
-        if(responseJSON.status){
-            window.location.href = '/login';
-        }else{
-            alert('Error al eliminar el usuario');
-        }
+        $.ajax({
+            url: '/api/user/?admin=true',
+            type: 'DELETE',
+            success: (data) => {
+                if(data.status === 200 && data.value){
+                    window.location.href = '/';
+                }
+            },
+            error: (err) => {
+                alert(err.responseJSON.msg)
+                console.log(err);
+            }
+        })
     }
 }

@@ -1,0 +1,11 @@
+tags:
+  - name: Auth
+    description: Esta API permite gestionar la autenticación de la Base de Datos.
+  - name: Productos
+    description: Esta API permite gestionar los productos de la Base de Datos.
+  - name: Usuarios
+    description: Esta API permite gestionar los usuarios de la Base de Datos.
+  - name: Carrito
+    description: Esta API permite gestionar el carrito de la Base de Datos.
+  - name: Ordenes
+    description: Esta API permite gestionar las ordenes de la Base de Datos.

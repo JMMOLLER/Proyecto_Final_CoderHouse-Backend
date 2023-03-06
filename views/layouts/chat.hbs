@@ -9,7 +9,7 @@
 			<div class="card-header">
 				<div class="d-flex bd-highlight">
 					<div class="img_cont">
-						<img src="{{avatar}}" class="rounded-circle user_img">
+						<img src="{{user.avatar}}" class="rounded-circle user_img">
 						<span class="online_icon"></span>
 					</div>
 					<div class="user_info">
@@ -33,7 +33,7 @@
 					<div class="input-group-append">
 						<span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span>
 					</div>
-					<input name="" class="form-control type_msg" placeholder="Type your message..." id="message_input" style="resize: none;"></input>
+					<input name="message" class="form-control type_msg" placeholder="Type your message..." id="message_input" style="resize: none;" disabled></input>
 					<div class="input-group-append" onclick="sendNewMessage()">
 						<span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span>
 					</div>

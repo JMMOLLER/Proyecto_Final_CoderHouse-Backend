@@ -7,7 +7,7 @@ socket.on('messages', async (data) => {
 async function getAuthenticateUserInfo() {
     const response = await fetch(`/api/user/`);
     const data = await response.json();
-    userId = data.id;
+    userId = data._id;
     return data;
 }
 function renderMessages(messages) {
@@ -39,6 +39,7 @@ function renderMessages(messages) {
         }
         if(document.getElementsByClassName('spinner-visible')[0]){
             removeSpinner(spinner);
+            document.getElementById('message_input').removeAttribute('disabled');
         }
         messagesContainer.appendChild(div);
     });

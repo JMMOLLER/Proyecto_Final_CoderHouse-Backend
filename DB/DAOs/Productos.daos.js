@@ -11,7 +11,7 @@ class Productos {
     async getAll(){
         try{
             this.mongodb(this.url);
-            return await ProductModel.find();
+            return await ProductModel.find().select('-__v');
         }catch(err){
             console.log(err);
             return false;
@@ -21,7 +21,7 @@ class Productos {
     async getById(id){
         try{
             this.mongodb(this.url);
-            return await ProductModel.findById(id).lean();
+            return await ProductModel.findById(id).select('-__v').lean();
         }catch(err){
             console.log(err);
             return false;
@@ -30,11 +30,10 @@ class Productos {
 
     async setProduct(new_data){
         try{
-            new_data['code']=this.generateCode();
             this.mongodb(this.url);
+            new_data['code']=this.generateCode();
             const newProduct = new ProductModel(new_data);
-            await newProduct.save();
-            return true;
+            return await newProduct.save();
         }catch(err){
             console.log(err);
             return false;
@@ -42,33 +41,52 @@ class Productos {
     }
 
     async checkStock({product_id, cant, user_cart}){
+        const response = {value:false, status:500};
         try{
             const data_to_check = await this.getById(product_id);
-            if(typeof data_to_check === 'boolean'){throw new Error('ID_producto not exists')};
+            cant = parseInt(cant) || "++";
+            let current_cant = 0;
+            if(!data_to_check){
+                response.status = 404;
+                response.message = 'ID product no found';
+                return response;
+            };
+            for(const element of user_cart.productos){
+                if(element.id==product_id){
+                    current_cant=element.quantity;
+                }
+            };//Busco la cantidad de productos que ya tiene el usuario en el carrito y le suma 1
             if(cant=="++"){
-                user_cart.productos.forEach(element => {
-                    if(element.id==product_id){
-                        cant=element.quantity+1;
-                    }
-                });
-                if(cant=="++"){cant=1};
+                cant=current_cant+1;
+                if(current_cant==0){cant=1};//Si no tiene ningun producto con el id recibido en el carrito, le asigna 1
+            }else{
+                cant=current_cant+cant;
             }
-            if(data_to_check.stock>=cant){return true};
-            return false;
+            if(data_to_check.stock>=cant){
+                response.value = true;
+                response.message = "Stock OK";
+                return response
+            };//Si hay stock suficiente, devuelve true
+            response.message = "Stock is not enough";
+            response.status = 409;
+            return response;
         }catch(err){
+            response.message = err.message;
             console.log(err);
-            return false;
+            return response;
         }
     }
 
-    async updateProduct(new_data, id_producto){
+    async updateProduct(update, id_producto){
         try{
-            const data_to_update = this.getById(id_producto);
-            if(typeof data_to_update === 'boolean'){throw new Error('ID_producto not exists')};
-            new_data['timestamp']=this.setTimestamp(new Date());
             this.mongodb(this.url);
-            await ProductModel.findByIdAndUpdate(id_producto,new_data);
-            return true;
+
+            const data_to_update = this.getById(id_producto);
+            if(!data_to_update){throw new Error('ID producto not exists')};
+
+            update['timestamp']=new Date().toISOString();
+            await ProductModel.findByIdAndUpdate(id_producto,update);
+            return update;
         }catch(err){
             console.log(err);
             return false;
@@ -78,8 +96,7 @@ class Productos {
     async deleteByID(id) {
         try{
             this.mongodb(this.url);
-            await ProductModel.findByIdAndDelete(id)
-            return true;
+            return await ProductModel.findByIdAndDelete(id);
         }catch(err){
             console.log(err);
             return false;
@@ -91,7 +108,7 @@ class Productos {
             if(producto.id){throw new Error('id is auto generated')}
             if(producto.timestamp){throw new Error('timestamp is auto generated')}
             if(producto.code){throw new Error('code is auto generated')}
-            if(!producto.title){throw new Error('tittle is required')}
+            if(!producto.title){throw new Error('title is required')}
             if(!producto.brand){throw new Error('brand is required')}
             if(!producto.thumbnail){throw new Error('thumbnail is required')}
             if(!producto.price){throw new Error('price is required')}
@@ -101,10 +118,6 @@ class Productos {
             console.log('\x1b[31m%s\x1b[0m', e.message);
             return false;
         }
-    }
-
-    setTimestamp(date) {
-        return date.getDate()+'/'+(date.getMonth()+1)+'/'+date.getFullYear();
     }
 
     generateCode(){

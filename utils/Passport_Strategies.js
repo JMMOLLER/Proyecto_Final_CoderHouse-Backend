@@ -1,109 +1,173 @@
-const Passport = require('passport');
-const path = require('path');
-const BaseDir = path.join(__dirname, '../');
-const fs = require('fs-extra');
-const mongoose = require('mongoose');
-const LocalStrategy = require('passport-local').Strategy;
-const { UserModel } = require('../DB/models/UsuariosModel');
-const { newUserEmail } = require('../Routers/Services/API.service');
+const Passport = require("passport");
+const mongoose = require("mongoose");
+const LocalStrategy = require("passport-local").Strategy;
+const JWTStrategy = require("passport-jwt").Strategy;
+const { deleteUserImg } = require("../Routers/Services/API.service");
+const { UserModel } = require("../DB/models/UsuariosModel");
+const { sendEmail, validatePhoneE164 } = require("../Routers/Services/API.service");
 
 /* ========= FUNCTIONS ========= */
 
-async function deleteUploadImg(req){
-    if(req.body.avatar_type!="0"){
-        req.body.avatar = req.file.filename;
-        await fs.remove(BaseDir + '/public/uploads/' + req.file.filename);
+function checkUserAvatar(req) {
+    try{
+        if (req.body.avatar_type != "0")
+            if (req.file) req.body.avatar = "/uploads/" + req.file.filename;
+            else req.body.avatar = "/uploads/default.png";
+        else if (req.body.avatar == "") req.body.avatar = "/uploads/default.png";
+    }catch(err){
+        console.log(err);
     }
     return;
 }
 
-function checkUserAvatar(req){
-    if(req.body.avatar_type!="0")
-        if(req.file)
-            req.body.avatar = "/uploads/" + req.file.filename;
-        else
-            req.body.avatar = "/uploads/default.png";
-    else if(req.body.avatar == "")
-        req.body.avatar = "/uploads/default.png";
-}
+const validateNewUser = (user) => {
+    if(!user.name){ return { value: false, msg: "Missing name" } }
+    if(!user.email){ return { value: false, msg: "Missing email" } }
+    if(!user.user_password){ return { value: false, msg: "Missing password" } }
+    if(!user.address){ return { value: false, msg: "Missing address" } }
+    if(!user.phone_number){ return { value: false, msg: "Missing phone number" } }
+    if(!(user.avatar_type).toString()){ return { value: false, msg: "Missing avatar_type" } }
+    if (user.user_password !== user.re_password) { return { value: false, msg: "Passwords don't match" } }
+    return { value: true, msg: "User validated" };
+};
 
 /* ========= PASSPORT ========= */
 
-Passport.use('local', new LocalStrategy({
-    passReqToCallback: true,
-    usernameField: 'email',
-    passwordField: 'password'
-}, (req, username, password, done) => {
-    console.log('\x1b[36m%s\x1b[0m', "Nueva autenticacion");
-    mongoose.connect(process.env.MONGODB_URI);
+/*
+    NOTA: La función isValidPassword() se encuentra en el modelo 
+        de usuario al igual que el método para convertir la 
+        contraseña en hash.
+*/
 
-    UserModel.findOne({email:username}, (err, user) => {
-        if(err)return done(err);
-        if(!user){
-            console.log('Usuario no encontrado '+username);
-            return done(null, false);
-        }if(!user.isValidPassword(password)){ //La funcion isValidPassword esta definida en el modelo de usuario
-            console.log('Contraseña invalida');
-            return done(null, false);
-        }
-        user.returnTo = req.session.returnTo;
-        return done(null, user);
-    });
-    
-}));
-
-Passport.use('signup', new LocalStrategy({
-    passReqToCallback: true,
-    usernameField: 'email',
-    passwordField: 'password'
-}, (req, username, password, done) => {
-
-    mongoose.connect(process.env.MONGODB_URI);
-    UserModel.findOne({ email: req.body.email }, async(error, mail) => {
-        if (error) {
-            await deleteUploadImg(req);
-            console.log('Error con el registro ' + error);
-            return done(err);
-        } if (mail) {
-            await deleteUploadImg(req);
-            console.log('Email ya registrado');
-            return done(null, false);
-        }
-        checkUserAvatar(req);
-        // La conversión de la contraseña a hash se hace en el modelo de usuario
-        const newUser = {
-            address: req.body.address,
-            password: req.body.password,
-            email: req.body.email,
-            name: req.body.name,
-            age: req.body.age,
-            avatar: req.body.avatar,
-            phone_number: req.body.phone_number
-        };
-        UserModel.create(newUser, async(err, userWithID) => {
-            if (err) {
-                console.log('Error al guardar el usuario: ' + err);
-                await deleteUploadImg(req);
+Passport.use(
+    "login",
+    new LocalStrategy(
+        {
+            passReqToCallback: true,
+            usernameField: "email",
+            passwordField: "user_password",
+        },
+        async (req, email, user_password, done) => {
+            try {
+                mongoose.connect(process.env.MONGODB_URI);
+                
+                const user = await UserModel.findOne({ email });
+                
+                if (!user) {
+                    console.log("\x1b[31m%s\x1b[0m", "Usuario no encontrado " + email);
+                    return done(null, false, {
+                        message: "Usuario no encontrado",
+                    });
+                }
+                if (!user.isValidPassword(user_password)) {
+                    console.log("\x1b[31m%s\x1b[0m", "Contraseña invalida");
+                    return done(null, false, {
+                        message: "Contraseña invalida",
+                    });
+                }
+                
+                console.log("\x1b[36m%s\x1b[0m", "Nueva autenticacion");
+                req.returnTo = req.session.returnTo;
+                const { password, __v, ...userData } = user._doc;
+                return done(null, userData);
+            } catch (err) {
+                console.log(err);
                 return done(err);
             }
-            console.log('Registro de usuario completo');
-            await newUserEmail(userWithID);
-            return done(null, userWithID);
-        });
-    });
+        }
+    )
+);
 
-}));
+Passport.use(
+    "register",
+    new LocalStrategy(
+        {
+            passReqToCallback: true,
+            usernameField: "email",
+            passwordField: "user_password",
+        },
+        async (req, email, user_password, done) => {
+            try {
+                mongoose.connect(process.env.MONGODB_URI);
+                const userExist = await UserModel.findOne({ email });
 
+                if (userExist) {
+                    if(req.body.avatar_type != "0"){
+                        await deleteUserImg("/uploads/" + req.file.filename);
+                    }
+                    console.log("\x1b[31m%s\x1b[0m", "Email ya registrado");
+                    return done(null, false, {
+                        message: "Email already registered",
+                    });
+                }
 
-/* SERIALIZE & DESERIALIZE */
-Passport.serializeUser((user, done) => {
-    /* A function that is executed asynchronously as soon as the current function is completed. */
-    process.nextTick(() => {
-        done(null, {id: user._id, avatar: user.avatar, returnTo: user.returnTo})
-    });
-});
+                checkUserAvatar(req);//Verifica si el usuario subio una imagen o una url
+                const response = validateNewUser(req.body)
+                if (!response.value) {
+                    if(req.body.avatar_type != "0"){
+                        await deleteUserImg("/uploads/" + req.file.filename);
+                    }
+                    console.log("\x1b[31m%s\x1b[0m", response.msg);
+                    return done(null, false, {
+                        message: response.msg,
+                    });
+                }if(!validatePhoneE164(req.body.phone_number)){
+                    if(req.body.avatar_type != "0"){
+                        await deleteUserImg("/uploads/" + req.file.filename);
+                    }
+                    console.log("\x1b[31m%s\x1b[0m", "Invalid phone number");
+                    return done(null, false, {
+                        message: "Invalid phone number",
+                    });
+                }
 
-Passport.deserializeUser((user, done) => {
-    mongoose.connect(process.env.MONGODB_URI);
-    UserModel.findById(user.id, done);
-});
+                const {
+                    avatar_type,
+                    re_password,
+                    user_password,
+                    ...newUserData
+                } = { ...req.body };
+
+                newUserData["password"] = user_password;
+
+                const newUser = await UserModel.create(newUserData);
+
+                const { password, __v, ...userData } = newUser._doc;
+
+                console.log("\x1b[36m%s\x1b[0m", "Nuevo registro");
+
+                //sendEmail(userData); //No lleva await porque considero que no es necesario esperar a que se envie el correo para continuar
+
+                return done(null, userData);
+            } catch (err) {
+                if(req.body.avatar_type != "0"){
+                    await deleteUserImg("/uploads/" + req.file.filename);
+                }
+                console.log(err);
+                return done(err);
+            }
+        }
+    )
+);
+
+const cookieExtractor = (req) => {
+    let token = null;
+    if (req && req.cookies) token = req.session.jwt;
+    return token;
+};
+
+Passport.use(
+    new JWTStrategy(
+        {
+            secretOrKey: process.env.COOKIE_SECRET,
+            jwtFromRequest: cookieExtractor,
+        },
+        async (token, done) => {
+            try {
+                return done(null, token.user);
+            } catch (err) {
+                done(err);
+            }
+        }
+    )
+);

@@ -1,0 +1,77 @@
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: El id del producto en la Base de Datos.
+        name:
+          type: string
+          description: El nombre del usuario.
+        email:
+          type: string
+          description: El email del usuario.
+        address:
+          type: string
+          description: La dirección del usuario.
+        phone_number:
+          type: string
+          description: El número de teléfono del usuario.
+        avatar:
+          type: string
+          description: La dirección del avatar del usuario.
+      example:
+        status: 200
+        msg: OK
+        value: true
+        user: {
+          _id: "6405403cad70ba19e75cd669",
+          name: "Test User",
+          email: "test@user.com",
+          address: "Test Address",
+          age: "20",
+          phone_number: "123456789",
+          avatar: "https://skillshack.blob.core.windows.net/uploads/express.webp"
+        }
+    allUsers:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El codigo de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+        products:
+          type: Array
+          description: El arreglo de productos.
+      example:
+        status: 200
+        msg: OK
+        value: true
+        products: [
+          {
+            _id: "63f6954488259a0110687304",
+            name: "Jorge Luis Moreno Moller",
+            email: "jlmm.jlmm76@gmail.com",
+            password: "$2b$10$LHlTDhBdKERNVLRZibt6S.zYl6ddPLlGwI4aEuBsVs.nn5ArBKZ5a",
+            address: "Calle las Antaras Mz. N Lote 6",
+            age: "19",
+            phone_number: "+51910737186",
+            avatar: "/uploads/default.png",
+          },
+          {
+            _id: "64001701b85707acd0e957fc",
+            name: "Sunao Nakko",
+            email: "nakosunao74@gmail.com",
+            password: "$2b$10$el2dDqQQ1gkLaN.Mz2oZ7uR1AwwYfjB9oliGKTExq3cHpd1IhRx9S",
+            address: "Jr Progreso 230, Barranco 15049, Perú",
+            age: "19",
+            phone_number: "+51972131823",
+            avatar: "https://i.imgur.com/l8Q7qdH.png",
+          }
+        ]

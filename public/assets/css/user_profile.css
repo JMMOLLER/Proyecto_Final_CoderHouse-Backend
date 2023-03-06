@@ -1,6 +1,6 @@
 .padding {
-    padding: 3rem !important;
-    padding-left: 200px !important;
+    padding: 8% !important;
+    padding-left: 12% !important;
 }
 
 body {
@@ -172,4 +172,26 @@ p {
     height: 27px;
     margin-left: 7.9cm;
     color: white;
+}
+
+@keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+}
+
+.container_change {
+    position: absolute;
+    z-index: 1;
+    backdrop-filter: blur(10px);
+    width: 100%;
+    height: 100%;
+    animation: fadeIn 1s;
+}
+
+.spinner-hidden {
+    display: none;
 }

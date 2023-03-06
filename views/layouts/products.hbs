@@ -67,33 +67,20 @@
                 const spinner = document.querySelector('.container_change');
                 spinner.classList.remove('spinner-hidden');
                 document.body.style.overflow = "hidden";
-                const user = await checkLogin()
-                if(user.status){
-                    if(await checkStock({id: item.dataset.value, cant: "++"})){
-                        await addToCart(item.dataset.value)
+                if(await checkStock({id: item.dataset.value, cant: "++"})){
+                    const status = await addToCart(item.dataset.value)
+                    if(status === 204){
+                        alert('Producto agregado al carrito')
                     }else{
-                        alert('No hay stock suficiente')
+                        alert('Error al agregar el producto al carrito')
                     }
                 }else{
-                    window.location.href = '/login'
+                    alert('No hay stock suficiente')
                 }
                 spinner.classList.add('spinner-hidden');
                 document.body.style.overflow = "auto"
             });
         });
-    }
-    async function checkLogin(){
-        const response = await fetch('/api/user/login', {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-            },
-        })
-        const data = await response.json()
-        if(!data.value){
-            console.log(data)
-        }
-        return data
     }
     async function addToCart(product){
         const data = await fetch(`/api/carrito/add/producto/${product}`,{
@@ -103,10 +90,12 @@
             },
         })
         const response = await data.json()
-        if(response.status != "OK"){
+        if(response.status == 401){
+            window.location.href = '/login'
+        }if(!response.value){
             console.log(response)
-            alert('Error al agregar al carrito')
         }
+        return response.status
     }
     async function checkStock({id, cant}) {
         const response = await fetch(`/api/carrito/stock/producto/${id}/${cant}`, {
@@ -116,6 +105,9 @@
         }
         })
         const data = await response.json()
+        if(data.status == 401){
+            window.location.href = '/login'
+        }
         if(!data.value){
             console.log(data)
         }

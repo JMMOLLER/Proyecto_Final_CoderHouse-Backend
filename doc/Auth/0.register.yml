@@ -1,0 +1,41 @@
+paths:
+  /api/auth/register:
+    post:
+      tags: 
+        - Auth
+      summary: Ruta para registrarse en el servidor.
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/Register'
+      responses:
+        "201":
+          description: 'En caso de éxito la ruta devuelve un objeto con las siguientes claves y valores:'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/Register'
+        "403":
+          description: 'En caso de estar autenticado la ruta devuelve un objeto indicando que el acceso a la ruta se encuentra **Prohibida**.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "409":
+          description: 'En caso de que el usuario ya exista o falte algún campo la ruta devuelve un objeto indicando que el acceso a la solicitud tuvo un **Conflicto**.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/RegisterError'
+        "500":
+          description: 'En caso de error interno la ruta devuelve un objeto indicando que se generó un error inesperado.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/InternalServerError'

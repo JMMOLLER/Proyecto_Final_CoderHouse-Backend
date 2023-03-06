@@ -1,0 +1,32 @@
+components:
+  requestBodies:
+    updateUser:
+      type: form-data
+      required:
+        -age
+        -address
+        -phone_number
+      properties:
+        age:
+          type: string
+          description: La edad del usuario.
+        address:
+          type: string
+          description: La dirección del usuario.
+        phone_number:
+          type: string
+          description: El número de teléfono del usuario en formato E164.
+      example:
+        age: 35
+        address: New Address
+        phone_number: 987654321
+    BuyCart:
+      type: object
+      required:
+        -shipping
+      properties:
+        shipping:
+          type: Int
+          description: El método de envío | 0 (Recojo en tienda) | 5 (Envio a normal) | 10 (Envio rápido).
+      example:
+        shipping: 10

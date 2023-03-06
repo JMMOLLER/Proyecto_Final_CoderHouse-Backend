@@ -1,0 +1,66 @@
+components:
+  requestBodies:
+    Login:
+      type: object
+      required:
+        -email
+        -user_password
+      properties:
+        email:
+          type: string
+          description: El email del usuario.
+        user_password:
+          type: string
+          description: La contraseña del usuario.
+      example:
+        email: test@user.com
+        user_password: "123"
+    Register:
+      type: form-data
+      required:
+        -name
+        -email
+        -user_password
+        -re_password
+        -address
+        -age
+        -phone_number
+        -avatar_type
+      properties:
+        name:
+          type: string
+          description: El nombre del usuario.
+        email:
+          type: string
+          description: El email del usuario.
+        user_password:
+          type: string
+          description: La contraseña del usuario.
+        re_password:
+          type: string
+          description: La confirmación de contraseña del usuario.
+        address:
+          type: string
+          description: La dirección del usuario.
+        age:
+          type: integer
+          description: La edad del usuario.
+        phone_number:
+          type: string
+          description: El número de teléfono del usuario.
+        avatar_type:
+          type: string
+          description: El tipo de avatar del usuario, este puede ser 0 (URL) o 1 (FILE).
+        avatar:
+          type: string
+          description: La URL o el archivo del avatar del usuario.
+      example:
+        name: Test User
+        email: test@user.com
+        user_password: 123
+        re_password: 123
+        address: Test Address
+        age: 20
+        phone_number: "+12125551212"
+        avatar_type: 0
+        avatar: https://skillshack.blob.core.windows.net/uploads/express.webp

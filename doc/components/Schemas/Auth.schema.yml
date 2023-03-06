@@ -1,0 +1,62 @@
+components:
+  schemas:
+    Login:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El codigo de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+        returnTo:
+          type: string
+          description: Ruta a la que se redirige al usuario.
+      example:
+        status: 202
+        msg: ACEPTED
+        value: true
+        returnTo: /user/profile
+    Register:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El codigo de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+        returnTo:
+          type: string
+          description: Ruta a la que se redirige al usuario.
+      example:
+        status: 201
+        msg: CREATED
+        value: true
+        returnTo: /user/profile
+    Logout:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El codigo de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+        returnTo:
+          type: string
+          description: Ruta a la que se redirige al usuario.
+      example:
+        status: 200
+        msg: OK
+        value: true
+        returnTo: /

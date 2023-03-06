@@ -1,52 +1,58 @@
 const express = require('express');
 const multer = require('multer');
-const Route = express.Router();
-const Passport = require('passport');
+const USER_FRONT = express.Router();
 const { storage } = require('../utils/MulterStorage');
 const upload = multer({ storage });
-const controller = require('../Routers/Controllers/USER.controller');
-const auth = require('../Routers/middleware-authentication/USER.auth');
-Route.use(express.json());
+const controller = require('./Controllers/Client.controller');
+const auth = require('./auth/auth');
+USER_FRONT.use(express.json());
 
 
 /* ============ ROUTES ============ */
-Route.get('/', controller.home);
+USER_FRONT.get('/', controller.home);
 
-Route.get('/products', controller.products);
+USER_FRONT.get('/products', controller.products);
 
-Route.get('/chat', auth.isLogged, controller.chat);
+USER_FRONT.get('/chat', auth.clientIsLogged, controller.chat);
 
 /* USER */
-Route.get('/user/profile', auth.isLogged, controller.user_profile);
+USER_FRONT.get('/user/profile', auth.clientIsLogged, controller.user_profile);
 
-Route.get('/user/cart', auth.isLogged, controller.user_cart);
+USER_FRONT.get('/user/cart', auth.clientIsLogged, controller.user_cart);
 
 /* LOGIN */
-Route.get('/login', auth.isUnlogged, controller.login_get);
+USER_FRONT.get('/login', auth.clientIsUnLogged, controller.login_get);
 
-Route.post('/login', auth.isUnlogged, Passport.authenticate('local', {
-    failureRedirect: '/fail_login',
-}), controller.login_post);
-
-Route.get('/fail_login', controller.fail_login);
+USER_FRONT.get('/fail_login', controller.fail_login);
 
 /* REGISTRO */
-Route.get('/register', auth.isUnlogged, controller.register_get);
+USER_FRONT.get('/register', auth.clientIsUnLogged, controller.register_get);
 
-Route.post('/register', auth.isUnlogged, upload.single('avatar'), controller.register_post);
-
-Route.get('/fail_register', controller.fail_register);
+USER_FRONT.get('/fail_register', controller.fail_register);
 
 /* TEST */
-Route.get('/test', (req, res) => {
-    res.render('index', {title: 'Test', layout: 'test'});
+USER_FRONT.get('/test', (req, res) => {
+    res.send('test GET route is working successfully!!');
 });
 
-Route.post('/test', Passport.authenticate('jwt', {session: false}), (req, res) => {
-    res.send(req.user);
+USER_FRONT.post('/test', (req, res) => {
+    res.json({
+        msg: 'test POST route is working successfully!!',
+        body: req.body
+    });
 });
 
-/* LOGOUT */
-Route.get('/logout', controller.logout);
+USER_FRONT.get('/protected', auth.clientIsLogged, (req, res) => {
+    res.send('this route is protected')
+})
 
-module.exports = { Route };
+USER_FRONT.get('/auth', auth.clientIsLogged, (req, res) => {
+    res.json({
+        msg: 'you are Authenticated',
+        returnTo: req.returnTo,
+        user: req.user,
+        token: req.session.jwt
+    });
+});
+
+module.exports = { USER_FRONT };

@@ -1,0 +1,62 @@
+components:
+  requestBodies:
+    newProduct:
+      type: object
+      required:
+        -brand
+        -title
+        -thumbnail
+        -price
+        -stock
+      properties:
+        brand:
+          type: string
+          description: La marca del producto.
+        title:
+          type: string
+          description: El título del producto.
+        thumbnail:
+          type: url
+          description: La direcciíión url de la imagen del producto.
+        price:
+          type: float
+          description: El precio del producto.
+        stock:
+          type: number
+          description: La cantidad disponible del producto.
+      example:
+        brand: HERSHEY'S
+        title: Chocolate Blanco HERSHEY'S 87g
+        thumbnail: https://vivanda.vtexassets.com/arquivos/ids/242595/20170153.jpg
+        price: 1.82
+        stock: 10
+    updateProduct:
+      type: object
+      required:
+        -brand
+        -title
+        -thumbnail
+        -price
+        -stock
+      properties:
+        brand:
+          type: string
+          description: La marca del producto.
+        title:
+          type: string
+          description: El título del producto.
+        thumbnail:
+          type: url
+          description: La direcciíión url de la imagen del producto.
+        price:
+          type: float
+          description: El precio del producto.
+        stock:
+          type: number
+          description: La cantidad disponible del producto.
+      example:
+        title: Pringles Sabor Queso 40g
+        price: 3.70
+        stock: 4
+        thumbnail: https://vivanda.vtexassets.com/arquivos/ids/397368/920011.jpg
+        brand: Pringles
