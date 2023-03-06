@@ -1,5 +1,6 @@
 require("dotenv").config();
 require("./utils/Passport_Strategies");
+const { conf } = require("./utils/YargsConfig");
 const express = require("express");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
@@ -26,7 +27,8 @@ const ms = require("ms");
 const app = express();
 const httpServer = new Server(app);
 socket(httpServer);
-const PORT = 8080;
+const PORT = conf.port;
+const HOST = conf.host;
 const sessionStore = MongoStore.create({
     mongoUrl: process.env.MONGODB_URI,
     ttl: ms("90m"),
@@ -77,8 +79,8 @@ app.use((req, res) => {
 });
 
 /* ============ SERVER ============ */
-const ExpressServer = httpServer.listen(PORT, () => {
-    console.log("Servidor iniciado en: http://localhost:" + PORT);
+const ExpressServer = httpServer.listen(PORT, HOST, () => {
+    console.log(`Servidor iniciado en: http://${HOST}:${PORT}`);
 });
 
 ExpressServer.on("error", (e) => console.log("Se ha generado un error: " + e));
