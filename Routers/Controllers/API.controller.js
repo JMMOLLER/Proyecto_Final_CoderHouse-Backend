@@ -194,6 +194,23 @@ const byProductId = async(req, res) => {
     }
 }
 
+const byCategory = async (req, res) => {
+    try{
+        const response = await BD_Productos.getByCategory(req.params.category);
+        response.value
+            ? res.status(200).json({status: 200, msg: 'OK', value: true, products: response.products})
+            : res.status(response.status).json({
+                status: response.status,
+                msg: `ERROR - ${response.msg}`,
+                value: false
+            })
+        return;
+    }catch(e){
+        console.log(e);
+        res.status(500).json(errJSON(e.message));
+    }
+}
+
 const createProduct = async (req, res) => {
     try{
         if(BD_Productos.validateProduct(req.body)){
@@ -528,6 +545,7 @@ module.exports = {
     products: {
         allProducts,
         byProductId,
+        byCategory,
         createProduct,
         consultQuantityOnPorduct,
         updateProduct,

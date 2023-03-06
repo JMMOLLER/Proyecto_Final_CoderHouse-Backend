@@ -57,6 +57,8 @@ API_PRODUCT.get('/', controller.products.allProducts);
 
 API_PRODUCT.get('/:id', controller.products.byProductId);
 
+API_PRODUCT.get('/category/:category', controller.products.byCategory);
+
 API_PRODUCT.post('/', controller.products.createProduct);
 
 /* MÉTODO PARA VALIDAR APROBACIÓN DE AUMENTO DE CANTIDAD DE PEDIDO DE UN PRODUCTO */

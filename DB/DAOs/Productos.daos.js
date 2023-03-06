@@ -39,6 +39,18 @@ class Productos {
         }
     }
 
+    async getByCategory(category){
+        try{
+            this.mongodb(this.url);
+            const products = await ProductModel.find({category:category}).select('-__v');
+            if(!products){return {status: 404, msg: 'Category not found', value: false}}
+            return {status: 200, msg: 'Category found', value: true, products};
+        }catch(err){
+            console.log(err);
+            return {status: 500, msg: err.message, value: false};
+        }
+    }
+
     async checkStock({product_id, cant, user_cart}){
         const response = {value:false, status:500};
         try{
