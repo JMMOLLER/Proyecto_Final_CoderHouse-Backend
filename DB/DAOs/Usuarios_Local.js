@@ -19,7 +19,7 @@ class UsuariosDAO{
     async getAll(){
         try{
             this.mongodb(this.url);
-            const data = await UserModel.find().lean();
+            const data = await UserModel.find().select('-__v').lean();
             return data;
         }catch(err){
             console.log(err);

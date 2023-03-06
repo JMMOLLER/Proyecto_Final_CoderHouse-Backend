@@ -1,14 +1,11 @@
 async function deleteUser(){
     if(confirm('¿Está seguro de eliminar su cuenta?')){
         $.ajax({
-            url: '/api/user',
+            url: '/api/user/?admin=true',
             type: 'DELETE',
             success: (data) => {
                 if(data.status === 200 && data.value){
-                    $.ajax({url: '/api/auth/logout', type: 'POST'})
-                    .done(() => {
-                        window.location.href = '/';
-                    })
+                    window.location.href = '/';
                 }
             },
             error: (err) => {

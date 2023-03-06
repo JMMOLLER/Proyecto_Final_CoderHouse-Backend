@@ -129,11 +129,15 @@ async function createMessageMail({typeShipping, cartInfo}){
 
 async function sendSMSToUser(USER){
     try{
-        return await sendSMS({
-            body: `Su pedido ha sido recibido y se encuentra en proceso`,
-            messagingServiceSid: process.env.TWILIO_MESSAGE_SERVICE_SID,
-            to: `${USER.phone_number}`
-        });
+        if(validatePhoneE164(USER.phone_number)){
+            return await sendSMS({
+                body: `Su pedido ha sido recibido y se encuentra en proceso`,
+                messagingServiceSid: process.env.TWILIO_MESSAGE_SERVICE_SID,
+                to: `${USER.phone_number}`
+            });
+        }else{
+            console.log("\x1b[31m%s\x1b[0m", 'Invalid phone number');
+        }
     }catch(err){
         console.log(err);
     }
@@ -151,6 +155,12 @@ async function sendWhatsappToUser(USER){
     }
 }
 
+const validatePhoneE164 = (phoneNumber) => {
+    const regEx = /^\+[1-9]\d{10,14}$/;
+
+    return regEx.test(phoneNumber);
+};
+
 /* ========== EXPORT ========== */
 module.exports = { 
     sendMessages,
@@ -158,5 +168,6 @@ module.exports = {
     sendSMSToUser, 
     sendWhatsappToUser,
     sendEmail,
-    deleteUserImg
+    deleteUserImg,
+    validatePhoneE164,
 };

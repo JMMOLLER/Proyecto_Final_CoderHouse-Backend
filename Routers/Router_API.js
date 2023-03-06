@@ -82,6 +82,8 @@ API_AUTH.post('/logout', auth.isLogged, controller.auth.logout);
 
 /* API USER */
 
+API_USER.use(auth.validateAdmin)// Middleware para validar en todas las rutas que el usuario sea administrador;
+
 API_USER.get('/', auth.isLogged, controller.user.userInfo);
 
 API_USER.get('/all', controller.user.allUsers);

@@ -1,4 +1,4 @@
-const { sendMessages } = require('../Services/API.service');
+const { sendMessages, validatePhoneE164 } = require('../Services/API.service');
 const { deleteUserImg } = require('../Services/API.service');
 const { BD_Carrito } = require('../../DB/DAOs/Carrito.daos.js');
 const { BD_Productos } = require('../../DB/DAOs/Productos.daos.js');
@@ -416,16 +416,31 @@ const userPurchase = async(req, res) => {
     try{
         const cartInfo = await BD_Carrito.getCartByUserID(req.user._id);
         const userInfo = await BD_Usuarios_Local.getById(req.user._id);
-        cartInfo.shipping = req.body.shipping;
-        if(cartInfo.productos.length==0){
-            return res.status(406).json({
-                status: 406,
-                msg: "No se puede realizar una compra sin productos en el carrito",
+        const values = [0, 5, 10]
+
+        if(!values.includes(parseInt(req.body.shipping))){
+            return res.status(400).json({
+                status: 400,
+                msg: "ERROR - Invalid shipping value",
                 value: false
             });
+        }else{
+            cartInfo.shipping = req.body.shipping;
+        }
+
+        if(cartInfo.productos.length==0){
+
+            return res.status(406).json({
+                status: 406,
+                msg: "ERROR - There are no products in the cart",
+                value: false
+            });
+
         }else if(await BD_Carrito.deleteByID(cartInfo._id)){
+
             await sendMessages({userInfo, cartInfo});
             return res.status(200).json({status: 200, msg: "OK", value: true})
+
         }else{
             return res.status(500).json(errJSON());
         }
@@ -437,13 +452,22 @@ const userPurchase = async(req, res) => {
 
 const user_update = async(req, res) => {
     try{
-        let oldAvatar;
-        const data = req.body
+        let oldAvatar, data = {};
+        const {age, address, phone_number}= req.body;
+
+        if(!validatePhoneE164(phone_number)){ return res.status(400).json({status: 400, msg: "ERROR - Invalid Phone Number", value: false}) };
 
         if(req.file){
             data.avatar = "/uploads/"+req.file.filename
             oldAvatar = await BD_Usuarios_Local.getAvatar(req.user._id)
+        }else if(!age, !address, !phone_number){
+            return res.status(400).json({status: 400, msg: "ERROR - Nothing to Update", value: false});
+        }else{
+            data.age = age;
+            data.address = address;
+            data.phone_number = phone_number;
         }
+        
         if(await BD_Usuarios_Local.updateUser(req.user._id, data)){
 
             if(oldAvatar) {await deleteUserImg(oldAvatar)};
@@ -475,6 +499,11 @@ const deleteUser = async(req, res) => {
                 msg: "ERROR - User ID not found", 
                 value: false
             });
+        req.session.destroy((err)=>{
+            if(err){
+                console.log(err);
+            }
+        });
         return;
     }catch(e){
         console.log(e);

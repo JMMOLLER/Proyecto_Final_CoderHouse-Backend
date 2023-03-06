@@ -1,0 +1,61 @@
+paths:
+  /api/productos/stock/{id}/{cant}:
+    get:
+      tags: 
+        - Productos
+      summary: Ruta para verificar si es posible agregar cierta cantidad de un producto al carrito del usuario autenticado [Debes estar autenticado para acceder a esta ruta].
+      parameters:
+        - in: path
+          name: id
+          value: 63ed0ab66e97f24378536514
+          type: string
+          description: La solicitud debe enviar el parametro **{id}** a buscar.
+          required: true
+        - in: path
+          name: cant
+          value: 1
+          type: string
+          description: La solicitud debe enviar el parametro **{cant}** para validar si es posible agregar la cantidad enviada, tambien se puede user **++** para aumentar +1 a la cantidad en el carrito.
+          required: true
+        - in: query
+          name: admin
+          value: true
+          type: boolean
+          description: La solicitud debe enviar el parametro **admin** en **true**
+          required: true
+      responses:
+        "200":
+          description: 'En caso de éxito la ruta devuelve un objeto con las siguientes claves y valores:'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/checkAvailability'
+        "400":
+          description: 'En caso de no enviar la estructura indicada la ruta devuelve un objeto indicando que la petición no fue aceptada.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        "401":
+          description: 'En caso de no enviar los parametros solicitados la ruta devuelve un objeto indicando que la petición no fue autorizada.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/UnAuthorizedError'
+        "409":
+          description: 'En caso de no existir stock suficiente la ruta devuelve un objeto indicando que la petición sufrió un **Conflicto** interno.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+        "500":
+          description: 'En caso de error interno la ruta devuelve un objeto indicando que se generó un error inesperado.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/InternalServerError'

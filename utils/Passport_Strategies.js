@@ -4,7 +4,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const JWTStrategy = require("passport-jwt").Strategy;
 const { deleteUserImg } = require("../Routers/Services/API.service");
 const { UserModel } = require("../DB/models/UsuariosModel");
-const { sendEmail } = require("../Routers/Services/API.service");
+const { sendEmail, validatePhoneE164 } = require("../Routers/Services/API.service");
 
 /* ========= FUNCTIONS ========= */
 
@@ -110,6 +110,14 @@ Passport.use(
                     console.log("\x1b[31m%s\x1b[0m", response.msg);
                     return done(null, false, {
                         message: response.msg,
+                    });
+                }if(!validatePhoneE164(req.body.phone_number)){
+                    if(req.body.avatar_type != "0"){
+                        await deleteUserImg("/uploads/" + req.file.filename);
+                    }
+                    console.log("\x1b[31m%s\x1b[0m", "Invalid phone number");
+                    return done(null, false, {
+                        message: "Invalid phone number",
                     });
                 }
 

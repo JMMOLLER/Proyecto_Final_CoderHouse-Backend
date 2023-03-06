@@ -1,0 +1,139 @@
+components:
+  schemas:
+    newCart:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El codigo de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+        cart:
+          type: Object
+          description: El objeto newCart creado en la **Base de datos**.
+      example:
+        status: 201
+        msg: CREATED
+        value: true
+        cart: {
+          owner: "6405403cad70ba19e75cd669",
+          _id: "640548e95c756416c9cfebb3",
+          timestamp: "2023-03-06T01:59:05.207Z",
+          productos: [],
+          __v: 0
+        }
+    Cart:
+      type: object
+      properties:
+        title:
+          type: string
+          description: El título del producto.
+        brand:
+          type: string
+          description: La marca del producto.
+        code:
+          type: string
+          description: El código del producto.
+        thumbnail:
+          type: url
+          description: La url de la imagen del producto.
+        precio:
+          type: number
+          description: El precio del producto.
+        stock:
+          type: number
+          description: La cantidad dispoible del producto.
+        _id:
+          type: string
+          description: El id del producto en la Base de Datos.
+        timestamp:
+          type: Date
+          description: La fecha de subida del producto.
+        __v:
+          type: number
+          description: La versión del producto.
+      example:
+        status: 200
+        msg: OK
+        value: true
+        cart: {
+          _id: "64054b24547c23705d86dfb6",
+          owner: "6405403cad70ba19e75cd669",
+          timestamp: "2023-03-06T02:08:36.633Z",
+          productos: [
+            {
+              _id: "63ed0ab66e97f24378536514",
+              id: "63ed0ab66e97f24378536514",
+              quantity: 1
+            }
+          ]
+        }
+    allCarts:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El codigo de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+        products:
+          type: Array
+          description: El arreglo de productos.
+      example:
+        status: 200
+        msg: OK
+        value: true
+        carts: [
+          {
+            "_id": "640279ca4e0afee75f467db9",
+            "owner": "64001701b85707acd0e957fc",
+            "timestamp": "2023-03-03T22:50:50.766Z",
+            "productos": [
+              {
+                _id: "63ed0ab66e97f24378536514",
+                id: "63ed0ab66e97f24378536514",
+                quantity: 1
+              }
+            ]
+          }
+        ]
+    ProductsOnCart:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El codigo de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+        products:
+          type: Array
+          description: El arreglo de productos.
+      example:
+        status: 200
+        msg: OK
+        value: true
+        products: [
+          {
+            _id: "63ed0ab66e97f24378536514",
+            title: "Pringles Sabor Original 40g",
+            price: 5.21,
+            stock: 7,
+            thumbnail: "https://elpozito.com.pe/tienda/barranco/wp-content/uploads/2021/01/311686.jpg",
+            timestamp: "2023-03-04T20:30:03.707Z",
+            brand: "Pringles",
+            code: "55-320-5018",
+            quantity: 2
+          }
+        ]

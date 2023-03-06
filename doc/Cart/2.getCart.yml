@@ -1,0 +1,48 @@
+paths:
+  /api/carrito/{id}:
+    get:
+      tags: 
+        - Carrito
+      summary: Ruta para obtener un carrito de la Base de Datos según el ID.
+      parameters:
+        - in: path
+          name: id
+          value: Ingrese el ID del carrito creado anteriormente.
+          type: string
+          description: La solicitud debe enviar el parametro **{id}** a buscar.
+          required: true
+        - in: query
+          name: admin
+          value: true
+          type: boolean
+          description: La solicitud debe enviar el parametro **admin** en **true**
+          required: true
+      responses:
+        "200":
+          description: 'En caso de éxito la ruta devuelve un objeto con las siguientes claves y valores:'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/Cart'
+        "401":
+          description: 'En caso de no enviar los parametros solicitados la ruta devuelve un objeto indicando que la petición no fue autorizada.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/UnAuthorizedError'
+        "404":
+          description: 'En caso de no encontrar el carrito la ruta devuelve un objeto indicando que el carrito no fue encontrado.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        "500":
+          description: 'En caso de error interno la ruta devuelve un objeto indicando que se generó un error inesperado.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/InternalServerError'

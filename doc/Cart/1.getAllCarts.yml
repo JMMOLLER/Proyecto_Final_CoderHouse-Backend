@@ -1,0 +1,35 @@
+paths:
+  /api/carrito/all:
+    get:
+      tags: 
+        - Carrito
+      summary: Ruta para mostrar todos los carritos de la Base de Datos.
+      parameters:
+        - in: query
+          name: admin
+          value: true
+          type: boolean
+          description: La solicitud debe enviar el parametro **admin** en **true**
+          required: true
+      responses:
+        "200":
+          description: 'En caso de éxito la ruta devuelve un objeto con las siguientes claves y valores:'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/allCarts'
+        "401":
+          description: 'En caso de no enviar los parametros solicitados la ruta devuelve un objeto indicando que la petición no fue autorizada.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/UnAuthorizedError'
+        "500":
+          description: 'En caso de error interno la ruta devuelve un objeto indicando que se generó un error inesperado.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/InternalServerError'

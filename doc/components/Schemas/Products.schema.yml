@@ -1,0 +1,131 @@
+components:
+  schemas:
+    newProduct:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El codigo de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+        product:
+          type: Object
+          description: El objeto newProducto a Producto de **Base de datos**.
+      example:
+        status: 201
+        msg: CREATED
+        value: true
+        product: {
+          "_id": "63ed0ab66e97f24378536514",
+          "title": "Pringles sabor Original 40g",
+          "price": 5.21,
+          "stock": 7,
+          "thumbnail": "https://elpozito.com.pe/tienda/barranco/wp-content/uploads/2021/01/311686.jpg",
+          "timestamp": "2023-02-15T16:39:18.976Z",
+          "brand": "Pringles",
+          "code": "55-320-5018",
+          "__v": 0
+        }
+    Product:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El codigo de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+        product:
+          type: Object
+          propeties:
+            title:
+              type: string
+              description: El título del producto.
+            brand:
+              type: string
+              description: La marca del producto.
+            code:
+              type: string
+              description: El código del producto.
+            thumbnail:
+              type: url
+              description: La url de la imagen del producto.
+            precio:
+              type: number
+              description: El precio del producto.
+            stock:
+              type: number
+              description: La cantidad dispoible del producto.
+            _id:
+              type: string
+              description: El id del producto en la Base de Datos.
+            timestamp:
+              type: Date
+              description: La fecha de subida del producto.
+      example:
+        status: 200
+        msg: OK
+        value: true
+        product: 
+          _id: 63ed0ab66e97f24378536514
+          title: Pringles clásico
+          price: 5.21
+          stock: 35
+          thumbnail: "https://elpozito.com.pe/tienda/barranco/wp-content/uploads/2021/01/311686.jpg"
+          timestamp: "2023-02-15T16:39:18.976Z"
+          brand: Pringles
+          code: 55-320-5018
+    allProducts:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El codigo de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+        products:
+          type: Array
+          description: El arreglo de productos.
+      example:
+        status: 200
+        msg: OK
+        value: true
+        products: [
+            {
+              "_id": "63ed0ab66e97f24378536514",
+              "title": "Pringles clásico",
+              "price": 5.21,
+              "stock": 35,
+              "thumbnail": "https://elpozito.com.pe/tienda/barranco/wp-content/uploads/2021/01/311686.jpg",
+              "timestamp": "2023-02-15T16:39:18.976Z",
+              "brand": "Pringles",
+              "code": "55-320-5018",
+          }
+        ]
+    checkAvailability:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El codigo de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+      example:
+        status: 200
+        msg: OK
+        value: true

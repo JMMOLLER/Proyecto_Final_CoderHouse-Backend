@@ -1,0 +1,148 @@
+components:
+  schemas:
+    InternalServerError:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El codigo de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+      example:
+        status: 500
+        msg: ERROR - foo is undefined
+        value: false
+    ConflictError:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El código de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+      example:
+        status: 409
+        msg: ERROR - Stock is not enough
+        value: false
+    NotAcceptableError:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El código de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+      example:
+        status: 406
+        msg: ERROR - Cart is empty
+        value: false
+    NotFoundError:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El código de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+      example:
+        status: 404
+        msg: ERROR - product ID not found
+        value: false
+    ForbiddenError:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El código de estado.
+        description:
+          type: Object
+          description: Devuelve la ruta y el método solicitado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+      example:
+        status: 403
+        description: {
+          "route": "/api/auth/register",
+          "method": "POST"
+        }
+        msg: Prohibido
+        value: false
+    UnAuthorizedError:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El codigo de estado.
+        description:
+          type: Object
+          description: Devuelve la ruta y el método solicitado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+      example:
+        status: 401
+        description: {
+          "route": "/api/productos",
+          "method": "GET"
+        }
+        msg: No autorizado
+        value: false
+    BadRequestError:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El código de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+      example:
+        status: 400
+        msg: ERROR - invalid JSON structure
+        value: false
+    RegisterError:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El código de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+        redirectTo:
+          type: string
+          description: Ruta a la que se redirige al usuario.
+      example:
+        status: 409
+        msg: ERROR - Missing name
+        value: false
+        redirectTo: /fail_register

@@ -1,0 +1,28 @@
+paths:
+  /api/auth/logout:
+    post:
+      tags: 
+        - Auth
+      summary: Ruta para cerrar sesión en el servidor.
+      responses:
+        "200":
+          description: 'En caso de éxito la ruta devuelve un objeto con las siguientes claves y valores:'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/Logout'
+        "401":
+          description: 'En caso de no estar autenticado la ruta devuelve un objeto indicando que la petición no fue autorizada.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/UnAuthorizedError'
+        "500":
+          description: 'En caso de error interno la ruta devuelve un objeto indicando que se generó un error inesperado.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/InternalServerError'

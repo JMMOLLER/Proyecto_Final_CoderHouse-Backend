@@ -11,7 +11,7 @@ class Productos {
     async getAll(){
         try{
             this.mongodb(this.url);
-            return await ProductModel.find();
+            return await ProductModel.find().select('-__v');
         }catch(err){
             console.log(err);
             return false;

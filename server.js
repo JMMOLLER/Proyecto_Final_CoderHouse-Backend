@@ -12,6 +12,7 @@ const swaggerSpecs = swaggerJsDoc(require("./utils/SwaggerOptions"));
 const { Server } = require("http");
 const { socket } = require("./utils/SocketIO");
 const { engine } = require("express-handlebars");
+const { USER_FRONT } = require("./Routers/Router_USER");
 const {
     allowInsecurePrototypeAccess,
 } = require("@handlebars/allow-prototype-access");
@@ -21,7 +22,6 @@ const {
     API_AUTH,
     API_USER,
 } = require("./Routers/Router_API");
-const { USER_FRONT } = require("./Routers/Router_USER");
 const ms = require("ms");
 const app = express();
 const httpServer = new Server(app);

@@ -29,7 +29,7 @@
                 type: 'POST',
                 data: $(this).serialize(),
                 success: (data) => {
-                    if(data.status===202 && data.value){
+                    if((data.status===202 || data.status===201) && data.value){
                         window.location.href = data.returnTo || '/user/profile';
                     }
                 },

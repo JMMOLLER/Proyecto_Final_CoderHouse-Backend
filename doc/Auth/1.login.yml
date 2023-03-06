@@ -1,0 +1,34 @@
+paths:
+  /api/auth/login:
+    post:
+      tags: 
+        - Auth
+      summary: Ruta para iniciar sesión en el servidor.
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/Login'
+      responses:
+        "202":
+          description: 'En caso de éxito la ruta devuelve un objeto con las siguientes claves y valores:'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/Login'
+        "403":
+          description: 'En caso de ya estar autenticado la ruta devuelve un objeto indicando que el acceso a la ruta se encuentra **Prohibida**.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        "500":
+          description: 'En caso de error interno la ruta devuelve un objeto indicando que se generó un error inesperado.'
+          content:
+            application/json:
+              type: object
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
