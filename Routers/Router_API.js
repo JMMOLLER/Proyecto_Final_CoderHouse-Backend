@@ -77,7 +77,7 @@ API_AUTH.post('/login', auth.isUnlogged, controller.auth.login);
 
 API_AUTH.post('/register', auth.isUnlogged, upload.single('avatar'), controller.auth.register);
 
-API_AUTH.get('/logout', auth.isLogged, controller.auth.logout);
+API_AUTH.post('/logout', auth.isLogged, controller.auth.logout);
 
 
 /* API USER */

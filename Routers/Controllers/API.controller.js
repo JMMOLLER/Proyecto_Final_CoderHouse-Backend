@@ -457,8 +457,9 @@ const deleteUser = async(req, res) => {
     try{
         const avatar = await BD_Usuarios_Local.getAvatar(req.user._id);
         await deleteUserImg(avatar);
-        await BD_Usuarios_Local.deleteByID(req.user._id)
-            ? res.status(200).json({status: 200, msg: "OK", value: true})
+        const user = await BD_Usuarios_Local.deleteByID(req.user._id);
+        user
+            ? res.status(200).json({status: 200, msg: "OK", value: true, user})
             : res.status(500).json({
                 status: 500, 
                 msg: "ERROR - User ID not found", 

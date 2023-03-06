@@ -10,23 +10,34 @@
     $('.validate-form').on('submit',function(){
         buttonSpinner(true);
         let check = true;
-        let isRegister = false;
-        for(var i=0; i<input.length; i++) {
+        const toFetch = '/api/auth'+window.location.pathname
+        for(let i=0; i<input.length; i++) {
             if(validate(input[i]) == false){
                 showValidate(input[i]);
                 check=false;
             }else if(input[i].id=="re_password"){
-                isRegister = true;
                 if(input[i].value!=input[i-1].value){
                     showValidate(input[i]);
                     check=false;
                 }
             }
         }
-        if(check && isRegister)
-            process(event);
         buttonSpinner(check);
-        return check;
+        if(check)
+            $.ajax({
+                url: toFetch,
+                type: 'POST',
+                data: $(this).serialize(),
+                success: (data) => {
+                    if(data.status===202 && data.value){
+                        window.location.href = data.returnTo || '/user/profile';
+                    }
+                },
+                error: (err) => {
+                    window.location.href = err.responseJSON.returnTo || '/fail_login';
+                }
+            });
+        return false;
     });
 
 

@@ -118,9 +118,9 @@ class UsuariosDAO{
     async deleteByID(id) {
         try{
             this.mongodb(this.url);
-            const user = await UserModel.findByIdAndDelete(id);
+            const user = await UserModel.findByIdAndDelete(id).select('-password -__v');
             if(!user){throw new Error('No se encontro el usuario')}
-            return true;
+            return user;
         }catch(err){
             console.log(err);
             return false;

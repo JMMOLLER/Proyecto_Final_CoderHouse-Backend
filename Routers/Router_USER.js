@@ -23,14 +23,10 @@ USER_FRONT.get('/user/cart', auth.clientIsLogged, controller.user_cart);
 /* LOGIN */
 USER_FRONT.get('/login', auth.clientIsUnLogged, controller.login_get);
 
-USER_FRONT.post('/login', auth.clientIsUnLogged, controller.login_post);
-
 USER_FRONT.get('/fail_login', controller.fail_login);
 
 /* REGISTRO */
 USER_FRONT.get('/register', auth.clientIsUnLogged, controller.register_get);
-
-USER_FRONT.post('/register', auth.clientIsUnLogged, upload.single('avatar'), controller.register_post);
 
 USER_FRONT.get('/fail_register', controller.fail_register);
 
@@ -58,8 +54,5 @@ USER_FRONT.get('/auth', auth.clientIsLogged, (req, res) => {
         token: req.session.jwt
     });
 });
-
-/* LOGOUT */
-USER_FRONT.get('/logout', controller.logout);
 
 module.exports = { USER_FRONT };
