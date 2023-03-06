@@ -11,7 +11,8 @@ const errJSON = (e) => {
     }return {
         status: 500,
         msg: "ERROR - " + e,
-        value: false
+        value: false,
+        returnTo: "/fatal_error"
     }
 }
 /* =========== ROUTES =========== */
@@ -316,7 +317,7 @@ const login = async(req, res) => {
             status: 202,
             msg: 'ACEPTED',
             value: true,
-            returnTo: req.returnTo || '/user/profile'
+            returnTo: req.returnTo || '/products'
         })
     })(req, res)
 }
@@ -344,7 +345,7 @@ const register = async(req, res) => {
             status: 201,
             msg: 'CREATED',
             value: true,
-            returnTo: req.returnTo || '/user/profile'
+            returnTo: req.returnTo || '/products'
         })
     })(req, res)
 }

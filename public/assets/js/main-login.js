@@ -34,7 +34,7 @@
                     }
                 },
                 error: (err) => {
-                    window.location.href = err.responseJSON.returnTo || '/fail_login';
+                    window.location.href = err.responseJSON.returnTo+`?err=${err.responseJSON.msg}`;
                 }
             });
         return false;

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {{#if err}}
+    {{#if isLoginError}}
         <link rel="stylesheet" href="assets/css/login_error.css">
     {{else}}
         <link rel="stylesheet" href="assets/css/register_error.css">
@@ -12,30 +12,62 @@
     <title>Se generó un Error</title>
 </head>
 <body>
-    {{#if err}}
-    <div>
-        <aside><img src="https://png.pngtree.com/png-vector/20190115/ourlarge/pngtree-sad-depressed-and-sad-emoticon-with-tear-on-face-png-image_317660.jpg" alt="404 Image" />
-        </aside>
-        <main>
-            <h1>¡Ups!</h1>
-            <p>
-            Parece que no se pudo iniciar la sesión <em>. . . asegurese de ingresar correctamente sus credenciales.</em>
-            </p>
-            <a href="/login"><button>¡Aún no me rindo!</button></a>
-        </main>
-    </div>
+    {{#if isfatalError}}
+        <div class="wrapper">
+            <h1>¡OH NO!</h1>
+            <p>Al parecer se generó un error con tu petición, el problema es el siguiente:</p>
+            <p>Mensaje de error:</p>
+            <ul>
+                <li>
+                    <p>{{msg}}</p>
+                </li>
+            </ul>
+            <div class="buttons">
+                <a href="/">Regresar</a>
+            </div>
+        </div>
+        <div class="space">
+            <div class="blackhole"></div>
+            <div class="ship"></div>
+        </div>
     {{else}}
-    <div class="wrapper">
-    <h1>Hmm...</h1>
-    <p>Al parecer se generó un error al intentar reistrarte, intenta probar con otro email o nombre de usuario.</p>
-    <div class="buttons">
-        <a href="/register">Dejame Intenarlo una vez más</a>
-    </div>
-    </div>
-    <div class="space">
-    <div class="blackhole"></div>
-    <div class="ship"></div>
-    </div>
+        {{#if isLoginError}}
+            <div>
+                <aside><img src="https://png.pngtree.com/png-vector/20190115/ourlarge/pngtree-sad-depressed-and-sad-emoticon-with-tear-on-face-png-image_317660.jpg" alt="404 Image" />
+                </aside>
+                <main>
+                    <h1>¡Ups!</h1>
+                    <p>
+                    Parece que no se pudo iniciar la sesión <em>. . . asegurese de ingresar correctamente sus credenciales.</em>
+                    </p>
+                    <p>Mensaje de error:</p>
+                    <ul>
+                        <li>
+                            <p>{{msg}}</p>
+                        </li>
+                    </ul>
+                    <a href="/login"><button>Intentarlo una vez más</button></a>
+                </main>
+            </div>
+        {{else}}
+            <div class="wrapper">
+                <h1>Hmm...</h1>
+                <p>Al parecer se generó un error al intentar reistrarte, intenta probar con otro email o nombre de usuario.</p>
+                <p>Mensaje de error:</p>
+                <ul>
+                    <li>
+                        <p>{{msg}}</p>
+                    </li>
+                </ul>
+                <div class="buttons">
+                    <a href="/register">Dejame Intenarlo una vez más</a>
+                </div>
+            </div>
+            <div class="space">
+                <div class="blackhole"></div>
+                <div class="ship"></div>
+            </div>
+        {{/if}}
     {{/if}}
 </body>
 </html>

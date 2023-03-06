@@ -81,12 +81,16 @@ const register_get = (req, res) => {
 }; 
 
 const fail_login = (req, res) => {
-    res.render('index',{layout: 'error_template', err: true});
+    res.render('index',{ layout: 'error_template', isLoginError: true, msg: req.query.err || 'Unknow Login Error' });
 };
 
 const fail_register = (req, res) => {
-    res.render('index',{layout: 'error_template'});
+    res.render('index',{ layout: 'error_template', isLoginError: false, msg: req.query.err || 'Unknow Register Error' });
 };
+
+const fatal_error = (req, res) => {
+    res.render('index',{ layout: 'error_template', isfatalError: true, msg: req.query.err || 'Unknow Fatal Error' });
+}
 
 /* =========== EXPORT =========== */
 module.exports = {
@@ -99,4 +103,5 @@ module.exports = {
     fail_login,
     register_get,
     fail_register,
+    fatal_error,
 };

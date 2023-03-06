@@ -30,6 +30,9 @@ USER_FRONT.get('/register', auth.clientIsUnLogged, controller.register_get);
 
 USER_FRONT.get('/fail_register', controller.fail_register);
 
+/* FATAL ERROR */
+USER_FRONT.get('/fatal_error', controller.fatal_error);
+
 /* TEST */
 USER_FRONT.get('/test', (req, res) => {
     res.send('test GET route is working successfully!!');

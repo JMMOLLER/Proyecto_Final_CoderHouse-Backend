@@ -48,15 +48,15 @@ class UsuariosDAO{
     async updateUser(id, data){
         try {
             this.mongodb(this.url);
-            const doc = await this.getById(id);
-            if(doc==false){throw new Error('No se encontro el usuario')}
+            const user = await this.getById(id);
+            if(user==false){throw new Error('No se encontro el usuario')}
 
-            doc.age = data.age;
-            doc.address = data.address;
-            doc.phone_number = data.phone_number;
+            if(data.age){user.age = data.age}
+            if(data.address){user.address = data.address}
+            if(data.phone_number){user.phone_number = data.phone_number}
+            if(data.avatar){user.avatar = data.avatar}
             
-            if(data.avatar){doc.avatar = data.avatar;}
-            await doc.save();
+            await user.save();
             return true;
         } catch (error) {
             console.log(error);
