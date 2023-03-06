@@ -5,6 +5,7 @@ components:
       required:
         -brand
         -title
+        -category
         -thumbnail
         -price
         -stock
@@ -15,6 +16,9 @@ components:
         title:
           type: string
           description: El título del producto.
+        category:
+          type: string
+          description: La categoría del producto.
         thumbnail:
           type: url
           description: La direcciíión url de la imagen del producto.
@@ -27,6 +31,7 @@ components:
       example:
         brand: HERSHEY'S
         title: Chocolate Blanco HERSHEY'S 87g
+        category: food
         thumbnail: https://vivanda.vtexassets.com/arquivos/ids/242595/20170153.jpg
         price: 1.82
         stock: 10
