@@ -2,7 +2,7 @@
 
 body {
     font-family: "Poppins", sans-serif;
-    /* color: #444444; */
+    color: #444444;
     color: #ffffff;
     background-image: url('../images/bg-02.jpg');
 }
@@ -166,6 +166,7 @@ a:hover {
     width: 100%;
     height: 100%;
     animation: fadeIn 1s;
+    bottom: 0 !important;
 }
   
 .spinner-hidden {
@@ -174,4 +175,8 @@ a:hover {
 
 a {
     cursor: pointer;
+}
+
+.search_input {
+    margin-bottom: 50px;
 }

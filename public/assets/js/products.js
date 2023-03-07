@@ -1,19 +1,32 @@
+
 window.onload = async () => {
     await checkNewProduct();
+
+    document.querySelector("input[type=search]").addEventListener("keyup", (e) => {
+        if (e.keyCode === 13) {
+            filterProducts();
+        }
+    });
+
     const items = document.querySelectorAll(".cart-button");
     items.forEach((item) => {
         item.addEventListener("click", async () => {
             const spinner = document.querySelector(".container_change");
+            spinner.clientHeight = getActualWidth();
             spinner.classList.remove("spinner-hidden");
             document.body.style.overflow = "hidden";
-            if (await checkStock({ id: item.dataset.value, cant: "++" })) {
+            const response = await checkStock({
+                id: item.dataset.value,
+                cant: "++",
+            });
+            if (response.value) {
                 const status = await addToCart(item.dataset.value);
                 if (status === 200) {
                     alert("Producto agregado al carrito");
                 } else {
                     alert("Error al agregar el producto al carrito");
                 }
-            } else {
+            } else if (response.status == 409 && !response.value) {
                 alert("No hay stock suficiente");
             }
             spinner.classList.add("spinner-hidden");
@@ -21,6 +34,35 @@ window.onload = async () => {
         });
     });
 };
+
+function filterProducts(){
+    const filter = document.querySelector("input[type=search]").value;
+    const list = document.querySelectorAll(".row")[1].childNodes;
+    list.forEach((item) => {
+        if (item.nodeName === "DIV") {
+            if(filter !== ""){
+                if (item.dataset.value != filter) {
+                    item.style.display = "none";
+                } else {
+                    item.style.display = "block";
+                }
+            }else{
+                item.style.display = "block";
+            }
+        }
+    });
+}
+
+function getActualWidth() {
+    const actualWidth =
+        window.innerWidth ||
+        document.documentElement.clientWidth ||
+        document.body.clientWidth ||
+        document.body.offsetWidth;
+
+    return actualWidth.toString()+"px";
+}
+
 async function addToCart(product) {
     const response = await fetch(
         `/api/carrito/add/producto/${product}?admin=true`,
@@ -57,7 +99,7 @@ async function checkStock({ id, cant }) {
     if (data.status == 500 && !data.value) {
         location.href = data.returnTo + `?err=${data.msg}`;
     }
-    return data.value;
+    return data;
 }
 async function getProducts() {
     const response = await fetch("/api/productos?admin=true", {

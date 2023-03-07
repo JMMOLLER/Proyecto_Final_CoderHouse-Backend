@@ -31,6 +31,7 @@ class Productos {
     async setProduct(new_data){
         try{
             this.mongodb(this.url);
+            new_data['code']=this.generateCode();
             const newProduct = new ProductModel(new_data);
             return await newProduct.save();
         }catch(err){
@@ -118,6 +119,7 @@ class Productos {
         try{
             if(producto.id){throw new Error('id is auto generated')}
             if(producto.timestamp){throw new Error('timestamp is auto generated')}
+            if(producto.code){throw new Error('code is auto generated')}
             if(!producto.category){throw new Error('category is required')}
             if(!producto.title){throw new Error('title is required')}
             if(!producto.brand){throw new Error('brand is required')}
@@ -129,6 +131,12 @@ class Productos {
             console.log('\x1b[31m%s\x1b[0m', e.message);
             return false;
         }
+    }
+
+    generateCode(){
+        return Math.floor((Math.random() * (99 - 10 + 1)) + 10)+
+            '-'+Math.floor((Math.random() * (999 - 100 + 1)) + 100)+
+            '-'+Math.floor((Math.random() * (9999 - 1000 + 1)) + 1000);
     }
 }
 
