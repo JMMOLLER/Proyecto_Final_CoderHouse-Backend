@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const LocalStrategy = require("passport-local").Strategy;
 const JWTStrategy = require("passport-jwt").Strategy;
 const TwitterStrategy = require("passport-twitter").Strategy;
+const GitHubStrategy = require("passport-github2").Strategy;
 const { deleteUserImg } = require("../Routers/Services/API.service");
 const { UserModel } = require("../DB/models/UsuariosModel");
 const { sendEmail, validatePhoneE164 } = require("../Routers/Services/API.service");
@@ -172,6 +173,38 @@ Passport.use(
                     phone_number: "+12125551212",
                     avatar: profile.photos[0].value || "/public/default.png",
                     twitterId: profile.id,
+
+                });
+                return done(null, newUser);
+            }
+        }catch(err){
+            console.log(err);
+            return done(null, false, { message: err.message });
+        }
+    })
+);
+
+Passport.use(
+    new GitHubStrategy({
+        clientID: process.env.GITHUB_CLIENT_ID,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        callbackURL: process.env.GITHUB_CALLBACK_URL,
+    },
+    async (accessToken, refreshToken, profile, done) => {
+        try{
+            mongoose.connect(process.env.MONGODB_URI);
+            const user = await UserModel.findOne({ githubId: profile.id });
+            if (user) return done(null, user);
+            else {
+                const newUser = await UserModel.create({
+                    name: profile._json.name,
+                    email: profile.username+"@github.com",
+                    password: profile.id,
+                    address: profile._json.location || "No address",
+                    age: profile._json.age || 20,
+                    phone_number: "+12125551212",
+                    avatar: profile.photos[0].value || "/public/default.png",
+                    githubId: profile.id,
 
                 });
                 return done(null, newUser);

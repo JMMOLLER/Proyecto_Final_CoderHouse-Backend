@@ -205,7 +205,7 @@ iframe {
 
 /*------------------------------------------------------------------
 [ Button sign in with ]*/
-.btn-face,
+.btn-github,
 .btn-google {
   font-family: Montserrat-SemiBold;
   font-size: 18px;
@@ -236,7 +236,7 @@ iframe {
 }
 
 .btn-google::before,
-.btn-face::before {
+.btn-github::before {
   content: "";
   display: block;
   position: absolute;
@@ -258,12 +258,12 @@ iframe {
   transition: all 0.4s;
 }
 
-.btn-face {
+.btn-github {
   color: #fff;
-  background-color: #3b5998;
+  background-color: #1b1b1b;
 }
 
-.btn-face i {
+.btn-github i {
   font-size: 30px;
   margin-right: 17px;
   padding-bottom: 3px;
@@ -280,12 +280,18 @@ iframe {
   padding-bottom: 3px;
 }
 
-.btn-face:hover:before,
+.btn-github img {
+  margin-right: 10px;
+  margin-bottom: 3px;
+  filter: invert(1)
+}
+
+.btn-github:hover:before,
 .btn-google:hover:before {
   opacity: 1;
 }
 
-.btn-face:hover,
+.btn-github:hover,
 .btn-google:hover {
   color: #fff;
 }

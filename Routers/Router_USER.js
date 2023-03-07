@@ -41,6 +41,10 @@ USER_FRONT.get('/auth/twitter/login', controller.register_twitter);
 
 USER_FRONT.get('/auth/twitter', Passport.authenticate('twitter'));
 
+USER_FRONT.get('/auth/GitHub/login', controller.register_github);
+
+USER_FRONT.get('/auth/GitHub', Passport.authenticate('github'));
+
 /* FATAL ERROR */
 USER_FRONT.get('/fatal_error', controller.fatal_error);
 
