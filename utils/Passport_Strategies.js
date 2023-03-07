@@ -2,6 +2,7 @@ const Passport = require("passport");
 const mongoose = require("mongoose");
 const LocalStrategy = require("passport-local").Strategy;
 const JWTStrategy = require("passport-jwt").Strategy;
+const TwitterStrategy = require("passport-twitter").Strategy;
 const { deleteUserImg } = require("../Routers/Services/API.service");
 const { UserModel } = require("../DB/models/UsuariosModel");
 const { sendEmail, validatePhoneE164 } = require("../Routers/Services/API.service");
@@ -148,6 +149,38 @@ Passport.use(
             }
         }
     )
+);
+
+Passport.use(
+    new TwitterStrategy({
+        consumerKey: process.env.TWITTER_CONSUMER_KEY,
+        consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+        callbackURL: process.env.TWITTER_CALLBACK_URL,
+    },
+    async (token, tokenSecret, profile, done) => {
+        try{
+            mongoose.connect(process.env.MONGODB_URI);
+            const user = await UserModel.findOne({ twitterId: profile.id });
+            if (user) return done(null, user);
+            else {
+                const newUser = await UserModel.create({
+                    name: profile.username,
+                    email: profile.username+"@twitter.com",
+                    password: profile.id,
+                    address: profile._json.location || "No address",
+                    age: profile._json.age || 20,
+                    phone_number: "+12125551212",
+                    avatar: profile.photos[0].value || "/public/default.png",
+                    twitterId: profile.id,
+
+                });
+                return done(null, newUser);
+            }
+        }catch(err){
+            console.log(err);
+            return done(null, false, { message: err.message });
+        }
+    })
 );
 
 const cookieExtractor = (req) => {

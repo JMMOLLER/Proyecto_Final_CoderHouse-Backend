@@ -59,14 +59,17 @@ async function saveChanges() {
         success: (data) => {
             if (data.status === 200) {
                 alert("Cambios guardados");
-                location.reload();
+                return location.reload();
             } else {
-                alert("Error al guardar los cambios");
+                return alert("Error al guardar los cambios");
             }
         },
         error: (err) => {
-            alert("Error al guardar los cambios");
-            location.href = err.responseJSON.returnTo+`?err=${err.responseJSON.msg}`;
+            alert("Error al guardar los cambios.\n"+err.responseJSON.msg);
+            if(err.responseJSON.status == 500){
+                return location.href = err.responseJSON.returnTo+`?err=${err.responseJSON.msg}`;
+            }
+            return location.reload();
         }
     })
     spinnerAnimation(false);

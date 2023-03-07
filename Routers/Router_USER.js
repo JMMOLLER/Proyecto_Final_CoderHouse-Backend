@@ -1,10 +1,9 @@
 const express = require('express');
-const multer = require('multer');
 const USER_FRONT = express.Router();
-const { storage } = require('../utils/MulterStorage');
-const upload = multer({ storage });
 const controller = require('./Controllers/Client.controller');
 const auth = require('./auth/auth');
+const jwt = require('jsonwebtoken');
+const Passport = require('passport');
 USER_FRONT.use(express.json());
 
 
@@ -32,6 +31,16 @@ USER_FRONT.get('/register', auth.clientIsUnLogged, controller.register_get);
 
 USER_FRONT.get('/fail_register', controller.fail_register);
 
+USER_FRONT.get('/completeRegister/:userId', (req, res) => {
+    res.render('index', { title: 'Completar Registro', layout: 'completeRegister' });
+});
+
+/* PASSPORT AUTHENTICATE */
+
+USER_FRONT.get('/auth/twitter/login', controller.register_twitter);
+
+USER_FRONT.get('/auth/twitter', Passport.authenticate('twitter'));
+
 /* FATAL ERROR */
 USER_FRONT.get('/fatal_error', controller.fatal_error);
 
@@ -51,13 +60,5 @@ USER_FRONT.get('/protected', auth.clientIsLogged, (req, res) => {
     res.send('this route is protected')
 })
 
-USER_FRONT.get('/auth', auth.clientIsLogged, (req, res) => {
-    res.json({
-        msg: 'you are Authenticated',
-        returnTo: req.returnTo,
-        user: req.user,
-        token: req.session.jwt
-    });
-});
 
 module.exports = { USER_FRONT };

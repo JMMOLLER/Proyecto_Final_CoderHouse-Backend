@@ -528,6 +528,21 @@ const user_update = async(req, res) => {
     }
 };
 
+const completeRegister = async(req, res) => {
+    try{
+        const response = await BD_Usuarios_Local.completeRegister(req.body);
+        if(response.status==500){
+            return res.status(500).json(errJSON(response.msg));
+        }
+        response.value
+            ? res.status(200).json({status: 200, msg: 'Registro completado', data: req.body})
+            : res.status(response.status).json({status: response.status, msg: response.msg, value: false});
+    }catch(e){
+        console.log(e);
+        res.status(500).json(errJSON(e.message));
+    }
+}
+
 const deleteUser = async(req, res) => {
     try{
         const avatar = await BD_Usuarios_Local.getAvatar(req.user._id);
@@ -587,5 +602,6 @@ module.exports = {
         user_update,
         userInfo,
         Info,
+        completeRegister,
     }
 };

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { UserModel } = require("../models/UsuariosModel");
+const { validatePhoneE164 } = require("../../Routers/Services/API.service")
 mongoose.set('strictQuery', true);
 
 class UsuariosDAO{
@@ -136,6 +137,37 @@ class UsuariosDAO{
         }catch(err){
             console.log(err);
             return false;
+        }
+    }
+
+    async completeRegister(data){
+        try {
+            this.mongodb(this.url);
+
+            if(!data.userid){return {msg:'userid is required', status: 400, value: false}}
+            if(!data.email){return {msg:'email is required', status: 400, value: false}}
+            if(!data.address){return {msg:'address is required', status: 400, value: false}}
+            if(!data.age){return {msg:'age is required', status: 400, value: false}}
+            if(!data.phone_number){return {msg:'phone_number is required', status: 400, value: false}}
+            if(!validatePhoneE164(data.phone_number)){return {msg:'phone_number is not valid', status: 400, value: false}}
+
+            if(!await this.checkEmail(data.email)){return {msg:'email already exist', status: 409, value: false}}
+
+            let user = await UserModel.findById(data.userid);
+            if(!user){return {msg:'user not found', status: 404, value: false}}
+            if(user.__v >= 1){return {msg:'user already complete', status: 409, value: false}}
+
+            user.email = data.email;
+            user.address = data.address;
+            user.age = data.age;
+            user.phone_number = data.phone_number;
+            user.__v = 1;
+            
+            await user.save();
+            return {msg: 'Usuario actualizado', status: 200, value: true};
+        } catch (error) {
+            console.log(error);
+            return {msg: error.message, status: 500, value: false};
         }
     }
 }

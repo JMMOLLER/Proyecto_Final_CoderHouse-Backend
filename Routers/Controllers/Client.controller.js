@@ -91,7 +91,20 @@ const login_get = (req, res) => {
 
 const register_get = (req, res) => {
     res.render('index', {title: 'Regristro', layout: 'register'});
-}; 
+};
+
+const register_twitter = (req, res) => {
+    Passport.authenticate('twitter',{ session: false }, (err, user, info) => {
+        if (err) { return res.redirect('/fail_login'); }
+        if (!user) { return res.redirect('/fail_login'); }
+        if((user.email).indexOf('@twitter.com') > -1){
+            return res.redirect('/completeRegister/'+user._id);
+        }
+        const token = jwt.sign({ user }, process.env.COOKIE_SECRET)
+        req.session.jwt = token
+        return res.redirect('/user/profile')
+    })(req, res)
+}
 
 const fail_login = (req, res) => {
     res.render('index',{ layout: 'error_template', isLoginError: true, msg: req.query.err || 'Unknow Login Error' });
@@ -118,4 +131,5 @@ module.exports = {
     register_get,
     fail_register,
     fatal_error,
+    register_twitter,
 };
