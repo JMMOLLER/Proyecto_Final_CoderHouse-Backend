@@ -92,6 +92,8 @@ API_USER.get('/all', controller.user.allUsers);
 
 API_USER.get('/:id', controller.user.Info);
 
+API_USER.get('/chat/:mail', controller.user.getChat);
+
 API_USER.post('/buy', auth.isLogged, controller.user.userPurchase);
 
 API_USER.put('/update', auth.isLogged, upload.single('avatar'), controller.user.user_update);

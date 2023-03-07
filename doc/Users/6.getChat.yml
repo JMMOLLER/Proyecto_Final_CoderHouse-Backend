@@ -1,15 +1,15 @@
 paths:
-  /api/productos/category/{category}:
+  /api/user/chat/{mail}:
     get:
       tags: 
-        - Productos
-      summary: Ruta para obtener un producto de la Base de Datos según su categoria.
+        - Usuarios
+      summary: Ruta para obtener los mensajes de un usuario de la Base de Datos según su email.
       parameters:
         - in: path
-          name: category
-          value: food
+          name: mail
+          value: jlmm.jlmm76@gmail.com
           type: string
-          description: La solicitud debe enviar el parametro **{category}** a buscar.
+          description: La solicitud debe enviar el parametro **{mail}** a buscar.
           required: true
         - in: query
           name: admin
@@ -24,7 +24,7 @@ paths:
             application/json:
               type: object
               schema:
-                $ref: '#/components/schemas/allProducts'
+                $ref: '#/components/schemas/MessagesUser'
         "401":
           description: 'En caso de no enviar los parametros solicitados la ruta devuelve un objeto indicando que la petición no fue autorizada.'
           content:
@@ -33,7 +33,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnAuthorizedError'
         "404":
-          description: 'En caso de no encontrar la categoría la ruta devuelve un objeto indicando que no fue encontrado.'
+          description: 'En caso de no encontrar el usuario la ruta devuelve un objeto indicando que el producto no fue encontrado.'
           content:
             application/json:
               type: object

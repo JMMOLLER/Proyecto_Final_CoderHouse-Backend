@@ -29,13 +29,23 @@ class Mensajes {
     // Obtener todos los mensajes
     async getAll() {
         try {
-            console.log('leyendo mensajes en mongo');
             this.mongodb(this.url);
-            const messages = await MessageModel.find().lean();
+            const messages = await MessageModel.find().select('-__v').lean();
             return await this.setFromInfo(messages);
         } catch (err) {
             console.log(err);
-            return [];
+            return null;
+        }
+    }
+
+    async getByEmail(id) {
+        try{
+            this.mongodb(this.url);
+            const messages = await MessageModel.find({from: id}).select('-__v').lean();
+            return await this.setFromInfo(messages);
+        }catch(err){
+            console.log(err);
+            return null;
         }
     }
 
@@ -62,7 +72,7 @@ class Mensajes {
             return messages;
         }catch(err){
             console.log(err);
-            return [];
+            return null;
         }
     }
 

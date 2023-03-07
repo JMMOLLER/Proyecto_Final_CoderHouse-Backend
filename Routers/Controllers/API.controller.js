@@ -2,7 +2,9 @@ const { sendMessages, validatePhoneE164 } = require('../Services/API.service');
 const { deleteUserImg } = require('../Services/API.service');
 const { BD_Carrito } = require('../../DB/DAOs/Carrito.daos.js');
 const { BD_Productos } = require('../../DB/DAOs/Productos.daos.js');
+const { Mensajes } = require('../../DB/DAOs/Mensajes.dao.js');
 const { BD_Usuarios_Local } = require('../../DB/DAOs/Usuarios_Local');
+const BD_Mensajes = new Mensajes().returnSingleton();
 const Passport = require('passport');
 const jwt = require('jsonwebtoken');
 const errJSON = (e) => {
@@ -413,6 +415,27 @@ const userInfo = (req, res) => {
     });
 };
 
+const getChat = async(req, res) => {
+    try{
+        const id = await BD_Usuarios_Local.getByEmail(req.params.mail);
+        if(!id){
+            return res.status(404).json({
+                status: 404,
+                msg: 'ERROR - User eMail not found',
+                value: false
+            });
+        }
+        const messages = await BD_Mensajes.getByEmail(id);
+        messages
+            ? res.status(200).json({status: 200, msg: 'OK', value: true, messages})
+            : res.status(500).json(errJSON());
+        return;
+    }catch(e){
+        console.log(e);
+        res.status(500).json(errJSON(e.message));
+    }
+}
+
 const Info = async(req, res) => {
     try{
         const user = await BD_Usuarios_Local.getById(req.params.id)
@@ -559,6 +582,7 @@ module.exports = {
     user: {
         allUsers,
         userPurchase,
+        getChat,
         deleteUser,
         user_update,
         userInfo,

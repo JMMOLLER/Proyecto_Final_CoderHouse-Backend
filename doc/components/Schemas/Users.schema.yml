@@ -75,3 +75,36 @@ components:
             avatar: "https://i.imgur.com/l8Q7qdH.png",
           }
         ]
+    MessagesUser:
+      type: object
+      properties:
+        status:
+          type: status code
+          description: El codigo de estado.
+        msg:
+          type: string
+          description: Mensaje de código de estado.
+        value:
+          type: boolean
+          description: Indica si se completó la solicitud correctamente.
+        messages:
+          type: Array
+          description: El arreglo de productos.
+      example:
+        status: 200
+        msg: OK
+        value: true
+        messages: [
+          {
+            "_id": "63f6957c88259a0110687311",
+            "message": "Probando socket desde el cliente",
+            "from": {
+              "_id": "640665a97080d45b39d8fcf4",
+              "name": "Jorge Luis Moreno Moller",
+              "email": "jlmm.jlmm76@gmail.com",
+              "age": "19",
+              "avatar": "/uploads/1678141221395.jpg"
+            },
+            "timestamp": "2023-02-23T22:21:48.157Z"
+          }
+        ]

@@ -45,6 +45,18 @@ class UsuariosDAO{
         }
     }
 
+    async getByEmail(email){
+        try{
+            this.mongodb(this.url);
+            const user = await UserModel.findOne({email: email});
+            if(!user){throw new Error('No se encontro el usuario')}
+            return user._id;
+        }catch(err){
+            console.log(err);
+            return false;
+        }
+    }
+
     async updateUser(id, data){
         try {
             this.mongodb(this.url);
