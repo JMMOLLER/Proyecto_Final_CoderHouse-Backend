@@ -1,8 +1,8 @@
 const Passport = require('passport');
-const { BD_Productos } = require('../../DB/DAOs/Productos.daos');
-const { BD_Carrito } = require('../../DB/DAOs/Carrito.daos');
+const { BD_Productos } = require('../../DB/DAOs/Productos.dao');
+const { BD_Carrito } = require('../../DB/DAOs/Carrito.dao');
 const jwt = require('jsonwebtoken');
-const { BD_Usuarios_Local } = require('../../DB/DAOs/Usuarios_Local');
+const { BD_Usuarios_Local } = require('../../DB/DAOs/Usuarios_Local.dao');
 
 /* =========== ROUTES =========== */
 const home = async(req, res) => {
@@ -93,12 +93,28 @@ const register_get = (req, res) => {
     res.render('index', {title: 'Regristro', layout: 'register'});
 };
 
+const fail_login = (req, res) => {
+    res.render('index',{ layout: 'error_template', isLoginError: true, msg: req.query.err || 'Unknow Login Error' });
+};
+
+const fail_register = (req, res) => {
+    res.render('index',{ layout: 'error_template', isLoginError: false, msg: req.query.err || 'Unknow Register Error' });
+};
+
+const fatal_error = (req, res) => {
+    res.render('index',{ layout: 'error_template', isfatalError: true, msg: req.query.err || 'Unknow Fatal Error' });
+};
+
+const completeRegister = (req, res) => {
+    res.render('index', { title: 'Completar Registro', layout: 'completeRegister' });
+};
+
 const register_twitter = (req, res) => {
     Passport.authenticate('twitter',{ session: false }, (err, user, info) => {
         if (err) { return res.redirect('/fail_login'); }
         if (!user) { return res.redirect('/fail_login'); }
         if((user.email).indexOf('@twitter.com') > -1){
-            return res.redirect('/completeRegister/'+user._id);
+            return res.redirect('/completeRegister/'+user._id);//Verificar si el usuario tiene sus datos completos
         }
         const token = jwt.sign({ user }, process.env.COOKIE_SECRET)
         req.session.jwt = token
@@ -111,24 +127,12 @@ const register_github = (req, res) => {
         if (err) { return res.redirect('/fail_login'); }
         if (!user) { return res.redirect('/fail_login'); }
         if((user.email).indexOf('@github.com') > -1){
-            return res.redirect('/completeRegister/'+user._id);
+            return res.redirect('/completeRegister/'+user._id);//Verificar si el usuario tiene sus datos completos
         }
         const token = jwt.sign({ user }, process.env.COOKIE_SECRET)
         req.session.jwt = token
         return res.redirect('/user/profile')
     })(req, res)
-}
-
-const fail_login = (req, res) => {
-    res.render('index',{ layout: 'error_template', isLoginError: true, msg: req.query.err || 'Unknow Login Error' });
-};
-
-const fail_register = (req, res) => {
-    res.render('index',{ layout: 'error_template', isLoginError: false, msg: req.query.err || 'Unknow Register Error' });
-};
-
-const fatal_error = (req, res) => {
-    res.render('index',{ layout: 'error_template', isfatalError: true, msg: req.query.err || 'Unknow Fatal Error' });
 }
 
 /* =========== EXPORT =========== */
@@ -146,4 +150,5 @@ module.exports = {
     fatal_error,
     register_twitter,
     register_github,
+    completeRegister,
 };

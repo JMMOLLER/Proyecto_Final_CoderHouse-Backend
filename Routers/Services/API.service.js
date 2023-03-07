@@ -1,38 +1,43 @@
-require('dotenv').config();
-const fs = require('fs-extra');
-const path = require('path');
-const UploadsDir = path.join(__dirname, '../../public/uploads/');
-const { BD_Productos } = require('../../DB/DAOs/Productos.daos');
-const { sendSMS } = require('../../utils/Twilio');
-const { sendMail } = require('../../utils/NodeMailer');
+require("dotenv").config();
+const fs = require("fs-extra");
+const path = require("path");
+const UploadsDir = path.join(__dirname, "../../public/uploads/");
+const { BD_Productos } = require("../../DB/DAOs/Productos.dao");
+const { sendSMS } = require("../../utils/Twilio");
+const { sendMail } = require("../../utils/NodeMailer");
 
-async function sendMessages({userInfo, cartInfo}){
+const getPulicPath = (e) => path.join(__dirname,"../../public/assets",e);
+
+async function sendMessages(newOrder) {
     /* FOR NODEMAILER */
-    await sendPurchaseMail({userInfo, cartInfo});
+    await sendPurchaseMail(newOrder);
     /* FOR SMS */
-    await sendSMSToUser(userInfo);
+    await sendSMSToUser(newOrder.user);
     return;
     /* FOR WHATSAPP */
     //await sendWhatsappToUser(USER);
 }
 
-async function deleteUserImg(currentUserImg){
-    try{
-        if(currentUserImg.indexOf('/uploads/')>-1 && currentUserImg.indexOf('default')==-1){
+async function deleteUserImg(currentUserImg) {
+    try {
+        if (
+            currentUserImg.indexOf("/uploads/") > -1 &&
+            currentUserImg.indexOf("default") == -1
+        ) {
             currentUserImg = currentUserImg.substr(9);
             await fs.remove(UploadsDir + currentUserImg);
         }
-    }catch(err){
+    } catch (err) {
         console.log(err);
     }
 }
 
-async function sendEmail(user_data){
-    try{
-        return await sendMail({
-            from: 'Servidor Node.js',
+async function sendEmail(user_data) {
+    try {
+        await sendMail({
+            from: "Tienda Tuya",
             to: process.env.MAIL_USER,
-            subject: 'Nuevo Registro',
+            subject: "Nuevo Registro",
             html: `<h1 style="color: blue; align-text: center">Nuevo usuario registrado</h1>
                 <p>Nombre: ${user_data.name}</p>
                 <p>Email: ${user_data.email}</p>
@@ -40,117 +45,105 @@ async function sendEmail(user_data){
                 <p>Edad: ${user_data.age}</p>
                 <p>Avatar: ${user_data.avatar}</p>`,
         });
-    }catch(err){
-        console.log(err);
-    }
-}
 
-async function sendPurchaseMail({userInfo, cartInfo}){
-    try{
+        const msg = fs
+            .readFileSync(
+                getPulicPath("/html/registrationUser.html"),"utf8"
+            ).replaceAll("URLHOST", (process.env.URLHOST+"/productos"));
         await sendMail({
-            from: 'Tienda Tuya',
-            to: process.env.MAIL_USER,
-            subject: `Nuevo pedido del usuario ${userInfo.name}`,
-            html: `<h1 style="color: blue; align-text: center">Nueva Compra de Usuario</h1>
-                <p>Nombre: ${userInfo.name}</p>
-                <p>Email: ${userInfo.email}</p>
-                <p>Dirección: ${userInfo.address}</p>`,
+            from: "Tienda Tuya",
+            to: user_data.email,
+            subject: "Gracias por tu Registro",
+            html: msg,
         });
-        const msg = await createMessageMail({
-            typeShipping: cartInfo.shipping, 
-            cartInfo
-        });
-        return await sendMail({
-            from: 'Tienda Tuya',
-            to: userInfo.email,
-            subject: `Gracias por tu nueva compra, ${userInfo.name}`,
-            html: `<style>
-                    table, th {
-                        border-bottom: 1px solid black;
-                        border-collapse: collapse;
-                    }.footer, .SubTotal td {
-                        border-top: 1px solid black;
-                        border-bottom: 1px solid black;
-                    }th, td {
-                        padding: 10px 30px;
-                        text-align: center;
-                    }
-                </style>
-                <table>
-                    <tr>
-                        <th>Productos</th>
-                        <th>Cantidad</th>
-                        <th>Precio por UND.</th>
-                    </tr>
-                    ${msg}
-                </table>`,
-        });
-    }catch(err){
+        return;
+    } catch (err) {
         console.log(err);
     }
-};
-
-async function createMessageMail({typeShipping, cartInfo}){
-    let message = '', SubTotal = 0, Total = 0, Shipping = '0.00';
-    if(typeShipping == '10'){
-        Shipping = '10.00';
-    }else if(typeShipping == '5'){
-        Shipping = '5.00';
-    }
-    for(let i=0; i<cartInfo.productos.length; i++){
-        const { id, quantity } = cartInfo.productos[i];
-        const producto = await BD_Productos.getById(id);
-        const { title, price } = producto;
-        message += `<tr>
-                <td>${title}</td>
-                <td>${quantity}</td>
-                <td>${price}</td>
-            </tr>`;
-        SubTotal += (price * quantity);
-    }
-    Total = (SubTotal + parseFloat(Shipping)).toFixed(2);
-    message += `<tr class="footer">
-            <th>SubTotal</th>
-            <th></th>
-            <td>${(SubTotal).toFixed(2)}</td>
-        </tr>
-        <tr class="footer">
-            <th>Envío</th>
-            <th></th>
-            <td>${Shipping}</td>
-        </tr>
-        <tr class="footer">
-            <th>Total</th>
-            <th></th>
-            <th>${Total}</th>
-        </tr>`;
-    return message;
 }
 
-async function sendSMSToUser(USER){
-    try{
-        if(validatePhoneE164(USER.phone_number)){
+async function sendPurchaseMail(purchaseDetail) {
+    try {
+        await sendMail({
+            from: "Tienda Tuya",
+            to: process.env.MAIL_USER,
+            subject: `Nuevo pedido del usuario ${purchaseDetail.user.name}`,
+            html: `<h1 style="color: blue; align-text: center">Nueva Compra de Usuario</h1>
+                <p>Nombre: ${purchaseDetail.user.name}</p>
+                <p>Email: ${purchaseDetail.user.email}</p>
+                <p>Dirección: ${purchaseDetail.user.address}</p>`,
+        });
+        const msg = renderOrder(purchaseDetail);
+        return await sendMail({
+            from: "Tienda Tuya",
+            to: purchaseDetail.user.email,
+            subject: `Gracias por tu nueva compra, ${purchaseDetail.user.name}`,
+            html: msg,
+        });
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+function renderOrder(purchaseDetail){
+    const productsRendered = renderProductsTemplate(purchaseDetail.products);
+    const orderRendered = renderOrderTemplate(purchaseDetail);
+    return orderRendered.replace("PRODUCTS_HERE", productsRendered);
+}
+
+function renderProductsTemplate(productsList) {
+    const templateProduct = fs.readFileSync(getPulicPath('/html/productsTemplate.html'), 'utf8');
+    const productsRendered = productsList.map(product => {
+        let html = templateProduct.replaceAll("THUMBNAIL_R", product.thumbnail);
+        html = html.replaceAll("NAME_R", product.title);
+        html = html.replaceAll("CODE_R", product.code);
+        html = html.replaceAll("BRAND_R", product.brand);
+        html = html.replaceAll("QUANTITY_R", product.quantity);
+        html = html.replaceAll("PRICE_R", product.price);
+        return html;
+    }).join("");
+    return productsRendered;
+}
+
+
+function renderOrderTemplate(orderDetail) {
+    let templateOrder = fs.readFileSync(getPulicPath('/html/billTemplate.html'), 'utf8');
+    templateOrder = templateOrder.replaceAll("URLHOST", process.env.URLHOST);
+    templateOrder = templateOrder.replace("SUBTOTAL_R", orderDetail.subTotal);
+    templateOrder = templateOrder.replace("SHIPPING_R", orderDetail.shipping);
+    templateOrder = templateOrder.replace("TOTAL_R", orderDetail.total);
+    templateOrder = templateOrder.replace("USER_EMAIL_R", orderDetail.user.email);
+    templateOrder = templateOrder.replaceAll("CODE_R", orderDetail.code);
+    templateOrder = templateOrder.replaceAll("DATE_R", orderDetail.date);
+    templateOrder = templateOrder.replace("SHIPPING_MTEHOD_R", orderDetail.shippingMethod);
+    templateOrder = templateOrder.replace("ADDRESS_R", orderDetail.user.address);
+    return templateOrder;
+}
+
+async function sendSMSToUser(USER) {
+    try {
+        if (validatePhoneE164(USER.phone_number)) {
             return await sendSMS({
                 body: `Su pedido ha sido recibido y se encuentra en proceso`,
                 messagingServiceSid: process.env.TWILIO_MESSAGE_SERVICE_SID,
-                to: `${USER.phone_number}`
+                to: `${USER.phone_number}`,
             });
-        }else{
-            console.log("\x1b[31m%s\x1b[0m", 'Invalid phone number');
+        } else {
+            console.log("\x1b[31m%s\x1b[0m", "Invalid phone number");
         }
-    }catch(err){
+    } catch (err) {
         console.log(err);
     }
 }
 
-async function sendWhatsappToUser(USER){
-    try{
+async function sendWhatsappToUser(USER) {
+    try {
         return await sendSMS({
             from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
             body: `Su pedido ha sido recibido y se encuentra en proceso`,
-            to: `whatsapp:${USER.phone_number}`
+            to: `whatsapp:${USER.phone_number}`,
         });
-    }catch(err){
+    } catch (err) {
         console.log(err);
     }
 }
@@ -162,10 +155,10 @@ const validatePhoneE164 = (phoneNumber) => {
 };
 
 /* ========== EXPORT ========== */
-module.exports = { 
+module.exports = {
     sendMessages,
     sendPurchaseMail,
-    sendSMSToUser, 
+    sendSMSToUser,
     sendWhatsappToUser,
     sendEmail,
     deleteUserImg,

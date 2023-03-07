@@ -138,7 +138,7 @@ Passport.use(
 
                 console.log("\x1b[36m%s\x1b[0m", "Nuevo registro");
 
-                //sendEmail(userData); //No lleva await porque considero que no es necesario esperar a que se envie el correo para continuar
+                sendEmail(userData); //considero que no es necesario esperar a que se envie el correo para continuar
 
                 return done(null, userData);
             } catch (err) {
@@ -164,6 +164,7 @@ Passport.use(
             const user = await UserModel.findOne({ twitterId: profile.id });
             if (user) return done(null, user);
             else {
+                //No se envia correo porque falta completar el registro
                 const newUser = await UserModel.create({
                     name: profile.username,
                     email: profile.username+"@twitter.com",
@@ -196,6 +197,7 @@ Passport.use(
             const user = await UserModel.findOne({ githubId: profile.id });
             if (user) return done(null, user);
             else {
+                //No se envia correo porque falta completar el registro
                 const newUser = await UserModel.create({
                     name: profile._json.name,
                     email: profile.username+"@github.com",

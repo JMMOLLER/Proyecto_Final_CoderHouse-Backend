@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { CarritoModel } = require("../models/CarritoModel");
-const { BD_Productos } = require('./Productos.daos');
+const { BD_Productos } = require('./Productos.dao');
 
 class Carrito{
 

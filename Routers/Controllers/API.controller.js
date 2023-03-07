@@ -1,9 +1,10 @@
-const { sendMessages, validatePhoneE164 } = require('../Services/API.service');
+const { sendMessages, validatePhoneE164, sendEmail } = require('../Services/API.service');
 const { deleteUserImg } = require('../Services/API.service');
-const { BD_Carrito } = require('../../DB/DAOs/Carrito.daos.js');
-const { BD_Productos } = require('../../DB/DAOs/Productos.daos.js');
+const { BD_Carrito } = require('../../DB/DAOs/Carrito.dao.js');
+const { BD_Productos } = require('../../DB/DAOs/Productos.dao.js');
+const { BD_Ordenes } = require('../../DB/DAOs/Ordenes.dao.js');
 const { Mensajes } = require('../../DB/DAOs/Mensajes.dao.js');
-const { BD_Usuarios_Local } = require('../../DB/DAOs/Usuarios_Local');
+const { BD_Usuarios_Local } = require('../../DB/DAOs/Usuarios_Local.dao');
 const BD_Mensajes = new Mensajes().returnSingleton();
 const Passport = require('passport');
 const jwt = require('jsonwebtoken');
@@ -336,7 +337,7 @@ const login = async(req, res) => {
             status: 202,
             msg: 'ACEPTED',
             value: true,
-            returnTo: req.returnTo || '/products'
+            returnTo: req.returnTo || '/productos'
         })
     })(req, res)
 }
@@ -364,7 +365,7 @@ const register = async(req, res) => {
             status: 201,
             msg: 'CREATED',
             value: true,
-            returnTo: req.returnTo || '/products'
+            returnTo: req.returnTo || '/productos'
         })
     })(req, res)
 }
@@ -478,8 +479,11 @@ const userPurchase = async(req, res) => {
             });
 
         }else if(await BD_Carrito.deleteByID(cartInfo._id)){
-
-            await sendMessages({userInfo, cartInfo});
+            const order = await BD_Ordenes.addNewOrder({userId: userInfo._id, cartInfo, shipping: req.body.shipping})
+            if(!order.value){
+                return res.status(500).json(errJSON(order.message));
+            }
+            await sendMessages(order.newOrder);
             return res.status(200).json({status: 200, msg: "OK", value: true})
 
         }else{
@@ -534,9 +538,12 @@ const completeRegister = async(req, res) => {
         if(response.status==500){
             return res.status(500).json(errJSON(response.msg));
         }
-        response.value
-            ? res.status(200).json({status: 200, msg: 'Registro completado', data: req.body})
-            : res.status(response.status).json({status: response.status, msg: response.msg, value: false});
+        if(response.value){
+            sendEmail(response.user);
+            res.status(200).json({status: 200, msg: 'Registro completado', user: response.user})
+        }else{
+            res.status(response.status).json({status: response.status, msg: response.msg, value: false});
+        }
     }catch(e){
         console.log(e);
         res.status(500).json(errJSON(e.message));

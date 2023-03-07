@@ -5,7 +5,7 @@ const carritoSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now },
     owner: { type: ObjectId, ref: 'usuarios' },
     productos: [{
-        id: { type: ObjectId, ref: 'productos' },
+        id: { type: ObjectId, required: true, ref: 'productos' },
         quantity: { type: Number, default: 1 }
     }]
 });

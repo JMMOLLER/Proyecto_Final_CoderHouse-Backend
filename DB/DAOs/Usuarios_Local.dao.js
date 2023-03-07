@@ -164,7 +164,7 @@ class UsuariosDAO{
             user.__v = 1;
             
             await user.save();
-            return {msg: 'Usuario actualizado', status: 200, value: true};
+            return {msg: 'Usuario actualizado', status: 200, value: true, user};
         } catch (error) {
             console.log(error);
             return {msg: error.message, status: 500, value: false};

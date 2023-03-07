@@ -10,7 +10,7 @@ USER_FRONT.use(express.json());
 /* ============ ROUTES ============ */
 USER_FRONT.get('/', controller.home);
 
-USER_FRONT.get('/products', controller.products);
+USER_FRONT.get('/productos', controller.products);
 
 USER_FRONT.get('/chat', auth.clientIsLogged, controller.chat);
 
@@ -31,9 +31,7 @@ USER_FRONT.get('/register', auth.clientIsUnLogged, controller.register_get);
 
 USER_FRONT.get('/fail_register', controller.fail_register);
 
-USER_FRONT.get('/completeRegister/:userId', (req, res) => {
-    res.render('index', { title: 'Completar Registro', layout: 'completeRegister' });
-});
+USER_FRONT.get('/completeRegister/:userId', auth.clientIsUnLogged, controller.completeRegister);
 
 /* PASSPORT AUTHENTICATE */
 
@@ -50,7 +48,8 @@ USER_FRONT.get('/fatal_error', controller.fatal_error);
 
 /* TEST */
 USER_FRONT.get('/test', (req, res) => {
-    res.send('test GET route is working successfully!!');
+    //res.send('test GET route is working successfully!!');
+    res.render('index', { title: 'Express', layout: 'test' });
 });
 
 USER_FRONT.post('/test', (req, res) => {
