@@ -15,6 +15,8 @@ USER_FRONT.get('/products', controller.products);
 
 USER_FRONT.get('/chat', auth.clientIsLogged, controller.chat);
 
+USER_FRONT.get('/chat/:mail', auth.clientIsLogged, controller.getChat);
+
 /* USER */
 USER_FRONT.get('/user/profile', auth.clientIsLogged, controller.user_profile);
 

@@ -2,20 +2,33 @@ const Passport = require('passport');
 const { BD_Productos } = require('../../DB/DAOs/Productos.daos');
 const { BD_Carrito } = require('../../DB/DAOs/Carrito.daos');
 const jwt = require('jsonwebtoken');
+const { BD_Usuarios_Local } = require('../../DB/DAOs/Usuarios_Local');
 
 /* =========== ROUTES =========== */
 const home = async(req, res) => {
     Passport.authenticate('jwt', { session: false }, (err, user, info) => {
         if (err || !user) {
-            res.render('index', {title: 'Home', layout: 'index'});
+            res.render('index', { title: 'Home', layout: 'index' });
         }else {
-            res.render('index', {title: 'Home', layout: 'index', user});
+            res.render('index', { title: 'Home', layout: 'index', user });
         }
     })(req, res);
 };
 
 const chat = async(req, res) => {
-    res.render('index', {title: 'Chat', layout: 'chat', user: req.user});
+    res.render('index', { title: 'Chat', layout: 'chat', user: req.user });
+};
+
+const getChat = async(req, res) => {
+    let userChat = await BD_Usuarios_Local.getByEmail(req.params.mail);
+    if(userChat){
+        res.render('index', { title: `Chat de ${userChat.name}`, layout: 'getChat', user: req.user, userChat })
+    }else{
+        userChat = {};
+        userChat.avatar = '/uploads/default.png';
+        userChat.name = 'Usuario Desconocido';
+        res.render('index', { title: 'Chat No encontrado', layout: 'getChat', user: req.user, userChat })
+    }
 };
 
 const products = async(req, res) => {
@@ -97,6 +110,7 @@ module.exports = {
     home,
     products,
     chat,
+    getChat,
     user_profile,
     user_cart,
     login_get,

@@ -417,15 +417,15 @@ const userInfo = (req, res) => {
 
 const getChat = async(req, res) => {
     try{
-        const id = await BD_Usuarios_Local.getByEmail(req.params.mail);
-        if(!id){
+        const user = await BD_Usuarios_Local.getByEmail(req.params.mail);
+        if(!user){
             return res.status(404).json({
                 status: 404,
                 msg: 'ERROR - User eMail not found',
                 value: false
             });
         }
-        const messages = await BD_Mensajes.getByEmail(id);
+        const messages = await BD_Mensajes.getByEmail(user._id);
         messages
             ? res.status(200).json({status: 200, msg: 'OK', value: true, messages})
             : res.status(500).json(errJSON());

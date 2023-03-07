@@ -27,25 +27,25 @@ function renderMessages(messages) {
                 if (message.from._id != userId) {
                     div.classList.add('d-flex', 'justify-content-start', 'mb-4');
                     div.innerHTML = `
-                                    <div class="img_cont_msg">
-                                        <img src="${message.from.avatar}" class="rounded-circle user_img_msg">
-                                    </div>
-                                    <div class="msg_cotainer">
-                                        ${message.message}
-                                        <span class="msg_time">${calcTextDate(message.timestamp)}</span>
-                                    </div>
-                                `;
+                        <div class="img_cont_msg">
+                            <a href="/chat/${message.from.email || "#" }"><img src="${message.from.avatar}" class="rounded-circle user_img_msg"></a>
+                        </div>
+                        <div class="msg_cotainer">
+                            ${message.message}
+                            <span class="msg_time">${calcTextDate(message.timestamp)}</span>
+                        </div>
+                    `;
                 } else {
                     div.classList.add('d-flex', 'justify-content-end', 'mb-4');
                     div.innerHTML = `
-                                    <div class="msg_cotainer_send">
-                                        ${message.message}
-                                        <span class="msg_time_send">${calcTextDate(message.timestamp)}</span>
-                                    </div>
-                                    <div class="img_cont_msg">
-                                        <img src="${message.from.avatar}" class="rounded-circle user_img_msg">
-                                    </div>
-                                `;
+                        <div class="msg_cotainer_send">
+                            ${message.message}
+                            <span class="msg_time_send">${calcTextDate(message.timestamp)}</span>
+                        </div>
+                        <div class="img_cont_msg">
+                            <a href="/chat/${message.from.email || "#" }"><img src="${message.from.avatar}" class="rounded-circle user_img_msg"></a>
+                        </div>
+                    `;
                 }
                 if(document.getElementsByClassName('spinner-visible')[0]){
                     removeSpinner(spinner);

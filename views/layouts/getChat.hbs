@@ -1,0 +1,123 @@
+{{> navbar}}
+<head>
+	<link href="/assets/css/chat.css" rel="stylesheet">
+	<title>{{title}}</title>
+</head>
+<body>
+	<div class="container-fluid" style="margin-top: 25px; height: 89%;">
+		<div class="card">
+			<div class="card-header">
+				<div class="d-flex bd-highlight">
+					<div class="img_cont">
+						<img src="{{userChat.avatar}}" class="rounded-circle user_img">
+						<span class="online_icon"></span>
+					</div>
+					<div class="user_info">
+						<span>Chat de {{userChat.name}}</span>
+						<p id="msg_cant"></p>
+					</div>
+				</div>
+			</div>
+			<div class="card-body msg_card_body" id="messages_container">
+                {{#if userChat._id}}
+                    <div class="spinner-visible" id="spinner">
+                        <div class="loader">
+                            <span class="loader"></span>
+                        </div>
+                        <span class="visually">Espera mientras se cargan los mensajes...</span>
+                    </div>
+                {{else}}
+                    <div style="text-align: center; margin-top: 15%; color:white">
+                        <h1>No se encontró el usuario buscado</h1>
+                    </div>
+                {{/if}}
+
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/assets/js/mdb.min.js"></script>
+	<script>
+		window.onload= () => {
+			const url = new URL(location.href);
+			$.ajax({
+				url: '/api/user'+url.pathname+'?admin=true',
+				type: 'GET',
+				success: function (data) {
+					if (data.status == 200) {
+						renderMessages(data.messages);
+						hideSpinner();
+					}
+				},
+                error: function (err) {
+                    if(err.responseJSON.status == 500){
+                        location.href = '/fatal_error?err='+err.responseJSON.message;
+                    }else{
+                        console.log(err.responseJSON);
+                    }
+                }
+			})
+		}
+		function hideSpinner(){
+			$('#spinner').hide();
+		}
+		function renderMessages(messages) {
+			try{
+				document.getElementById('msg_cant').innerHTML = messages.length+' mensaje(s)';
+				const messagesContainer = document.getElementById('messages_container');
+				messages.forEach(async (message) => {
+					try{
+						const div = document.createElement('div');
+						div.classList.add('d-flex', 'justify-content-start', 'mb-4');
+						div.innerHTML = `
+							<div class="img_cont_msg">
+								<img src="${message.from.avatar}" class="rounded-circle user_img_msg">
+							</div>
+							<div class="msg_cotainer">
+								${message.message}
+								<span class="msg_time">${calcTextDate(message.timestamp)}</span>
+							</div>
+						`;
+						messagesContainer.appendChild(div);
+					}catch(err){
+						location.href = '/fatal_error?err='+err.message;
+					}
+				});
+			}catch(err){
+				location.href = '/fatal_error?err='+err.message;
+			}
+		}
+
+		function calcTextDate(timestamp) {
+			try{
+				const today = new Date().toISOString().split('T')[0].split('-');
+				const messageDate = timestamp.split('T')[0].split('-');
+				const messageHour = changeHourFormat(timestamp.split('T')[1].split(':'));
+				if((today[2] == messageDate[2]) && (today[1] == messageDate[1]) && (today[0] == messageDate[0])){
+					return (messageHour+', Hoy');
+				}else if((today[2]) - messageDate[2] == 1){
+					return (messageHour+', Ayer');
+				}else if((today[2]) - messageDate[2] == 2){
+					return (messageHour+', Anteyer');
+				}else{
+					return (messageDate[2]+'/'+messageDate[1]+'/'+messageDate[0]);
+				}
+			}catch(err){
+				location.href = '/fatal_error?err='+err.message;
+			}
+		}
+
+		function changeHourFormat(hour) {
+			try{
+				if(hour[0] > 12){
+					hour[0] = hour[0] - 12;
+					hour[1] = hour[1] + ' PM';
+				}else{
+					hour[1] = hour[1] + ' AM';
+				}
+				return hour[0] + ':' + hour[1];
+			}catch(err){
+				location.href = '/fatal_error?err='+err.message;
+			}
+		}
+ 	</script>
+</body>
