@@ -1,5 +1,5 @@
 {
-    "ext": "js,json,hbs,html,yml",
+    "ext": "js,json,html,yml",
     "ignore": [
         "public/assets/*"
     ]

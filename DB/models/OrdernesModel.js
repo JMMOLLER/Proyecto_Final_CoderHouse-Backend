@@ -6,6 +6,7 @@ const orderSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now },
     subTotal: { type: Number, required: true },
     total: { type: Number, required: true },
+    totalItems: { type: Number, required: true },
     shipping: { type: Number, required: true },
     shippingMethod: { type: String, required: true },
     date: { type: String, required: true },

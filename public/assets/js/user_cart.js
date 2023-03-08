@@ -29,7 +29,7 @@ buyBTN.addEventListener("click", async () => {
     if (response.status == 200) {
         changeStatus("success");
         setTimeout(() => {
-            window.location.href = "/";
+            window.location.href = response.returnTo || '/user/ordenes';
         }, "3500");
     } else {
         changeStatus("failed");

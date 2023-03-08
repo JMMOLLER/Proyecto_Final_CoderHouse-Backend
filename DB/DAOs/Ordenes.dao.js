@@ -21,14 +21,31 @@ class Ordenes {
         }
     }
 
+    async getAllByUser(userId){
+        try{
+            this.mongodb(this.url);
+            const doc = await OrderModel.find({user:userId}).select('-__v');
+            if(!doc) return {value: false, message: 'Orders not found', status: 404};
+            if(doc.length == 0) return {value: true, message: 'Orders not found', status: 200};
+            const orders = await this.normalizeData(doc);
+
+            return {orders, value: true, message: 'Orders found successfully', status: 200};
+        }catch(err){
+            console.log(err);
+            return {value: false, message: e.messag, status: 500, value: false};
+        }
+    }
+
     async getByCode(code){
         try{
             this.mongodb(this.url);
-            const doc = await OrderModel.find({code:code}).select('-__v').lean();
-            return await this.normalizeData(doc);
+            const doc = await OrderModel.findOne({code:code}).select('-__v');
+            if(!doc) return {value: false, message: 'Order not found', status: 404};
+            const order = await this.normalizeData([doc]);
+            return {order:order[0], value: true, message: 'Order found successfully'};
         }catch(err){
             console.log(err);
-            return false;
+            return {value: false, message: e.message, status: 500};
         }
     }
 
@@ -65,6 +82,7 @@ class Ordenes {
             new_data['date'] = fecha.toLocaleString('default', { month: 'long' })+" "+fecha.getDate()+", "+fecha.getFullYear();
             new_data['user'] = userId;
             new_data['products'] = cartInfo.productos;
+            new_data['totalItems'] = this.getTotalItems(cartInfo.productos);
             new_data['subTotal'] = Number(await this.calculateSubTotal(cartInfo.productos));
             new_data['shipping'] = shipping;
             new_data['total'] = new_data['subTotal'] + new_data['shipping'];
@@ -80,6 +98,14 @@ class Ordenes {
             console.log(err);
             return {value: false, message: err.message};
         }
+    }
+
+    getTotalItems(products){
+        let totalItems = 0;
+        for(const product of products){
+            totalItems += product.quantity;
+        }
+        return totalItems;
     }
 
     async calculateSubTotal(products){

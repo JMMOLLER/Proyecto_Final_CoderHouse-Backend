@@ -12,6 +12,10 @@ USER_FRONT.get('/', controller.home);
 
 USER_FRONT.get('/productos', controller.products);
 
+USER_FRONT.get('/user/ordenes', auth.clientIsLogged, controller.get_user_orders);
+
+USER_FRONT.get('/user/orden/:code', auth.clientIsLogged, controller.get_user_order);
+
 USER_FRONT.get('/chat', auth.clientIsLogged, controller.chat);
 
 USER_FRONT.get('/chat/:mail', auth.clientIsLogged, controller.getChat);

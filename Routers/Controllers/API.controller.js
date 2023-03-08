@@ -484,7 +484,7 @@ const userPurchase = async(req, res) => {
                 return res.status(500).json(errJSON(order.message));
             }
             await sendMessages(order.newOrder);
-            return res.status(200).json({status: 200, msg: "OK", value: true})
+            return res.status(200).json({status: 200, msg: "OK", value: true, returnTo: "/ordenes"})
 
         }else{
             return res.status(500).json(errJSON());
