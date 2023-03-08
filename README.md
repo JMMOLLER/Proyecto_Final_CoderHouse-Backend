@@ -5,6 +5,7 @@ Este proyecto es el entregable final del curso de desarrollo web Bakend de la in
 - Formularios
 - Sesiones
 - Carritos
+- Ordenes/Pedidos
 - NodeMailer
 - Twilio
 - PassPort
