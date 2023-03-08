@@ -19,7 +19,7 @@ components:
       example:
         age: 35
         address: New Address
-        phone_number: 987654321
+        phone_number: "+12155521213"
     BuyCart:
       type: object
       required:

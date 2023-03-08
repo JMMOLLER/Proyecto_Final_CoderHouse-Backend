@@ -7,5 +7,5 @@ tags:
     description: Esta API permite gestionar los usuarios de la Base de Datos.
   - name: Carrito
     description: Esta API permite gestionar el carrito de la Base de Datos.
-  - name: Ordenes
-    description: Esta API permite gestionar las ordenes de la Base de Datos.
+  # - name: Ordenes
+  #   description: Esta API permite gestionar las ordenes de la Base de Datos.

@@ -43,6 +43,7 @@ components:
         -thumbnail
         -price
         -stock
+        -category
       properties:
         brand:
           type: string
@@ -59,9 +60,13 @@ components:
         stock:
           type: number
           description: La cantidad disponible del producto.
+        category:
+          type: string
+          description: La categoría del producto.
       example:
         title: Pringles Sabor Queso 40g
         price: 3.70
         stock: 4
         thumbnail: https://vivanda.vtexassets.com/arquivos/ids/397368/920011.jpg
         brand: Pringles
+        category: food
