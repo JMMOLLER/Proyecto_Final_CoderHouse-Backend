@@ -77,6 +77,7 @@ async function saveChanges() {
 
 async function deleteUser() {
     if (confirm("¿Está seguro de eliminar su cuenta?")) {
+        spinnerAnimation(true);
         $.ajax({
             url: "/api/user/?admin=true",
             type: "DELETE",
@@ -84,9 +85,11 @@ async function deleteUser() {
                 if (data.status === 200 && data.value) {
                     window.location.href = "/";
                 }
+                spinnerAnimation(false);
             },
             error: (err) => {
                 alert(err.responseJSON.msg);
+                spinnerAnimation(false);
                 console.log(err);
             },
         });
