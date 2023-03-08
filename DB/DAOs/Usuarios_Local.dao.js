@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const { UserModel } = require("../models/UsuariosModel");
+const { OrderModel } = require("../models/OrdernesModel");
+const { CarritoModel } = require("../models/CarritoModel");
 const { validatePhoneE164 } = require("../../Routers/Services/API.service")
 mongoose.set('strictQuery', true);
 
@@ -133,6 +135,8 @@ class UsuariosDAO{
             this.mongodb(this.url);
             const user = await UserModel.findByIdAndDelete(id).select('-password -__v');
             if(!user){throw new Error('No se encontro el usuario')}
+            await CarritoModel.deleteMany({owner: id});
+            await OrderModel.deleteMany({user: id});
             return user;
         }catch(err){
             console.log(err);
