@@ -4,7 +4,6 @@ const fs = require("fs-extra");
 const jwt = require('jsonwebtoken');
 const logger = require("../../utils/LoggerConfig");
 const { conf } = require("../../utils/YargsConfig");
-const { rss } = require ("node:process").memoryUsage();
 const { sendSMS } = require("../../utils/Twilio");
 const { sendMail } = require("../../utils/NodeMailer");
 
@@ -32,7 +31,7 @@ function info_data(){
         PORT: conf.port,
         OS: process.platform,
         NODE_V: process.version,
-        MEMORY: rss()/1e+6,
+        MEMORY: process.memoryUsage.rss()/1e+6,
         PATH: process.cwd(),
         PROCESS_ID: process.pid,
         ABSOLUTE_PATH: process.argv[1],
