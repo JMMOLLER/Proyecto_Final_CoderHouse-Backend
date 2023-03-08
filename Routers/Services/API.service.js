@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs-extra");
 const jwt = require('jsonwebtoken');
 const logger = require("../../utils/LoggerConfig");
+const { conf } = require("../../utils/YargsConfig");
 const { sendSMS } = require("../../utils/Twilio");
 const { sendMail } = require("../../utils/NodeMailer");
 
@@ -22,6 +23,20 @@ async function sendMessages(newOrder) {
     /* FOR SMS */
     await sendSMSToUser(newOrder.user);
     return;
+}
+
+function info_data(){
+    logger.info("Peticion de informacion del servidor");
+    return {
+        PORT: conf.port,
+        OS: process.platform,
+        NODE_V: process.version,
+        MEMORY: process.memoryUsage.rss()/1e+6,
+        PATH: process.cwd(),
+        PROCESS_ID: process.pid,
+        ABSOLUTE_PATH: process.argv[1],
+        PARAMETERS: process.argv.slice(2)
+    }
 }
 
 async function deleteUserImg(currentUserImg) {
@@ -175,4 +190,5 @@ module.exports = {
     deleteUserImg,
     validatePhoneE164,
     generateToken,
+    info_data,
 };

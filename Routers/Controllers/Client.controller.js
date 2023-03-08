@@ -1,12 +1,14 @@
 const Passport = require('passport');
 const logger = require('../../utils/LoggerConfig');
-const { generateToken } = require('../Services/API.service');
+const { generateToken, info_data } = require('../Services/API.service');
 /* =========== DAOs =========== */
 const { BD_Productos } = require('../../DB/DAOs/Productos.dao');
 const { BD_Carrito } = require('../../DB/DAOs/Carrito.dao');
 const { BD_Ordenes } = require('../../DB/DAOs/Ordenes.dao');
 const { BD_Usuarios_Local } = require('../../DB/DAOs/Usuarios_Local.dao');
 /* =========== END DAOs =========== */
+
+
 
 /* =========== ROUTES =========== */
 const home = async(req, res) => {
@@ -27,6 +29,15 @@ const home = async(req, res) => {
 const chat = async(req, res) => {
     try{
         res.render('index', { title: 'Chat', layout: 'chat', user: req.user });
+    }catch(e){
+        logger.error(e);
+        res.redirect('/fatal_error?err='+e.message)
+    }
+};
+
+const sysInfo = (req, res) => {
+    try{
+        res.render('index', { title: 'Configuración del servidor', layout: 'sysInfo', data: info_data() });
     }catch(e){
         logger.error(e);
         res.redirect('/fatal_error?err='+e.message)
@@ -143,6 +154,8 @@ const get_user_order = async(req, res) => {
         res.redirect('/fatal_error?err='+e.message)
     }
 };
+
+/* AUTH */
 
 const register_twitter = (req, res) => {
     try{
@@ -262,4 +275,5 @@ module.exports = {
     completeRegister,
     get_user_orders,
     get_user_order,
+    sysInfo,
 };

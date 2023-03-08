@@ -1,0 +1,223 @@
+
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css'>
+        <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+        <link rel="icon" href="/assets/images/memory.png" type="image/x-icon">
+        <link rel="stylesheet" href="/assets/css/sysInfo.css">
+        <title>{{title}}</title>
+    </head>
+    <body>
+
+        {{#with data}}
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 vertab-container">
+                        <div class="col-lg-3 col-md-3 col-sm-3  vertab-menu">
+                            <div class="list-group">
+                                <a class="list-group-item text-left"> PORT </a>
+                                <a class="list-group-item text-left"> OS </a>
+                                <a class="list-group-item text-left"> NODE VERSION </a>
+                                <a class="list-group-item text-left"> RSS </a>
+                                <a class="list-group-item text-left"> PATH </a>
+                                <a class="list-group-item text-left"> PROCESS ID </a>
+                                <a class="list-group-item text-left"> ABSOLUTE PATH</a>
+                                <a class="list-group-item text-left"> PARÁMETROS DE LANZAMIENTO</a>
+                            </div>
+                        </div>
+                        <div id="accordion" class="col-lg-9 col-md-9 col-sm-9 col-xs-12 vertab-accordion panel-group"> 
+                            <div class="vertab-content">
+                                <div id="collapse1" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        
+                                            <h4>¿Puerto?</h4>
+                                            <p>
+                                                Los puertos TCP están disponibles en el rango de 0 a 65535. Los números de puerto hasta 1024 generalmente se conservan para servicios conocidos como FTP (21), SMTP (25), HTTP (80), HTTPS (443). Por lo tanto, generalmente es convencional usar un código de 4 dígitos superior a 1024 para fines de desarrollo para que no interfiera con ninguno de los servicios en ejecución en su máquina de desarrollo / implementación.
+                                            </p>
+                                            <div style="margin-top: 3.1cm;">
+                                                <p><strong>Puerto Actual: {{PORT}}</strong></p>
+                                                <img src="/assets/images/web.png" alt="Image" width="100px">
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="vertab-content">
+                                <div id="collapse2" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                            <h4>¿Sistema Operativo?</h4>
+                                            <p>La propiedad <code>process.platform</code> devuelve una cadena que identifica el funcionamiento en la plataforma del sistema para la que se compiló el binario Node.js.</p><br>
+
+                                            <div style="margin-top: 1.5cm;">
+                                                <p>Los valores posibles actualmente son:</p><br>
+
+                                                <div style="display: flex;justify-content: space-between;align-items: center;">
+                                                    <div>
+                                                        <ul>
+                                                            <li><code>'aix'</code></li>
+                                                            <li><code>'darwin'</code></li>
+                                                            <li><code>'freebsd'</code></li>
+                                                            <li><code>'linux'</code></li>
+                                                            <li><code>'openbsd'</code></li>
+                                                            <li><code>'sunos'</code></li>
+                                                            <li><code>'win32'</code></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div >
+                                                        <p><strong>Sistema Operativo usado: {{OS}}</strong></p>
+                                                        <img src="/assets/images/os.png" alt="Image" width="200px">
+                                                    </div>    
+                                                </div>
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="vertab-content">
+                                <div id="collapse3" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                            <h4>¿Versión de Node.js?</h4><br>
+                                            <p>La propiedad <code>version.process.version</code> contiene la cadena de la versión usada en Node.js.</p>
+                                            <p>Para obtener la cadena de versión sin la <i><u>v</u></i> antepuesta, use <code>process.versions.node</code>.</p>
+                                            <br><br>
+                                            <div style="margin-top: 60px;">
+                                                <p><strong>Version de Node: {{NODE_V}}</strong></p>
+                                                <img src="/assets/images/node.png" alt="Image" width="100px">
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="vertab-content">
+                                <div id="collapse4" class="panel-collapse collapse">
+                                    <div class="panel-body" style="padding: 0;">
+                                            <h4>¿Resident Set Size?</h4>
+                                            <p>El método <code>process.memoryUsage.rss()</code> devuelve un entero que representa el Tamaño del conjunto residente o Resident Set Size (RSS) en bytes.</p>
+                                            <p>El tamaño del conjunto residente, es la cantidad de espacio ocupado en el dispositivo de memoria (que es un subconjunto de la memoria total asignada) para el, incluidos todos los objetos y código de C++ y JavaScript.</p>
+                                            <p>Este es el mismo valor que la propiedad <code>rss</code> proporcionada por <code>process.memoryUsage()</code> pero <code>process.memoryUsage.rss()</code> es más rápido.</p>
+                                            <div style="margin-top: 70px;">
+                                                <p style="margin-top: 17px;"><strong>total reservada: {{MEMORY}} MB</strong></p>
+                                                <img src="/assets/images/memory.png" alt="Image" width="100px">
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="vertab-content">
+                                <div id="collapse5" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                            <h4>¿Path?</h4><br>
+                                            <p>El método <code>process.cwd()</code> devuelve el directorio de trabajo actual del proceso de Node.js.</p>
+                                            <p style="margin-top: 4.9cm;"><strong>Ubicación del proyecto: "{{PATH}}"</strong></p>
+                                            <img src="/assets/images/folder.png" alt="Image" width="100px">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="vertab-content">
+                                <div id="collapse5" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <div style="display: flex;flex-flow: column;height: 9.7cm;justify-content: space-between;">
+                                            <div>
+                                                <h4>¿ID de Proceso?</h4>
+                                                <p>La propiedad <code>process.pid</code> devuelve el PID del proceso.</p>
+                                            </div>
+                                            <div>
+                                                <h4>¿Qué es PID?</h4>
+                                                <p>El identificador de procesos o process ID (PID) es un número entero usado por el kernel de algunos sistemas operativos para identificar un proceso de forma unívoca.</p>
+                                            </div>
+                                            <div>
+                                                <p><strong>ID de proceso: {{PROCESS_ID}}</strong></p>
+                                                <img src="/assets/images/process.png" alt="Image" width="100px">
+                                            </div>
+                                        </div>    
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="vertab-content">
+                                <div id="collapse5" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                            <h4>¿Ubicación Absoluta?</h4><br>
+                                            <p>El método <code>process.argv[1]</code> devuelve la ubicación del archivo donde se esta iniciando el proyecto de Node.js.</p>
+                                            <p>Para escoger el segundo parametro podemos usar <code>process.argv[2]</code> el cúal nos devolverá el parametro que nosotros escribamos por consola y asi sucesivamente.</p>
+                                            <div style="margin-top: 3.6cm;">
+                                                <p style="margin-top: 1cm;"><strong>Ubicación de ejecución: "{{ABSOLUTE_PATH}}"</strong></p>
+                                                <img src="/assets/images/folder.png" alt="Image" width="100px">
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="vertab-content">
+                                <div id="collapse5" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                            <h4>Parámetros de ejecución</h4><br>
+                                            <p>El servidor hace uso de <code>Yargs</code> para configurar parametros de ejecución. Los parametros configurados son:</p>
+                                            <ul style="display: flex; justify-content: space-around;height: 3cm;align-items: center;background-color: #0000002e;">
+                                                <li>
+                                                    <code>--p:</code> port
+                                                    <ul>
+                                                        <li>*</li>
+                                                        <li>*</li>
+                                                        <li><code>default:</code> 8080</li>
+                                                    </ul>
+                                                </li>
+                                                <li>
+                                                    <code>--m:</code> mode
+                                                    <ul>
+                                                        <li>prod</li>
+                                                        <li>debug</li>
+                                                        <li><code>default:</code> debug</li>
+                                                    </ul>
+                                                </li>
+                                                <li>
+                                                    <code>--h:</code> host
+                                                    <ul>
+                                                        <li>ip address</li>
+                                                        <li>localhost</li>
+                                                        <li><code>default:</code> localhost</li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                            <p>Los parametros de ejecución son los siguientes:</p><br>
+                                            <div style="display: flex;justify-content: space-between;align-items: center;">
+                                                <div>
+                                                    <ul>
+                                                        {{#if PARAMETERS.[1]}}
+                                                            {{#with PARAMETERS.[1]}}
+                                                                <li><code>--p:</code>    {{this}}</li>
+                                                            {{/with}}
+                                                        {{else}}
+                                                            <li><code>--p:</code>    8080 (default active)</li>
+                                                        {{/if}}
+                                                        {{#if PARAMETERS.[3]}}
+                                                            {{#with PARAMETERS.[3]}}
+                                                                <li><code>--m:</code>    {{this}}</li>
+                                                            {{/with}}
+                                                        {{else}}
+                                                            <li><code>--m:</code>    debug (default active)</li>
+                                                        {{/if}}
+                                                        {{#if PARAMETERS.[5]}}
+                                                            {{#with PARAMETERS.[5]}}
+                                                                <li><code>--h:</code>    {{this}}</li>
+                                                            {{/with}}
+                                                        {{else}}
+                                                            <li><code>--h:</code>    localhost (default active)</li>
+                                                        {{/if}}
+                                                    </ul>
+                                                </div>
+                                                <img src="/assets/images/memory.png" alt="Image" width="100px">
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="/"><button type="button" class="btn btn-success">Volver</button></a>
+            </div>
+            
+        {{/with}}
+
+        <script src="/assets/js/sysInfo.js"></script>
+    </body>
+</html>
