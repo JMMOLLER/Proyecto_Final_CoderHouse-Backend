@@ -1,0 +1,829 @@
+{
+	"info": {
+		"_postman_id": "a5109802-998d-473a-b63a-05b6a14e685e",
+		"name": "ProyectoFinalCoderHouse",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23228912"
+	},
+	"item": [
+		{
+			"name": "API_Productos",
+			"item": [
+				{
+					"name": "Mostrar_Productos",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "file",
+							"file": {}
+						},
+						"url": {
+							"raw": "localhost:8080/api/productos?admin=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"productos"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Traer_Producto",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/productos/63ed0ab66e97f24378536514?admin=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"productos",
+								"63ed0ab66e97f24378536514"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Traer Categoria",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/productos/category/food?admin=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"productos",
+								"category",
+								"food"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Agregar_Producto",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"brand\": \"HERSHEY'S\",\r\n    \"title\": \"Chocolate Blanco HERSHEY'S 87g\",\r\n    \"category\": \"food\",\r\n    \"thumbnail\": \"https://vivanda.vtexassets.com/arquivos/ids/242595/20170153.jpg?v=637438445023300000\",\r\n    \"price\": 1.82,\r\n    \"stock\": \"10\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/productos?admin=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"productos"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Consultar Disponibilidad",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/productos/stock/63ed0ab66e97f24378536514/7?admin=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"productos",
+								"stock",
+								"63ed0ab66e97f24378536514",
+								"7"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar_Producto",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"smulderrig3\",\r\n    \"brand\": \"venenatis\",\r\n    \"thumbnail\": \"http://dummyimage.com/130x100.png/cc0000/ffffff\",\r\n    \"price\": 214.21,\r\n    \"stock\": \"87\",\r\n    \"category\": \"food\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/productos/640831ce2fec8ec610daf6b1?admin=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"productos",
+								"640831ce2fec8ec610daf6b1"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar_Producto",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8080/api/productos/640831ce2fec8ec610daf6b1?admin=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"productos",
+								"640831ce2fec8ec610daf6b1"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "API_Carrito",
+			"item": [
+				{
+					"name": "Crear_Carrito",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/carrito?admin=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"carrito"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mostrar_Carritos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/carrito/all?admin=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"carrito",
+								"all"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Traer Carrito",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/carrito/63fa95aae227a708eded8373?admin=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"carrito",
+								"63fa95aae227a708eded8373"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Agregar Producto",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/carrito/add/producto/63f57cc8b9e6a429c6117b6f?admin=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"carrito",
+								"add",
+								"producto",
+								"63f57cc8b9e6a429c6117b6f"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Traer Productos de Carrito",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/carrito/6408311c2fec8ec610daf68b/productos?admin=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"carrito",
+								"6408311c2fec8ec610daf68b",
+								"productos"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Disminuir Cantidad Producto",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/carrito/producto/63f57cc8b9e6a429c6117b6f?admin=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"carrito",
+								"producto",
+								"63f57cc8b9e6a429c6117b6f"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Producto de Carrito",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/carrito/producto/all/63f57cc8b9e6a429c6117b6f?admin=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"carrito",
+								"producto",
+								"all",
+								"63f57cc8b9e6a429c6117b6f"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar_Carrito",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/carrito/6408311c2fec8ec610daf68b?admin=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"carrito",
+								"6408311c2fec8ec610daf68b"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "API_USER",
+			"item": [
+				{
+					"name": "Traer Usuarios",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/user/all?admin=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"all"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User info/Check Login",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/user/?admin=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								""
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Traer Usuario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/user/64001701b85707acd0e957fc?admin=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"64001701b85707acd0e957fc"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Usuario",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "age",
+									"value": "19",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Av. Torombolo 830, Coyote 1809, Australia",
+									"type": "text"
+								},
+								{
+									"key": "phone_number",
+									"value": "+12125551213",
+									"type": "text"
+								},
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "house of pleasure.jpg",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/user/update?admin=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"update"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buy Cart",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"shipping\": \"10.00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/user/buy?admin=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"buy"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Usuario",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "/*\r\n    Para eliminar un usuario debe iniciar sesión con la cuenta a eliminar\r\n*/",
+							"options": {
+								"raw": {
+									"language": "javascript"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/user/?admin=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								""
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Traer Mensajes de Usuario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/user/chat/jlmm.jlmm76@gmail.com?admin=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"chat",
+								"jlmm.jlmm76@gmail.com"
+							],
+							"query": [
+								{
+									"key": "admin",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Test User",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "test@user.com",
+									"type": "text"
+								},
+								{
+									"key": "user_password",
+									"value": "123",
+									"type": "text"
+								},
+								{
+									"key": "re_password",
+									"value": "123",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "calle de prueba 152",
+									"type": "text"
+								},
+								{
+									"key": "age",
+									"value": "24",
+									"type": "text"
+								},
+								{
+									"key": "phone_number",
+									"value": "+12125551212",
+									"type": "text"
+								},
+								{
+									"key": "avatar_type",
+									"value": "1",
+									"description": "0 URL | 1 File",
+									"type": "text"
+								},
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "house of pleasure.jpg"
+								},
+								{
+									"key": "avatar",
+									"value": "https://skillshack.blob.core.windows.net/uploads/express.webp",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"test@user.com\",\r\n    \"user_password\": \"123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/auth/logout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
