@@ -1,23 +1,36 @@
 const Passport = require('passport');
+const logger = require('../../utils/LoggerConfig');
+const { generateToken } = require('../Services/API.service');
+/* =========== DAOs =========== */
 const { BD_Productos } = require('../../DB/DAOs/Productos.dao');
 const { BD_Carrito } = require('../../DB/DAOs/Carrito.dao');
 const { BD_Ordenes } = require('../../DB/DAOs/Ordenes.dao');
-const jwt = require('jsonwebtoken');
 const { BD_Usuarios_Local } = require('../../DB/DAOs/Usuarios_Local.dao');
+/* =========== END DAOs =========== */
 
 /* =========== ROUTES =========== */
 const home = async(req, res) => {
-    Passport.authenticate('jwt', { session: false }, (err, user, info) => {
-        if (err || !user) {
-            res.render('index', { title: 'Home', layout: 'index' });
-        }else {
-            res.render('index', { title: 'Home', layout: 'index', user });
-        }
-    })(req, res);
+    try{
+        Passport.authenticate('jwt', { session: false }, (err, user, info) => {
+            if (err || !user) {
+                res.render('index', { title: 'Home', layout: 'index' });
+            }else {
+                res.render('index', { title: 'Home', layout: 'index', user });
+            }
+        })(req, res);
+    }catch(e){
+        logger.error(e);
+        res.redirect('/fatal_error?err='+e.message)
+    }
 };
 
 const chat = async(req, res) => {
-    res.render('index', { title: 'Chat', layout: 'chat', user: req.user });
+    try{
+        res.render('index', { title: 'Chat', layout: 'chat', user: req.user });
+    }catch(e){
+        logger.error(e);
+        res.redirect('/fatal_error?err='+e.message)
+    }
 };
 
 const getChat = async(req, res) => {
@@ -26,13 +39,14 @@ const getChat = async(req, res) => {
         if(userChat){
             res.render('index', { title: `Chat de ${userChat.name}`, layout: 'getChat', user: req.user, userChat })
         }else{
+            logger.warn(`No se encontró el usuario con email: ${req.params.mail}`);
             userChat = {};
             userChat.avatar = '/uploads/default.png';
             userChat.name = 'Usuario Desconocido';
             res.render('index', { title: 'Chat No encontrado', layout: 'getChat', user: req.user, userChat })
         }
     }catch(e){
-        console.log(e);
+        logger.error(e);
         res.redirect('/fatal_error?err='+e.message)
     }
 };
@@ -41,7 +55,8 @@ const products = async(req, res) => {
     try{
         Passport.authenticate('jwt', { session: false }, async(err, user, info) => {
             const products= await BD_Productos.getAll();
-            if (err || !user) {
+            if(err) throw err;
+            if (!user) {
                 res.render('index', {
                     title: 'Productos', 
                     layout: 'products', 
@@ -57,7 +72,7 @@ const products = async(req, res) => {
             }
         })(req, res);
     }catch(e){
-        console.log(e);
+        logger.error(e);
         res.redirect('/fatal_error?err='+e.message)
     }
 };
@@ -70,7 +85,7 @@ const user_profile = async(req, res) => {
             user: req.user,
         });
     }catch(e){
-        console.log(e);
+        logger.error(e);
         res.redirect('/fatal_error?err='+e.message)
     }
 };
@@ -92,7 +107,7 @@ const user_cart = async(req, res) => {
             user: req.user
         });
     } catch (e) {
-        console.log(e);
+        logger.error(e);
         res.redirect('/fatal_error?err='+e.message)
     }
 };
@@ -103,14 +118,10 @@ const get_user_orders = async(req, res) => {
         if(orders.value){
             res.render('index', {title: 'Mis Pedidos', layout: 'user_orders', user: req.user, orders: orders.orders });
         }else{
-            if(orders.status = 404){
-                res.send('No se encontro el pedido');
-            }else{
-                res.redirect('/fatal_error?err='+orders.message)
-            }
+            res.redirect('/fatal_error?err='+orders.message)
         }
     }catch(e){
-        console.log(e);
+        logger.error(e);
         res.redirect('/fatal_error?err='+e.message)
     }
 };
@@ -122,13 +133,13 @@ const get_user_order = async(req, res) => {
             res.render('index', {title: 'Pedido #'+req.params.code, layout: 'user_order', user: req.user, order: order.order });
         }else{
             if(order.status = 404){
-                res.send('No se encontro el pedido');
+                res.render('index', {title: 'Pedido no encontrado', layout: 'notFound'})
             }else{
                 res.redirect('/fatal_error?err='+order.message)
             }
         }
     }catch(e){
-        console.log(e);
+        logger.error(e);
         res.redirect('/fatal_error?err='+e.message)
     }
 };
@@ -136,17 +147,21 @@ const get_user_order = async(req, res) => {
 const register_twitter = (req, res) => {
     try{
         Passport.authenticate('twitter',{ session: false }, (err, user, info) => {
+
             if (err) { return res.redirect('/fail_login'); }
+
             if (!user) { return res.redirect('/fail_login'); }
+
             if((user.email).indexOf('@twitter.com') > -1){
                 return res.redirect('/completeRegister/'+user._id);//Verificar si el usuario tiene sus datos completos
             }
-            const token = jwt.sign({ user }, process.env.COOKIE_SECRET)
-            req.session.jwt = token
+
+            req.session.jwt = generateToken(user);
+
             return res.redirect('/user/profile')
         })(req, res)
     }catch(e){
-        console.log(e);
+        logger.error(e);
         res.redirect('/fatal_error?err='+e.message)
     }
 }
@@ -154,44 +169,80 @@ const register_twitter = (req, res) => {
 const register_github = (req, res) => {
     try{
         Passport.authenticate('github',{ session: false }, (err, user, info) => {
+
             if (err) { return res.redirect('/fail_login'); }
+
             if (!user) { return res.redirect('/fail_login'); }
+            
             if((user.email).indexOf('@github.com') > -1){
                 return res.redirect('/completeRegister/'+user._id);//Verificar si el usuario tiene sus datos completos
             }
-            const token = jwt.sign({ user }, process.env.COOKIE_SECRET)
-            req.session.jwt = token
+
+            req.session.jwt = generateToken(user);
+
             return res.redirect('/user/profile')
         })(req, res)
     }catch(e){
-        console.log(e);
+        logger.error(e);
         res.redirect('/fatal_error?err='+e.message)
     }
 }
 
 const login_get = (req, res) => {
-    res.render('index', {title: 'Login', layout: 'login'});
+    try{
+        res.render('index', {title: 'Login', layout: 'login'});
+    }catch(e){
+        logger.error(e);
+        res.redirect('/fatal_error?err='+e.message)
+    }
 };    
 
 const register_get = (req, res) => {
-    res.render('index', {title: 'Regristro', layout: 'register'});
+    try{
+        res.render('index', {title: 'Regristro', layout: 'register'});
+    }catch(e){
+        logger.error(e);
+        res.redirect('/fatal_error?err='+e.message)
+    }
 };
 
 const fail_login = (req, res) => {
-    res.render('index',{ layout: 'error_template', isLoginError: true, msg: req.query.err || 'Unknow Login Error' });
+    try{
+        res.render('index',{ layout: 'error_template', isLoginError: true, msg: req.query.err || 'Unknow Login Error' });
+    }catch(e){
+        logger.error(e);
+        res.redirect('/fatal_error?err='+e.message)
+    }
 };
 
 const fail_register = (req, res) => {
-    res.render('index',{ layout: 'error_template', isLoginError: false, msg: req.query.err || 'Unknow Register Error' });
+    try{
+        res.render('index',{ layout: 'error_template', isLoginError: false, msg: req.query.err || 'Unknow Register Error' });
+    }catch(e){
+        logger.error(e);
+        res.redirect('/fatal_error?err='+e.message)
+    }
 };
 
 const fatal_error = (req, res) => {
-    res.render('index',{ layout: 'error_template', isfatalError: true, msg: req.query.err || 'Unknow Fatal Error' });
+    try{
+        res.render('index',{ layout: 'error_template', isfatalError: true, msg: req.query.err || 'Unknow Fatal Error' });
+    }catch(e){
+        logger.error(e);
+        res.redirect('/fatal_error?err='+e.message)
+    }
 };
 
 const completeRegister = (req, res) => {
-    res.render('index', { title: 'Completar Registro', layout: 'completeRegister' });
+    try{
+        res.render('index', { title: 'Completar Registro', layout: 'completeRegister' });
+    }catch(e){
+        logger.error(e);
+        res.redirect('/fatal_error?err='+e.message)
+    }
 };
+
+/* =========== END ROUTES =========== */
 
 /* =========== EXPORT =========== */
 module.exports = {

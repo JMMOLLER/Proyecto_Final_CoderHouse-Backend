@@ -2,7 +2,6 @@ const express = require('express');
 const USER_FRONT = express.Router();
 const controller = require('./Controllers/Client.controller');
 const auth = require('./auth/auth');
-const jwt = require('jsonwebtoken');
 const Passport = require('passport');
 USER_FRONT.use(express.json());
 
@@ -52,8 +51,7 @@ USER_FRONT.get('/fatal_error', controller.fatal_error);
 
 /* TEST */
 USER_FRONT.get('/test', (req, res) => {
-    //res.send('test GET route is working successfully!!');
-    res.render('index', { title: 'Express', layout: 'test' });
+    res.send('test GET route is working successfully!!');
 });
 
 USER_FRONT.post('/test', (req, res) => {

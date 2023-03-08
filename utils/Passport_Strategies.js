@@ -1,5 +1,6 @@
 const Passport = require("passport");
 const mongoose = require("mongoose");
+const logger = require("./LoggerConfig");
 const LocalStrategy = require("passport-local").Strategy;
 const JWTStrategy = require("passport-jwt").Strategy;
 const TwitterStrategy = require("passport-twitter").Strategy;
@@ -17,20 +18,25 @@ function checkUserAvatar(req) {
             else req.body.avatar = "/uploads/default.png";
         else if (req.body.avatar == "") req.body.avatar = "/uploads/default.png";
     }catch(err){
-        console.log(err);
+        logger.error(err);
     }
     return;
 }
 
 const validateNewUser = (user) => {
-    if(!user.name){ return { value: false, msg: "Missing name" } }
-    if(!user.email){ return { value: false, msg: "Missing email" } }
-    if(!user.user_password){ return { value: false, msg: "Missing password" } }
-    if(!user.address){ return { value: false, msg: "Missing address" } }
-    if(!user.phone_number){ return { value: false, msg: "Missing phone number" } }
-    if(!(user.avatar_type).toString()){ return { value: false, msg: "Missing avatar_type" } }
-    if (user.user_password !== user.re_password) { return { value: false, msg: "Passwords don't match" } }
-    return { value: true, msg: "User validated" };
+    try{
+        if(!user.name){ return { value: false, msg: "Missing name" } }
+        if(!user.email){ return { value: false, msg: "Missing email" } }
+        if(!user.user_password){ return { value: false, msg: "Missing password" } }
+        if(!user.address){ return { value: false, msg: "Missing address" } }
+        if(!user.phone_number){ return { value: false, msg: "Missing phone number" } }
+        if(!(user.avatar_type).toString()){ return { value: false, msg: "Missing avatar_type" } }
+        if (user.user_password !== user.re_password) { return { value: false, msg: "Passwords don't match" } }
+        return { value: true, msg: "User validated" };
+    }catch(err){
+        logger.error(err);
+        return { value: false, msg: err.message };
+    }
 };
 
 /* ========= PASSPORT ========= */
@@ -56,25 +62,28 @@ Passport.use(
                 const user = await UserModel.findOne({ email });
                 
                 if (!user) {
-                    console.log("\x1b[31m%s\x1b[0m", "Usuario no encontrado " + email);
+                    logger.warn("\x1b[33m%s\x1b[0m","Usuario no encontrado " + email);
                     return done(null, false, {
                         message: "Usuario no encontrado",
                     });
                 }
                 if (!user.isValidPassword(user_password)) {
-                    console.log("\x1b[31m%s\x1b[0m", "Contraseña invalida");
+                    logger.warn("\x1b[33m%s\x1b[0m", "Contraseña invalida");
                     return done(null, false, {
                         message: "Contraseña invalida",
                     });
                 }
                 
-                console.log("\x1b[36m%s\x1b[0m", "Nueva autenticacion");
+
                 req.returnTo = req.session.returnTo;
                 const { password, __v, ...userData } = user._doc;
+
+                logger.info("\x1b[36m%s\x1b[0m","Nueva autenticacion");
+
                 return done(null, userData);
             } catch (err) {
-                console.log(err);
-                return done(err);
+                logger.error(err);
+                return done(err, false, { message: err.msg });
             }
         }
     )
@@ -97,7 +106,7 @@ Passport.use(
                     if(req.body.avatar_type != "0"){
                         await deleteUserImg("/uploads/" + req.file.filename);
                     }
-                    console.log("\x1b[31m%s\x1b[0m", "Email ya registrado");
+                    logger.warn("\x1b[33m%s\x1b[0m", "Email ya registrado");
                     return done(null, false, {
                         message: "Email already registered",
                     });
@@ -109,7 +118,7 @@ Passport.use(
                     if(req.body.avatar_type != "0"){
                         await deleteUserImg("/uploads/" + req.file.filename);
                     }
-                    console.log("\x1b[31m%s\x1b[0m", response.msg);
+                    logger.warn("\x1b[33m%s\x1b[0m", response.msg);
                     return done(null, false, {
                         message: response.msg,
                     });
@@ -117,7 +126,7 @@ Passport.use(
                     if(req.body.avatar_type != "0"){
                         await deleteUserImg("/uploads/" + req.file.filename);
                     }
-                    console.log("\x1b[31m%s\x1b[0m", "Invalid phone number");
+                    logger.warn("\x1b[33m%s\x1b[0m", "Invalid phone number");
                     return done(null, false, {
                         message: "Invalid phone number",
                     });
@@ -136,17 +145,17 @@ Passport.use(
 
                 const { password, __v, ...userData } = newUser._doc;
 
-                console.log("\x1b[36m%s\x1b[0m", "Nuevo registro");
-
                 sendEmail(userData); //considero que no es necesario esperar a que se envie el correo para continuar
+
+                logger.info("\x1b[36m%s\x1b[0m","Nuevo registro Local");
 
                 return done(null, userData);
             } catch (err) {
                 if(req.body.avatar_type != "0"){
                     await deleteUserImg("/uploads/" + req.file.filename);
                 }
-                console.log(err);
-                return done(err);
+                logger.error(err);
+                return done(err, false, { message: err.msg });
             }
         }
     )
@@ -162,8 +171,10 @@ Passport.use(
         try{
             mongoose.connect(process.env.MONGODB_URI);
             const user = await UserModel.findOne({ twitterId: profile.id });
-            if (user) return done(null, user);
-            else {
+            if (user){
+                logger.info("\x1b[36m%s\x1b[0m","Nueva autenticacion Twitter");
+                return done(null, user); 
+            }else {
                 //No se envia correo porque falta completar el registro
                 const newUser = await UserModel.create({
                     name: profile.username,
@@ -176,10 +187,13 @@ Passport.use(
                     twitterId: profile.id,
 
                 });
+
+                logger.info("\x1b[36m%s\x1b[0m","Nuevo registro Twitter");
+
                 return done(null, newUser);
             }
         }catch(err){
-            console.log(err);
+            logger.error(err);
             return done(null, false, { message: err.message });
         }
     })
@@ -195,8 +209,10 @@ Passport.use(
         try{
             mongoose.connect(process.env.MONGODB_URI);
             const user = await UserModel.findOne({ githubId: profile.id });
-            if (user) return done(null, user);
-            else {
+            if (user) {
+                logger.info("\x1b[36m%s\x1b[0m","Nueva autenticacion Github");
+                return done(null, user);
+            }else {
                 //No se envia correo porque falta completar el registro
                 const newUser = await UserModel.create({
                     name: profile._json.name,
@@ -209,10 +225,11 @@ Passport.use(
                     githubId: profile.id,
 
                 });
+                logger.info("\x1b[36m%s\x1b[0m","Nuevo registro Github");
                 return done(null, newUser);
             }
         }catch(err){
-            console.log(err);
+            logger.error(err);
             return done(null, false, { message: err.message });
         }
     })

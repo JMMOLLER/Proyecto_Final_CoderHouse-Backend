@@ -1,13 +1,16 @@
-const { sendMessages, validatePhoneE164, sendEmail } = require('../Services/API.service');
-const { deleteUserImg } = require('../Services/API.service');
+/* =========== DAOs =========== */
 const { BD_Carrito } = require('../../DB/DAOs/Carrito.dao.js');
 const { BD_Productos } = require('../../DB/DAOs/Productos.dao.js');
 const { BD_Ordenes } = require('../../DB/DAOs/Ordenes.dao.js');
 const { Mensajes } = require('../../DB/DAOs/Mensajes.dao.js');
 const { BD_Usuarios_Local } = require('../../DB/DAOs/Usuarios_Local.dao');
 const BD_Mensajes = new Mensajes().returnSingleton();
+/* =========== END DAOs =========== */
+const { sendMessages, validatePhoneE164, sendEmail } = require('../Services/API.service');
+const { deleteUserImg } = require('../Services/API.service');
+const { generateToken } = require('../Services/API.service');
 const Passport = require('passport');
-const jwt = require('jsonwebtoken');
+const logger = require('../../utils/LoggerConfig');
 const errJSON = (e) => {
     if(!e){
         e = "ERROR - An error has occurred while processing the request"
@@ -18,18 +21,23 @@ const errJSON = (e) => {
         returnTo: "/fatal_error"
     }
 }
+
+
 /* =========== ROUTES =========== */
 
 /* API CARRITO */
 const allCarts = async(req, res) => {
     try{
         const carts = await BD_Carrito.getAll();
-        carts
-            ? res.status(200).json({status: 200,msg: "OK",value: true,carts})
-            : res.status(500).json(errJSON());
+        if(carts){
+            res.status(200).json({status: 200,msg: "OK",value: true,carts})
+        }else{
+            logger.error("ERROR - No se pudo obtener los carritos")
+            res.status(500).json(errJSON());
+        }
         return;
     }catch(e){
-        console.log(e);
+        logger.error(e);
         return res.status(500).json(errJSON(e.message));
     }
 }
@@ -37,16 +45,19 @@ const allCarts = async(req, res) => {
 const byCartId = async(req, res) => {
     try{
         const cart = await BD_Carrito.getById(req.params.id);
-        cart
-            ? res.status(200).json({status: 200, msg: "OK", value: true, cart})
-            : res.status(404).json({
+        if(cart){
+            res.status(200).json({status: 200, msg: "OK", value: true, cart})
+        }else{
+            logger.warn(`ERROR - No se encontró el carrito con ID: ${req.params.id}`)
+            res.status(404).json({
                 status: 404,
                 msg: "ERROR - Cart ID not found",
                 value: true
             });
+        }
         return;
     }catch(e){
-        console.log(e);
+        logger.error(e);
         return res.status(500).json(errJSON(e.message));
     }
 }
@@ -56,16 +67,27 @@ const addProductOnCart = async(req, res) => {
         const id_carrito = await BD_Carrito.getCartByUserID(req.user._id)
         const id_producto = req.params.prod;
         const response = await BD_Carrito.addProduct({id_carrito: id_carrito._id, id_producto});
-        response.value
-            ? res.status(200).json({ status: 200, value: true, msg: 'OK', cart: response.content })
-            : res.status(response.status).json({
-                status: response.status,
-                value: false,
-                msg: `ERROR - ${response.message}`
-            });
+
+        if(response.value){
+            res.status(200).json({ status: 200, value: true, msg: 'OK', cart: response.content })
+        }else{
+
+            if(response.status === 500){
+                logger.error(response.message);
+                return res.status(500).json(errJSON(response.message));
+            }else{
+                logger.warn(response.message);
+                return res.status(response.status).json({
+                    status: response.status,
+                    value: false,
+                    msg: `ERROR - ${response.message}`
+                });
+            }
+
+        }
         return;
     }catch(e){
-        console.log(e);
+        logger.error(e);
         return res.status(500).json(errJSON(e.message));
     }
 }
@@ -80,8 +102,9 @@ const getCartProducts = async(req, res) => {
                 productos.push(await BD_Productos.getById(datos[i].id));
                 productos[i].quantity = datos[i].quantity;
             }
-            res.status(200).json({status: 200,msg: "OK",value: true,productos});
+            res.status(200).json({ status: 200, msg: "OK", value: true, productos });
         }else{
+            logger.warn(`ERROR - No se encontró el carrito con ID: ${req.params.id}`)
             res.status(404).json({
                 status: 404,
                 msg: "ERROR - cart ID not found",
@@ -90,7 +113,7 @@ const getCartProducts = async(req, res) => {
         }
         return;
     }catch(e){
-        console.log(e);
+        logger.error(e);
         return res.status(500).json(errJSON(e.message));
     }
 }
@@ -98,16 +121,15 @@ const getCartProducts = async(req, res) => {
 const createCart = async(req, res) => {
     try{
         const cart = await BD_Carrito.createCarrito({ ownerId:req.user._id });
-        cart
-            ? res.status(201).json({status: 201, msg: 'CREATED', value: true, cart})
-            : res.status(500).json({
-                status: 500,
-                msg: 'ERROR - while creating carrito',
-                value: false
-            })
+        if(cart){
+            res.status(201).json({status: 201, msg: 'CREATED', value: true, cart})
+        }else{
+            logger.error("ERROR - No se pudo crear el carrito");
+            res.status(500).json(errJSON('ERROR - While creating the cart'))
+        }
         return;
     }catch(e){
-        console.log(e);
+        logger.error(e);
         return res.status(500).json(errJSON(e.message));
     }
 }
@@ -115,16 +137,24 @@ const createCart = async(req, res) => {
 const decreaseQuantityOnCart = async(req, res) => {
     try{
         const response = await BD_Carrito.decreaseProduct(req.user._id, req.params.id_prod);
-        response.value
-            ? res.status(200).json({status: 200, msg: 'OK', value: true, cart: response.cart})
-            : res.status(response.status).json({
-                status: response.status, 
-                msg: `ERR - ${response.message}`,
-                value: false
-            });
+        if(response.value){
+            res.status(200).json({status: 200, msg: 'OK', value: true, cart: response.cart})
+        }else{
+            if(response.status === 500){
+                logger.error(response.message);
+                return res.status(500).json(errJSON(response.message));
+            }else{
+                logger.warn(response.message);
+                res.status(response.status).json({
+                    status: response.status, 
+                    msg: `ERR - ${response.message}`,
+                    value: false
+                });
+            }
+        }
         return;
     }catch(e){
-        console.log(e);
+        logger.error(e);
         return res.status(500).json(errJSON(e.message));
     }
 }
@@ -132,16 +162,24 @@ const decreaseQuantityOnCart = async(req, res) => {
 const deleteProductOnCart = async(req, res) => {
     try{
         const response = await BD_Carrito.deleteProduct(req.user._id, req.params.id_prod);
-        response.value
-            ? res.status(200).json({status:200, msg: 'OK', value: true, cart: response.cart})
-            : res.status(response.status).json({
-                status: response.status,
-                msg: `ERR - ${response.message}`,
-                value: false
-            })
+        if(response.value){
+            res.status(200).json({status:200, msg: 'OK', value: true, cart: response.cart})
+        }else{
+            if(response.status === 500){
+                logger.error(response.message);
+                return res.status(500).json(errJSON(response.message));
+            }else{
+                logger.warn(response.message);
+                res.status(response.status).json({
+                    status: response.status,
+                    msg: `ERR - ${response.message}`,
+                    value: false
+                })
+            }
+        }
         return;
     }catch(e){
-        console.log(e);
+        logger.error(e);
         return res.status(500).json(errJSON(e.message));
     }
 }
@@ -149,16 +187,19 @@ const deleteProductOnCart = async(req, res) => {
 const deleteCart = async(req, res) => {
     try{
         const cart = await BD_Carrito.deleteByID(req.params.id);
-        cart
-            ? res.status(200).json({status: 200, msg: 'OK', value: true, cart})
-            : res.status(404).json({
+        if(cart){
+            res.status(200).json({status: 200, msg: 'OK', value: true, cart})
+        }else{
+            logger.warn(`ERROR - No se encontró el carrito con ID: ${req.params.id}`)
+            res.status(404).json({
                 status: 404,
                 msg: 'ERROR - Cart ID not found',
                 value: false
             })
+        }
         return;
     }catch(e){
-        console.log(e);
+        logger.error(e);
         return res.status(500).json(errJSON(e.message));
     }
 }
@@ -170,12 +211,15 @@ const deleteCart = async(req, res) => {
 const allProducts = async(req, res) => {
     try{
         const products = await BD_Productos.getAll();
-        products
-            ? res.status(200).json({status: 200, msg: 'OK', value: true, products})
-            : res.status(500).json(errJSON());
+        if(products){
+            res.status(200).json({status: 200, msg: 'OK', value: true, products})
+        }else{
+            logger.error("ERROR - No se pudieron obtener los productos");
+            res.status(500).json(errJSON());
+        }
         return;
     }catch(e){
-        console.log(e);
+        logger.error(e);
         res.status(500).json(errJSON(e.message));
     }
 }
@@ -183,16 +227,19 @@ const allProducts = async(req, res) => {
 const byProductId = async(req, res) => {
     try{
         const product = await BD_Productos.getById(req.params.id);
-        product
-            ? res.status(200).json({status: 200, msg: 'OK', value: true, product})
-            : res.status(404).json({
+        if(product){
+            res.status(200).json({status: 200, msg: 'OK', value: true, product})
+        }else{
+            logger.warn(`ERROR - No se encontró el producto con ID: ${req.params.id}`)
+            res.status(404).json({
                 status: 404, 
                 msg: 'ERROR - Product ID not found',
                 value: false
             })
+        }
         return;
     }catch(e){
-        console.log(e);
+        logger.error(e);
         res.status(500).json(errJSON(e.message));
     }
 }
@@ -200,17 +247,25 @@ const byProductId = async(req, res) => {
 const byCategory = async (req, res) => {
     try{
         const response = await BD_Productos.getByCategory(req.params.category);
-        response.value
-            ? res.status(200).json({status: 200, msg: 'OK', value: true, products: response.products})
-            : res.status(response.status).json({
-                status: response.status,
-                msg: `ERROR - ${response.msg}`,
-                value: false
-            })
+        if(response.value){
+            res.status(200).json({status: 200, msg: 'OK', value: true, products: response.products})
+        }else{
+            if(response.status === 500){
+                logger.error(response.msg);
+                res.status(500).json(errJSON(response.msg));
+            }else{
+                logger.warn(response.msg);
+                res.status(response.status).json({
+                    status: response.status,
+                    msg: `ERROR - ${response.msg}`,
+                    value: false
+                })
+            }
+        }
         return;
     }catch(e){
-        console.log(e);
-        res.status(500).json(errJSON(e.message));
+        logger.error(e);
+        return res.status(500).json(errJSON(e.message));
     }
 }
 
@@ -218,10 +273,14 @@ const createProduct = async (req, res) => {
     try{
         if(BD_Productos.validateProduct(req.body)){
             const product = await BD_Productos.setProduct(req.body);
-            product
-                ? res.status(201).json({status: 201, msg: 'CREATED', value: true, product})
-                : res.status(500).json(errJSON('ERROR - Se generó un error mientras se añadia el producto'))
+            if(product){
+                res.status(201).json({status: 201, msg: 'CREATED', value: true, product})
+            }else{
+                logger.error('ERROR - No se pudo crear el producto');
+                res.status(500).json(errJSON('ERROR - Se generó un error mientras se añadia el producto'))
+            }
         } else {
+            logger.warn('ERROR - invalid JSON structure');
             res.status(400).json({
                 status: 400,
                 msg: 'ERROR - invalid JSON structure',
@@ -230,32 +289,44 @@ const createProduct = async (req, res) => {
         }
         return;
     }catch(e){
-        console.log(e);
-        res.status(500).json(errJSON(e.message));
+        logger.error(e);
+        return res.status(500).json(errJSON(e.message));
     }
 }
 
 const consultQuantityOnPorduct = async(req, res) => {
     try{
+
         if(!parseInt(req.params.cant) && req.params.cant != "++"){
+            logger.warn("ERROR - invalid quantity to consult");
+            return res.status(400).json({status:400, msg: "ERROR - invalid quantity to consult", value: false});
+        }if(req.params.cant < 1){
+            logger.warn("ERROR - invalid quantity to consult");
             return res.status(400).json({status:400, msg: "ERROR - invalid quantity to consult", value: false});
         }
-        if(req.params.cant < 1){
-            return res.status(400).json({status:400, msg: "ERROR - invalid quantity to consult", value: false});
-        }
+
         const data = req.params;//{product_id, cant}
         data.user_cart = await BD_Carrito.getCartByUserID(req.user._id);
         const response = await BD_Productos.checkStock(data)
-        response.value
-            ? res.status(200).json({status: 200, msg: 'OK', value: true})
-            : res.status(response.status).json({ 
-                status: response.status, 
-                mg: `ERROR - ${response.message}`, 
-                value: false
-            })
+
+        if(response.value){
+            res.status(200).json({status: 200, msg: 'OK', value: true})
+        }else{
+            if(response.status === 500){
+                logger.error(response.message);
+                res.status(500).json(errJSON(response.message));
+            }else{
+                logger.warn(response.message);
+                res.status(response.status).json({ 
+                    status: response.status, 
+                    mg: `ERROR - ${response.message}`, 
+                    value: false
+                });
+            }
+        }
         return;
     }catch(e){
-        console.log(e);
+        logger.error(e);
         return res.status(500).json(errJSON(e.message));
     }
 }
@@ -264,14 +335,18 @@ const updateProduct = async(req, res) => {
     try{
         if(BD_Productos.validateProduct(req.body)){
             const product = await BD_Productos.updateProduct(req.body, req.params.id)
-            product
-                ? res.status(200).json({status: 200, msg: 'OK', value: true, product})
-                : res.status(404).json({
+            if(product){
+                res.status(200).json({status: 200, msg: 'OK', value: true, product})
+            }else{
+                logger.warn(`ERROR - No se encontró el producto con ID: ${req.params.id}`)
+                res.status(404).json({
                     status: 404,
                     msg: 'ERROR - Product ID not found',
                     value: false
                 })
+            }
         }else{
+            logger.warn('ERROR - invalid JSON structure');
             res.status(400).json({
                 status: 400,
                 msg: 'ERROR - invalid JSON structure',
@@ -280,25 +355,28 @@ const updateProduct = async(req, res) => {
         }
         return;
     }catch(e){
-        console.log(e);
-        res.status(500).json(errJSON(e.message));
+        logger.error(e);
+        return res.status(500).json(errJSON(e.message));
     }
 }
 
 const deleteProduct = async(req, res) => {
     try{
         const product = await BD_Productos.deleteByID(req.params.id);
-        product
-            ? res.status(200).json({status: 200, msg: "OK", value: true, product})
-            : res.status(404).json({
+        if(product){
+            res.status(200).json({status: 200, msg: "OK", value: true, product})
+        }else{
+            logger.warn(`ERROR - No se encontró el producto con ID: ${req.params.id}`)
+            res.status(404).json({
                 status: 404,
                 msg: "ERROR - Product ID not found",
                 value: false
             });
+        }
         return;
     }catch(e){
-        console.log(e);
-        res.status(500).json(errJSON(e.message));
+        logger.error(e);
+        return res.status(500).json(errJSON(e.message));
     }
 }
 
@@ -306,88 +384,124 @@ const deleteProduct = async(req, res) => {
 /* API AUTH */
 
 const login = async(req, res) => {
-    Passport.authenticate('login', { session: false }, (err, user, info) => {
-        if(err){
-            return res.status(500).json({
-                status: 500,
-                msg: `ERROR - ${err.message}`,
-                value: false
-            })
-        }
-        if(!user){
-            if(info.message === 'Contraseña invalida'){
-                return res.status(401).json({
-                    status: 401,
-                    msg: `ERROR - ${info.message}`,
-                    value: false,
-                    returnTo: '/fail_login'
+    try{
+        Passport.authenticate('login', { session: false }, (err, user, info) => {
+
+            if(err){
+
+                logger.error(`ERROR - ${err.message}`);
+
+                return res.status(500).json({
+                    status: 500,
+                    msg: `ERROR - ${err.message}`,
+                    value: false
                 })
-            }else{
-                return res.status(404).json({
-                    status: 404,
-                    msg: `ERROR - ${info.message}`,
-                    value: false,
-                    returnTo: '/fail_login'
-                })
+
+            }if(!user){
+
+                logger.warn(`ERROR - ${info.message}`);
+
+                if(info.message === 'Contraseña invalida'){
+                    return res.status(401).json({
+                        status: 401,
+                        msg: `ERROR - ${info.message}`,
+                        value: false,
+                        returnTo: '/fail_login'
+                    })
+                }else{
+                    return res.status(404).json({
+                        status: 404,
+                        msg: `ERROR - ${info.message}`,
+                        value: false,
+                        returnTo: '/fail_login'
+                    })
+                }
+
             }
-        }
-        const token = jwt.sign({ user }, process.env.COOKIE_SECRET)
-        req.session.jwt = token
-        return res.status(202).json({
-            status: 202,
-            msg: 'ACEPTED',
-            value: true,
-            returnTo: req.returnTo || '/productos'
-        })
-    })(req, res)
+
+            req.session.jwt = generateToken(user)
+
+            return res.status(202).json({
+                status: 202,
+                msg: 'ACEPTED',
+                value: true,
+                returnTo: req.returnTo || '/productos'
+            })
+
+        })(req, res)
+    }catch(e){
+        logger.error(e);
+        return res.status(500).json(errJSON(e.message));
+    }
 }
 
 const register = async(req, res) => {
-    Passport.authenticate('register', { session: false }, (err, user, info) => {
-        if(err){
-            return res.status(500).json({
-                status: 500,
-                msg: `ERROR - ${err.message}`,
-                value: false
+    try{
+        Passport.authenticate('register', { session: false }, (err, user, info) => {
+
+            if(err){
+
+                logger.error(`ERROR - ${err.message}`);
+
+                return res.status(500).json({
+                    status: 500,
+                    msg: `ERROR - ${err.message}`,
+                    value: false
+                })
+
+            }if(!user){
+
+                logger.warn(`ERROR - ${info.message}`);
+
+                return res.status(409).json({
+                    status: 409,
+                    msg: `ERROR - ${info.message}`,
+                    value: false,
+                    returnTo: '/fail_register'
+                })
+
+            }
+
+            req.session.jwt = generateToken(user)
+
+            return res.status(201).json({
+                status: 201,
+                msg: 'CREATED',
+                value: true,
+                returnTo: req.returnTo || '/productos'
             })
-        }
-        if(!user){
-            return res.status(409).json({
-                status: 409,
-                msg: `ERROR - ${info.message}`,
-                value: false,
-                returnTo: '/fail_register'
-            })
-        }
-        const token = jwt.sign({ user }, process.env.COOKIE_SECRET)
-        req.session.jwt = token
-        return res.status(201).json({
-            status: 201,
-            msg: 'CREATED',
-            value: true,
-            returnTo: req.returnTo || '/productos'
-        })
-    })(req, res)
+
+        })(req, res)
+    }catch(e){
+        logger.error(e);
+        return res.status(500).json(errJSON(e.message));
+    }
 }
 
 const logout = async(req, res) => {
-    res.clearCookie('session');
-    return req.session.destroy((err) =>{
-        if(err){
-            return res.status(500).json({
-                status: 500,
-                msg: `ERROR - ${err.message}`,
-                value: false,
+    try{
+        res.clearCookie('session');
+        return req.session.destroy((err) =>{
+            if(err){
+                logger.error(`ERROR - ${err.message}`);
+                return res.status(500).json({
+                    status: 500,
+                    msg: `ERROR - ${err.message}`,
+                    value: false,
+                    returnTo: '/'
+                });
+            }
+            return res.status(200).json({
+                status: 200,
+                msg: 'OK',
+                value: true,
                 returnTo: '/'
             });
-        }
-        return res.status(200).json({
-            status: 200,
-            msg: 'OK',
-            value: true,
-            returnTo: '/'
         });
-    });
+    }catch(e){
+        logger.error(e);
+        return res.status(500).json(errJSON(e.message));
+    }
 }
 
 
@@ -397,29 +511,38 @@ const logout = async(req, res) => {
 const allUsers = async(req, res) => {
     try{
         const users = await BD_Usuarios_Local.getAll();
-        users
-            ? res.status(200).json({status: 200, msg: 'OK', value: true, users})
-            : res.status(500).json(errJSON());
+        if(users){
+            res.status(200).json({status: 200, msg: 'OK', value: true, users})
+        }else{
+            logger.error('ERROR - No se pudieron obtener todos los usuarios');
+            res.status(500).json(errJSON());
+        }
         return;
     }catch(e){
-        console.log(e);
-        res.status(500).json(errJSON(e.message));
+        logger.error(e);
+        return res.status(500).json(errJSON(e.message));
     }
 }
 
 const userInfo = (req, res) => {
-    return res.status(200).json({
-        status: 200,
-        msg: 'OK',
-        value: true,
-        user: req.user
-    });
+    try{
+        return res.status(200).json({
+            status: 200,
+            msg: 'OK',
+            value: true,
+            user: req.user
+        });
+    }catch(e){
+        logger.error(e);
+        return res.status(500).json(errJSON(e.message));
+    }
 };
 
 const getChat = async(req, res) => {
     try{
         const user = await BD_Usuarios_Local.getByEmail(req.params.mail);
         if(!user){
+            logger.warn(`ERROR - No se encontró el usuario con eMail: ${req.params.mail}`);
             return res.status(404).json({
                 status: 404,
                 msg: 'ERROR - User eMail not found',
@@ -427,30 +550,36 @@ const getChat = async(req, res) => {
             });
         }
         const messages = await BD_Mensajes.getByEmail(user._id);
-        messages
-            ? res.status(200).json({status: 200, msg: 'OK', value: true, messages})
-            : res.status(500).json(errJSON());
+        if(messages){
+            res.status(200).json({status: 200, msg: 'OK', value: true, messages})
+        }else{
+            logger.error('ERROR - No se pudieron obtener los mensajes del usuario');
+            res.status(500).json(errJSON());
+        }
         return;
     }catch(e){
-        console.log(e);
-        res.status(500).json(errJSON(e.message));
+        logger.error(e);
+        return res.status(500).json(errJSON(e.message));
     }
 }
 
-const Info = async(req, res) => {
+const getUserByID = async(req, res) => {
     try{
         const user = await BD_Usuarios_Local.getById(req.params.id)
-        user
-            ? res.status(200).json({status:200,msg:'OK',value: true,user})
-            : res.status(404).json({
+        if(user){
+            res.status(200).json({status:200,msg:'OK',value: true,user})
+        }else{
+            logger.warn(`ERROR - No se encontró el usuario con ID: ${req.params.id}`);
+            res.status(404).json({
                 status: 404,
                 msg: 'ERROR - User ID not found',
                 value: false
             });
+        }
         return;
     }catch(e){
-        console.log(e);
-        res.status(500).json(errJSON(e.message));
+        logger.error(e);
+        return res.status(500).json(errJSON(e.message));
     }
 };
 
@@ -461,6 +590,7 @@ const userPurchase = async(req, res) => {
         const values = [0, 5, 10]
 
         if(!values.includes(parseInt(req.body.shipping))){
+            logger.warn('ERROR - Valor de envío inválido');
             return res.status(400).json({
                 status: 400,
                 msg: "ERROR - Invalid shipping value",
@@ -472,6 +602,7 @@ const userPurchase = async(req, res) => {
 
         if(cartInfo.productos.length==0){
 
+            logger.warn('ERROR - No hay productos en el carrito');
             return res.status(406).json({
                 status: 406,
                 msg: "ERROR - There are no products in the cart",
@@ -481,17 +612,19 @@ const userPurchase = async(req, res) => {
         }else if(await BD_Carrito.deleteByID(cartInfo._id)){
             const order = await BD_Ordenes.addNewOrder({userId: userInfo._id, cartInfo, shipping: req.body.shipping})
             if(!order.value){
+                logger.error(`ERROR - ${order.message}`);
                 return res.status(500).json(errJSON(order.message));
             }
             await sendMessages(order.newOrder);
-            return res.status(200).json({status: 200, msg: "OK", value: true, returnTo: "/ordenes"})
+            return res.status(200).json({status: 200, msg: "OK", value: true, returnTo: "/user/ordenes"})
 
         }else{
+            logger.error('ERROR - No se pudo eliminar el carrito');
             return res.status(500).json(errJSON());
         }
     }catch(e){
-        console.log(e);
-        res.status(500).json(errJSON(e.message));
+        logger.error(e);
+        return res.status(500).json(errJSON(e.message));
     }
 };
 
@@ -500,13 +633,21 @@ const user_update = async(req, res) => {
         let oldAvatar, data = {};
         const {age, address, phone_number}= req.body;
 
-        if(!validatePhoneE164(phone_number)){ return res.status(400).json({status: 400, msg: "ERROR - Invalid Phone Number", value: false}) };
+        if(!validatePhoneE164(phone_number)){
+            logger.warn('ERROR - Número de teléfono inválido');
+            return res.status(400).json({status: 400, msg: "ERROR - Invalid Phone Number", value: false})
+        };
 
         if(req.file){
+
             data.avatar = "/uploads/"+req.file.filename
             oldAvatar = await BD_Usuarios_Local.getAvatar(req.user._id)
+
         }else if(!age, !address, !phone_number){
+
+            logger.warn('ERROR - No hay datos para actualizar');
             return res.status(400).json({status: 400, msg: "ERROR - Nothing to Update", value: false});
+
         }else{
             data.age = age;
             data.address = address;
@@ -519,16 +660,17 @@ const user_update = async(req, res) => {
             
             const user = await BD_Usuarios_Local.getById(req.user._id);
 
-            req.session.jwt = jwt.sign({ user }, process.env.COOKIE_SECRET);
+            req.session.jwt = generateToken(user);
 
             res.status(200).json({status: 200, msg: "OK", value: true})
 
         }else{
+            logger.error('ERROR - No se pudo actualizar el usuario');
             res.status(500).json({status: 500, msg: "ERROR", value: false});
         }
     }catch(e){
-        console.log(e);
-        res.status(500).json(errJSON(e.message));
+        logger.error(e);
+        return res.status(500).json(errJSON(e.message));
     }
 };
 
@@ -536,17 +678,19 @@ const completeRegister = async(req, res) => {
     try{
         const response = await BD_Usuarios_Local.completeRegister(req.body);
         if(response.status==500){
+            logger.error(`ERROR - ${response.msg}`);
             return res.status(500).json(errJSON(response.msg));
         }
         if(response.value){
             sendEmail(response.user);
             res.status(200).json({status: 200, msg: 'Registro completado', user: response.user})
         }else{
+            logger.warn(`ERROR - ${response.msg}`);
             res.status(response.status).json({status: response.status, msg: response.msg, value: false});
         }
     }catch(e){
-        console.log(e);
-        res.status(500).json(errJSON(e.message));
+        logger.error(e);
+        return res.status(500).json(errJSON(e.message));
     }
 }
 
@@ -555,22 +699,25 @@ const deleteUser = async(req, res) => {
         const avatar = await BD_Usuarios_Local.getAvatar(req.user._id);
         await deleteUserImg(avatar);
         const user = await BD_Usuarios_Local.deleteByID(req.user._id);
-        user
-            ? res.status(200).json({status: 200, msg: "OK", value: true, user})
-            : res.status(500).json({
+        if(user){
+            res.status(200).json({status: 200, msg: "OK", value: true, user})
+        }else{
+            logger.warn(`ERROR - No se encontró el usuario con ID: ${req.params.id}`);
+            res.status(500).json({
                 status: 500, 
                 msg: "ERROR - User ID not found", 
                 value: false
             });
+        }
         req.session.destroy((err)=>{
             if(err){
-                console.log(err);
+                logger.error(`ERROR - ${err}`);
             }
         });
         return;
     }catch(e){
-        console.log(e);
-        res.status(500).json(errJSON(e.message));
+        logger.error(e);
+        return res.status(500).json(errJSON(e.message));
     }
 };
 
@@ -608,7 +755,7 @@ module.exports = {
         deleteUser,
         user_update,
         userInfo,
-        Info,
+        getUserByID,
         completeRegister,
     }
 };

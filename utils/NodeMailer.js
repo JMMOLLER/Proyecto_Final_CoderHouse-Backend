@@ -1,13 +1,14 @@
 require('dotenv').config();
+const logger = require("./LoggerConfig");
 const { createTransport } = require('nodemailer');
 
-const TEST_MAIL = process.env.MAIL_USER;
+const MAIL_USER = process.env.MAIL_USER;
 
 const transporter = createTransport({
     service: process.env.MAIL_SERVICE,
     port: process.env.MAIL_PORT,
     auth: {
-        user: TEST_MAIL,
+        user: MAIL_USER,
         pass: process.env.MAIL_PASS
     }
 });
@@ -16,9 +17,9 @@ const transporter = createTransport({
 let sendMail = async(mailOptions)=>{
     try {
         const info = await transporter.sendMail(mailOptions);
-        console.log(info)
+        logger.info(`Email enviado: ${info.messageId}`);
     } catch (err) {
-        console.log(err)
+        logger.error(err);
     }
 }
 
