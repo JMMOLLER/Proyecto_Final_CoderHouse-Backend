@@ -6,7 +6,6 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const Handlebars = require("handlebars");
 const MongoStore = require("connect-mongo");
-const Passport = require("passport");
 const swaggerUI = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 const swaggerSpecs = swaggerJsDoc(require("./utils/SwaggerOptions"));
@@ -14,27 +13,21 @@ const { Server } = require("http");
 const { socket } = require("./utils/SocketIO");
 const { engine } = require("express-handlebars");
 const { USER_FRONT } = require("./Routers/Router_USER");
-const {
-    allowInsecurePrototypeAccess,
-} = require("@handlebars/allow-prototype-access");
-const {
-    API_PRODUCT,
-    API_CART,
-    API_AUTH,
-    API_USER,
-} = require("./Routers/Router_API");
+const { allowInsecurePrototypeAccess } = require("@handlebars/allow-prototype-access");
+const { API_PRODUCT, API_CART, API_AUTH, API_USER } = require("./Routers/Router_API");
 const ms = require("ms");
 const app = express();
-const httpServer = new Server(app);
-socket(httpServer);
 const PORT = conf.port;
 const HOST = conf.host;
+const httpServer = new Server(app);
 const sessionStore = MongoStore.create({
     mongoUrl: process.env.MONGODB_URI,
     ttl: ms("90m"),
 });
+socket(httpServer);
 
-/* ============ MIDDLEWARES ============ */
+/* ============ MIDDLEWARES CONFIG ============ */
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "hbs");
@@ -79,8 +72,8 @@ app.use((req, res) => {
 });
 
 /* ============ SERVER ============ */
-const ExpressServer = httpServer.listen(PORT, HOST, () => {
-    console.log(`Servidor iniciado en: http://${HOST}:${PORT}`);
+const ExpressServer = httpServer.listen(PORT, () => {
+    console.log(`Servidor iniciado en: ${process.env.URLHOST}:${PORT}`);
 });
 
 ExpressServer.on("error", (e) => console.log("Se ha generado un error: " + e));
