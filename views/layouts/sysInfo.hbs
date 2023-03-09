@@ -177,6 +177,14 @@
                                                         <li><code>default:</code> localhost</li>
                                                     </ul>
                                                 </li>
+                                                <li>
+                                                    <code>--e:</code> session expire
+                                                    <ul>
+                                                        <li>*</li>
+                                                        <li>*</li>
+                                                        <li><code>default:</code> 600000</li>
+                                                    </ul>
+                                                </li>
                                             </ul>
                                             <p>Los parametros de ejecución son los siguientes:</p><br>
                                             <div style="display: flex;justify-content: space-between;align-items: center;">
@@ -202,6 +210,13 @@
                                                             {{/with}}
                                                         {{else}}
                                                             <li><code>--h:</code>    localhost (default active)</li>
+                                                        {{/if}}
+                                                        {{#if PARAMETERS.[7]}}
+                                                            {{#with PARAMETERS.[7]}}
+                                                                <li><code>--e:</code>    {{this}}</li>
+                                                            {{/with}}
+                                                        {{else}}
+                                                            <li><code>--e:</code>    600000 (default active)</li>
                                                         {{/if}}
                                                     </ul>
                                                 </div>

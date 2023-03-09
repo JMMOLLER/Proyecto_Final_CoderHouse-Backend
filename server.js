@@ -15,14 +15,13 @@ const { engine } = require("express-handlebars");
 const { USER_FRONT } = require("./Routers/Router_USER");
 const { allowInsecurePrototypeAccess } = require("@handlebars/allow-prototype-access");
 const { API_PRODUCT, API_CART, API_AUTH, API_USER } = require("./Routers/Router_API");
-const ms = require("ms");
 const app = express();
 const PORT = conf.port;
 const HOST = conf.host;
 const httpServer = new Server(app);
 const sessionStore = MongoStore.create({
     mongoUrl: process.env.MONGODB_URI,
-    ttl: ms("90m"),
+    ttl: conf.expires,
 });
 socket(httpServer);
 
@@ -51,7 +50,7 @@ app.use(
         resave: false,
         saveUninitialized: false,
         cookie: {
-            maxAge: ms("2h"),
+            maxAge: conf.expires,
         },
     })
 );
@@ -72,7 +71,7 @@ app.use((req, res) => {
 });
 
 /* ============ SERVER ============ */
-const ExpressServer = httpServer.listen(PORT, () => {
+const ExpressServer = httpServer.listen(PORT, process.env.URLHOST, () => {
     console.log(`Servidor iniciado en: ${process.env.URLHOST}:${PORT}`);
 });
 

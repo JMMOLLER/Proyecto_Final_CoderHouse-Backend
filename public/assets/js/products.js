@@ -41,7 +41,7 @@ function filterProducts(){
     list.forEach((item) => {
         if (item.nodeName === "DIV") {
             if(filter !== ""){
-                if (item.dataset.value != filter) {
+                if (item.dataset.value != filter.toLowerCase()) {
                     item.style.display = "none";
                 } else {
                     item.style.display = "block";

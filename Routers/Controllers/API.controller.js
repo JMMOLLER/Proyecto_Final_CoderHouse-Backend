@@ -385,7 +385,6 @@ const deleteProduct = async(req, res) => {
 
 const login = async(req, res) => {
     try{
-        console.log(req.body);
         Passport.authenticate('login', { session: false }, (err, user, info) => {
 
             if(err){
