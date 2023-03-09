@@ -10,7 +10,7 @@ const conf = yargs(process.argv.slice(2)).alias({
     p: 8080,
     h: 'localhost',
     m: 'debug',
-    e: ms('10m')
+    e: ms('30m')
 }).argv;
 
 module.exports = { conf };
