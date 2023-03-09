@@ -13,4 +13,4 @@ Este proyecto es el entregable final del curso de desarrollo web Bakend de la in
 - JWT
 
 # Proyecto en la nube
-[Despliegue en glitch](https://entusiasmo.glitch.me/)
+[Despliegue en glitch](https://tienda-tuya.onrender.com)
