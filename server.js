@@ -71,8 +71,8 @@ app.use((req, res) => {
 });
 
 /* ============ SERVER ============ */
-const ExpressServer = httpServer.listen(PORT, process.env.URLHOST, () => {
-    console.log(`Servidor iniciado en: ${process.env.URLHOST}:${PORT}`);
+const ExpressServer = httpServer.listen(PORT, HOST, () => {
+    console.log(`Servidor iniciado en: ${HOST}:${PORT}`);
 });
 
 ExpressServer.on("error", (e) => console.log("Se ha generado un error: " + e));
