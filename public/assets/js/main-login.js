@@ -23,20 +23,33 @@
             }
         }
         buttonSpinner(check);
-        if(check)
-            $.ajax({
-                url: toFetch,
-                type: 'POST',
-                data: $(this).serialize(),
-                success: (data) => {
-                    if((data.status===202 || data.status===201) && data.value){
-                        window.location.href = data.returnTo || '/user/profile';
-                    }
-                },
-                error: (err) => {
-                    window.location.href = err.responseJSON.returnTo+`?err=${err.responseJSON.msg}`;
+
+        let toSend;
+
+        if(window.location.pathname=="/register"){
+            toSend = new FormData(this);
+        }else{
+            toSend = new URLSearchParams(new FormData(this));
+        }
+        
+        if(check){
+            fetch(toFetch, {
+                method: 'POST',
+                body: toSend,
+            }).then((res) => {
+                return res.json()
+            }).then((data) => {
+                if(data.status === 201 || data.status === 202){
+                    window.location.href = data.returnTo || '/user/profile';
+                }else{
+                    buttonSpinner(false);
+                    window.location.href = data.returnTo+`?err=${data.msg}`;
                 }
-            });
+            }).catch((err) => {
+                buttonSpinner(false);
+                alert(err);
+            })
+        }
         return false;
     });
 
