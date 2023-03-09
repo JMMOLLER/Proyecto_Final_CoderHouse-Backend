@@ -14,3 +14,7 @@ Este proyecto es el entregable final del curso de desarrollo web Bakend de la in
 
 # Proyecto en la nube
 [Despliegue en Render](https://tienda-tuya.onrender.com)
+
+# Probando Funcionalidad de las APIs
+
+[![Watch the video](https://youtu.be/ZREDuhFQ4zc)
