@@ -8,8 +8,6 @@ socket.on('messages', async (data) => {
         await getAuthenticateUserInfo();
         renderMessages(data);
     }catch(err){
-        console.log(err);
-        return;
         location.href = '/fatal_error?err='+err.message;
     }
 });
@@ -20,8 +18,6 @@ async function getAuthenticateUserInfo() {
         userId = data.user._id;
         return data;
     }catch(err){
-        console.log(err);
-        return;
         location.href = '/fatal_error?err='+err.message;
     }
 }
@@ -44,6 +40,9 @@ function renderMessages(messages) {
                             ${message.message}
                             <span class="msg_time">${calcTextDate(message.timestamp)}</span>
                         </div>
+                    `;
+                    if(message.from.email){
+                        div.innerHTML += `
                         <div class="reply">
                             <a 
                                 onclick=replyAction(this) 
@@ -54,8 +53,8 @@ function renderMessages(messages) {
                             >
                                 <i class="fa-solid fa-reply"></i>
                             </a>
-                        </div>
-                    `;
+                        </div>`
+                    }
                 } else {
                     div.classList.add('d-flex', 'justify-content-end', 'mb-c');
                     div.innerHTML = `
@@ -75,14 +74,10 @@ function renderMessages(messages) {
                 }
                 messagesContainer.appendChild(div);
             }catch(err){
-                console.log(err);
-                return;
                 location.href = '/fatal_error?err='+err.message;
             }
         });
     }catch(err){
-        console.log(err);
-        return;
         location.href = '/fatal_error?err='+err.message;
     }
 }
@@ -125,8 +120,6 @@ function sendNewMessage() {
         socket.emit('new-message', messageObj);
         el.value = '';
     }catch(err){
-        console.log(err);
-        return;
         location.href = '/fatal_error?err='+err.message;
     }
 }
