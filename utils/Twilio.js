@@ -9,7 +9,7 @@ let sendSMS = async (sendElement) => {
     new Promise((resolve, reject) => {
         try{
             client.messages.create(sendElement).then(
-                message => resolve(console.log("Se envió el sms de compra con ID:" + message.sid))
+                message => resolve(logger.info("Se envío el SMS al usuario. SMS ID: "+message.sid))
             ).done();
         }catch(err){
             logger.error(err);
