@@ -22,15 +22,8 @@ class Mensajes {
             this.mongodb(this.url);
             const newMessage = new MessageModel(message);
             await newMessage.save();
-            const messageTmp = newMessage.toObject();
-            const userInfo = await UserModel.findOne({ _id: messageTmp.from }).select('-password -address -phone_number -__v').lean();
-            if(!userInfo){
-                logger.warn('No se encontro el usuario');
-                await this.deleteById(newMessage._id);
-                return null;
-            };
-            messageTmp.from = userInfo
-            return messageTmp;
+            const normalizeMessage = await this.setFromInfo([newMessage.toObject()]);
+            return normalizeMessage[0];
         } catch (err) {
             logger.error(err);
             return null;
@@ -44,6 +37,19 @@ class Mensajes {
             const messages = await MessageModel.find().select('-__v').lean();
             return await this.setFromInfo(messages);
         } catch (err) {
+            logger.error(err);
+            return null;
+        }
+    }
+
+
+    async getByID(id) {
+        try{
+            this.mongodb(this.url);
+            const messages = await MessageModel.findById(id).select('-__v').lean();
+            const message = await this.setFromInfo([messages]);
+            return message[0];
+        }catch(err){
             logger.error(err);
             return null;
         }
@@ -81,12 +87,45 @@ class Mensajes {
                 if(!user){
                     doc[i].from = {
                         _id: doc[i].from,
-                        name: 'Usuario anonimo',
+                        name: 'Usuario desconocido',
                         avatar: '/uploads/default.png'
                     };
+
+                    if(doc[i].replyTo){
+
+                        const userToReply = await this.getByID(doc[i].replyTo);
+
+                        if(userToReply){
+
+                            doc[i].replyTo = userToReply.from;
+
+                        }else{
+                            doc[i].replyTo = {
+                                _id: doc[i].replyTo,
+                                name: 'Usuario desconocido',
+                                avatar: '/uploads/default.png'
+                            };
+                        }
+                    }
+
                     messages.push(doc[i]);
                     i++;
                     continue;
+                }if(doc[i].replyTo){
+                    
+                    const userToReply = await this.getByID(doc[i].replyTo);
+
+                    if(userToReply){
+
+                        doc[i].replyTo = userToReply.from;
+
+                    }else{
+                        doc[i].replyTo = {
+                            _id: doc[i].replyTo,
+                            name: 'Usuario desconocido',
+                            avatar: '/uploads/default.png'
+                        };
+                    }
                 }
                 doc[i].from = user;
                 messages.push(doc[i]);

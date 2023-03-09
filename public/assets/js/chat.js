@@ -1,10 +1,15 @@
 const socket = io.connect();
 let userId;
+const alert = document.getElementById('collapseExample')
+const bsCollapse = new mdb.Collapse(alert, {toggle: false});
+
 socket.on('messages', async (data) => {
     try{
         await getAuthenticateUserInfo();
         renderMessages(data);
     }catch(err){
+        console.log(err);
+        return;
         location.href = '/fatal_error?err='+err.message;
     }
 });
@@ -15,30 +20,47 @@ async function getAuthenticateUserInfo() {
         userId = data.user._id;
         return data;
     }catch(err){
+        console.log(err);
+        return;
         location.href = '/fatal_error?err='+err.message;
     }
 }
 function renderMessages(messages) {
     try{
         const messagesContainer = document.getElementById('messages_container');
+        console.log(messages);
         messages.forEach(async (message) => {
             try{
                 const div = document.createElement('div');
+
                 if (message.from._id != userId) {
-                    div.classList.add('d-flex', 'justify-content-start', 'mb-4');
+                    div.classList.add('d-flex', 'justify-content-start', 'mb-c');
                     div.innerHTML = `
                         <div class="img_cont_msg">
                             <a href="/chat/${message.from.email || "#" }"><img src="${message.from.avatar}" class="rounded-circle user_img_msg"></a>
                         </div>
                         <div class="msg_cotainer">
+                            ${message.replyTo ? "<span class=\"msg_reply\">Respuesta a: "+ message.replyTo.name +"</span>" : ""}
                             ${message.message}
                             <span class="msg_time">${calcTextDate(message.timestamp)}</span>
                         </div>
+                        <div class="reply">
+                            <a 
+                                onclick=replyAction(this) 
+                                data-value="${message._id}" 
+                                data-mail="${message.from.email || "#"}" 
+                                data-name="${message.from.name}"
+                                role="button"
+                            >
+                                <i class="fa-solid fa-reply"></i>
+                            </a>
+                        </div>
                     `;
                 } else {
-                    div.classList.add('d-flex', 'justify-content-end', 'mb-4');
+                    div.classList.add('d-flex', 'justify-content-end', 'mb-c');
                     div.innerHTML = `
                         <div class="msg_cotainer_send">
+                            ${message.replyTo ? "<span class=\"msg_reply\">Respuesta a: "+ message.replyTo.name +"</span>" : ""}
                             ${message.message}
                             <span class="msg_time_send">${calcTextDate(message.timestamp)}</span>
                         </div>
@@ -53,13 +75,64 @@ function renderMessages(messages) {
                 }
                 messagesContainer.appendChild(div);
             }catch(err){
+                console.log(err);
+                return;
                 location.href = '/fatal_error?err='+err.message;
             }
         });
     }catch(err){
+        console.log(err);
+        return;
         location.href = '/fatal_error?err='+err.message;
     }
 }
+
+function replyAction(e){
+    const msg_container = document.getElementById('message_input')
+
+    if(e && !bsCollapse._element.classList.contains('show')){
+        bsCollapse.toggle();
+        const toReply = e.dataset.value;
+        document.getElementById('toReplyNotify').innerHTML = e.dataset.name;
+        document.getElementById('toReplyNotify').href = "/chat/"+e.dataset.mail;
+        msg_container.dataset.isReply = true;
+        msg_container.dataset.value = toReply;
+        console.log(e.dataset.value);
+    }else{
+        bsCollapse.toggle();
+        setTimeout(() => {
+            msg_container.dataset.isReply = false;
+            delete msg_container.dataset.value;
+            document.getElementById('toReplyNotify').innerHTML = '';
+            document.getElementById('toReplyNotify').href = "#";
+            console.log('reset');
+        }, 500);
+    }
+    msg_container.focus();
+}
+
+function sendNewMessage() {
+    try{
+        const el = document.getElementById('message_input');
+        const messageObj = {
+            from: userId,
+            message: el.value,
+        };
+        if(el.dataset.isReply == 'true'){
+            messageObj.replyTo = el.dataset.value;
+            replyAction();
+        }
+        socket.emit('new-message', messageObj);
+        el.value = '';
+    }catch(err){
+        console.log(err);
+        return;
+        location.href = '/fatal_error?err='+err.message;
+    }
+}
+
+
+/* ============ FUNCIONALIDADES ============ */
 
 function calcTextDate(timestamp) {
     try{
@@ -103,19 +176,6 @@ function removeSpinner(spinner) {
     }
 }
 
-function sendNewMessage() {
-    try{
-        const el = document.getElementById('message_input');
-        const messageObj = {
-            from: userId,
-            message: el.value,
-        };
-        socket.emit('new-message', messageObj);
-        el.value = '';
-    }catch(err){
-        location.href = '/fatal_error?err='+err.message;
-    }
-}
 document.getElementById('message_input').addEventListener('keyup', (e) => {
     try{
         if (e.keyCode == 13) {

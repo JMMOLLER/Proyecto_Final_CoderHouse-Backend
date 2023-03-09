@@ -29,15 +29,34 @@
 
 			</div>
 			<div class="card-footer">
+
+				{{!-- START NOTIFICATION REPLY --}}
+
+				<div class="collapse mt-3" id="collapseExample">
+					<div class="alert alert-info alert-dismissible" role="alert">
+						<i class="fa-solid fa-reply" style="margin-right: 10px;"></i>
+						Estás respondiendo a <a href="#" target="_blank" class="alert-link" id="toReplyNotify"></a>.
+						<button type="button" onclick="replyAction()" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+				</div>
+
+				{{!-- END NOTIFICATION REPLY --}}
+
+
+				{{!-- START INPUT MESSAGE --}}
+
 				<div class="input-group">
 					<div class="input-group-append">
-						<span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span>
+						<span class="input-group-text attach_btn" style="cursor: not-allowed;"><i class="fas fa-paperclip"></i></span>
 					</div>
-					<input name="message" class="form-control type_msg" placeholder="Type your message..." id="message_input" style="resize: none;" disabled></input>
+					<input name="message" class="form-control type_msg" data-is-reply="false" placeholder="Type your message..." id="message_input" style="resize: none;" disabled></input>
 					<div class="input-group-append" onclick="sendNewMessage()">
 						<span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span>
 					</div>
 				</div>
+
+				{{!-- END INPUT MESSAGE --}}
+
 			</div>
 		</div>
 	</div>

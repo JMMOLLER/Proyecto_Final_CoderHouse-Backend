@@ -732,7 +732,7 @@ module.exports = {
         addProductOnCart,
         deleteCart,
         decreaseQuantityOnCart,
-        deleteProductOnCart
+        deleteProductOnCart,
     },
     products: {
         allProducts,

@@ -6,7 +6,7 @@ module.exports = {
     socket: (httpServer) => {
         const io = new IOServer(httpServer);
         io.on("connection", async (socket) => {
-            console.log("USUARIO CONECTADO");
+            console.log('\x1b[33m%s\x1b[0m', "UN USUARIO SE HA CONECTADO");
             socket.emit('messages', await DB.getAll());
 
             socket.on('new-message', async (data) => {

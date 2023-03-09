@@ -15,6 +15,7 @@ const home = async(req, res) => {
     try{
         Passport.authenticate('jwt', { session: false }, (err, user, info) => {
             if (err || !user) {
+                res.clearCookie('session');
                 res.render('index', { title: 'Home', layout: 'index' });
             }else {
                 res.render('index', { title: 'Home', layout: 'index', user });
@@ -26,18 +27,18 @@ const home = async(req, res) => {
     }
 };
 
-const chat = async(req, res) => {
+const sysInfo = (req, res) => {
     try{
-        res.render('index', { title: 'Chat', layout: 'chat', user: req.user });
+        res.render('index', { title: 'Configuración del servidor', layout: 'sysInfo', data: info_data() });
     }catch(e){
         logger.error(e);
         res.redirect('/fatal_error?err='+e.message)
     }
 };
 
-const sysInfo = (req, res) => {
+const chat = async(req, res) => {
     try{
-        res.render('index', { title: 'Configuración del servidor', layout: 'sysInfo', data: info_data() });
+        res.render('index', { title: 'Chat', layout: 'chat', user: req.user });
     }catch(e){
         logger.error(e);
         res.redirect('/fatal_error?err='+e.message)

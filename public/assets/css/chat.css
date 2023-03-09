@@ -7,6 +7,15 @@ html {
     background: linear-gradient(to right, #91eae4, #86a8e7, #7f7fd5);
 }
 
+.reply {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+    cursor: pointer;
+}
+.fa-reply {
+    color: darkgray;
+}
 .chat {
     margin-top: auto;
     margin-bottom: auto;
@@ -145,14 +154,23 @@ html {
 .msg_time {
     position: absolute;
     left: 0;
-    bottom: -15px;
+    bottom: -18px;
     color: rgba(255, 255, 255, 0.5);
     font-size: 10px;
 }
 .msg_time_send {
     position: absolute;
     right: 0;
-    bottom: -15px;
+    bottom: -18px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 10px;
+}
+.mb-c {
+    margin-bottom: 3rem !important;
+}
+.msg_reply {
+    position: absolute;
+    top: -30px;
     color: rgba(255, 255, 255, 0.5);
     font-size: 10px;
 }
