@@ -1,8 +1,10 @@
-steps:
-  - uses: actions/checkout@v3
-  - uses: JorgeLNJunior/render-deploy@v1.3.2
-    with:
-      service_id: ${{ secrets.RENDER_SERVICE_ID }}
-      api_key: ${{ secrets.RENDER_API_KEY }}
-      clear_cache: false
-      wait_deploy: true 
+name: Tienda Tuya
+on: push
+  steps:
+    - uses: actions/checkout@v3
+    - uses: JorgeLNJunior/render-deploy@v1.3.2
+      with:
+        service_id: ${{ secrets.RENDER_SERVICE_ID }}
+        api_key: ${{ secrets.RENDER_API_KEY }}
+        clear_cache: false
+        wait_deploy: true 
