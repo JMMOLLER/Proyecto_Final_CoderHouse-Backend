@@ -5,17 +5,6 @@ on:
       - Deploy_On_Render
 jobs:
   deploy:
-
-    - uses: actions/checkout@v1
-
-    - uses: altinukshini/deployment-action@releases/v1
-      name: Create GitHub deployment
-      id: deployment
-      with:
-        token: "${{ secrets.GH_TOKEN }}"
-        target_url: https://tienda-tuya.onrender.com
-        environment: Tienda Tuya
-
     runs-on: ubuntu-latest
     environment: Tienda Tuya
     steps:
@@ -26,6 +15,15 @@ jobs:
           api_key: ${{ secrets.RENDER_API_KEY }}
           clear_cache: false
           wait_deploy: true 
+
+      - uses: actions/checkout@v1
+      - uses: altinukshini/deployment-action@releases/v1
+        name: Create GitHub deployment
+        id: deployment
+        with:
+          token: "${{ secrets.GH_TOKEN }}"
+          target_url: https://tienda-tuya.onrender.com
+          environment: Tienda Tuya
 
       - name: Update deployment status (success)
         if: success()
