@@ -16,3 +16,5 @@ jobs:
           clear_cache: false
           wait_deploy: true 
           environment_url: https://tienda-tuya.onrender.com/
+          deployment_status: deployed
+          status: deployed
