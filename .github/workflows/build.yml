@@ -2,6 +2,7 @@ name: Tienda Tuya
 on: push
 jobs:
   deploy:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: JorgeLNJunior/render-deploy@v1.3.2
