@@ -1,5 +1,5 @@
 name: Tienda Tuya
-on: Tienda Tuya
+on: push
 jobs:
   deploy:
     name: Wait for Deploy
@@ -10,6 +10,7 @@ jobs:
         with:
           render-token: rnd_ZF6dDGlZU4FXy2otIOgjamBuHVpu
           github-token: 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
+          service-id: srv-cg454gqk728m6o4arr1g
           retries: 20
           wait: 16000
           sleep: 30000
