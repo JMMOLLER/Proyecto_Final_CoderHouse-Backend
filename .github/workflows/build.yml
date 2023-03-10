@@ -1,8 +1,12 @@
 name: Tienda Tuya
-on: Tienda Tuya
+on:
+  push:
+    branches:
+      - Deploy_On_Render
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: Tienda Tuya
     steps:
       - uses: actions/checkout@v3
       - uses: JorgeLNJunior/render-deploy@v1.3.2
