@@ -1,8 +1,5 @@
 name: Tienda Tuya
-on:
-  label:
-    types:
-      - created
+on: push
 jobs:
   deploy:
     steps:
