@@ -1,5 +1,5 @@
 name: Tienda Tuya
-on: Deploy_On_Render
+on: [Deploy_On_Render]:
 jobs:
   deploy:
     name: Wait for Deploy
