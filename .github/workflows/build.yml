@@ -1,16 +1,2 @@
-name: Tienda Tuya
-on: push
-jobs:
-  deploy:
-    name: Wait for Deploy
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait for Render Deployment
-        uses: bounceapp/render-action@0.6.0
-        with:
-          render-token: rnd_ZF6dDGlZU4FXy2otIOgjamBuHVpu
-          github-token: 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
-          service-id: srv-cg454gqk728m6o4arr1g
-          retries: 20
-          wait: 16000
-          sleep: 30000
+- name: Deploy to Render
+  uses: JorgeLNJunior/render-deploy@v1.3.2
