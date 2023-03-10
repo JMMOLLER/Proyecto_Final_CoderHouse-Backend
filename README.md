@@ -19,4 +19,4 @@ Este proyecto es el entregable final del curso de desarrollo web Bakend de la in
 
 # Probando Funcionalidad de las APIs
 
-[![Watch the video](https://youtu.be/ZREDuhFQ4zc)
+[![Watch the video](https://img.youtube.com/vi/ZREDuhFQ4zc/sddefault.jpg)](https://youtu.be/ZREDuhFQ4zc)
