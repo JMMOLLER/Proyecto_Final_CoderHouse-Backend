@@ -1,5 +1,5 @@
 name: Tienda Tuya
-on: push
+on: Tienda Tuya
 jobs:
   deploy:
     name: Wait for Deploy
