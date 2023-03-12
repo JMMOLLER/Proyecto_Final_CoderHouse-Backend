@@ -1,6 +1,7 @@
 require("dotenv").config();
 require("./utils/Passport_Strategies");
-const { conf } = require("./utils/YargsConfig");
+/* ============ IMPORTS ============ */
+const ms = require("ms");
 const express = require("express");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
@@ -9,12 +10,15 @@ const MongoStore = require("connect-mongo");
 const swaggerUI = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 const swaggerSpecs = swaggerJsDoc(require("./utils/SwaggerOptions"));
+/* ============ IMPORTS LOCAL ============ */
+const { conf } = require("./utils/YargsConfig");
 const { Server } = require("http");
 const { socket } = require("./utils/SocketIO");
 const { engine } = require("express-handlebars");
 const { USER_FRONT } = require("./Routers/Router_USER");
 const { allowInsecurePrototypeAccess } = require("@handlebars/allow-prototype-access");
 const { API_PRODUCT, API_CART, API_AUTH, API_USER } = require("./Routers/Router_API");
+/* ============ APP CONFIG ============ */
 const app = express();
 const PORT = conf.port;
 const HOST = conf.host;
@@ -24,7 +28,6 @@ const sessionStore = MongoStore.create({
     ttl: conf.expires,
 });
 socket(httpServer);
-
 /* ============ MIDDLEWARES CONFIG ============ */
 
 app.use(express.json());
@@ -50,7 +53,7 @@ app.use(
         resave: false,
         saveUninitialized: false,
         cookie: {
-            maxAge: conf.expires,
+            maxAge: Number(ms(conf.expires)) || conf.expires,
         },
     })
 );

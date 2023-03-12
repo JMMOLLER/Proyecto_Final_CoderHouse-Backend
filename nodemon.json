@@ -1,6 +1,7 @@
 {
     "ext": "js,json,html,yml",
     "ignore": [
-        "public/assets/*"
+        "public/assets/*",
+        "package.json"
     ]
 }
