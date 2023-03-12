@@ -5,9 +5,10 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./server.js --p 8080 --m debug --h localhost --e 600000",
+    "dev": "nodemon ./server.js --p 8080 --m debug --h localhost --e 2m",
     "start": "node server.js"
-  },"engines": {
+  },
+  "engines": {
     "node": "16.17.0"
   },
   "keywords": [],
