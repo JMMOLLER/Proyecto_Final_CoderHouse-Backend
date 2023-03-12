@@ -53,7 +53,7 @@ app.use(
         resave: false,
         saveUninitialized: false,
         cookie: {
-            maxAge: ms(conf.expires),
+            maxAge: Number(ms(conf.expires)) || conf.expires,
         },
     })
 );
