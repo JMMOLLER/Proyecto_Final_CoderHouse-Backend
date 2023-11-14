@@ -16,7 +16,7 @@ dependencies:
     version: 1.20.1
   connect-mongo:
     specifier: ^4.6.0
-    version: 4.6.0(express-session@1.17.3)(mongodb@4.13.0)
+    version: 4.6.0(express-session@1.17.3)(mongodb@4.17.0)
   cookie-parser:
     specifier: ^1.4.6
     version: 1.4.6
@@ -45,8 +45,8 @@ dependencies:
     specifier: ^6.9.0
     version: 6.9.0
   mongodb:
-    specifier: ^4.13.0
-    version: 4.13.0
+    specifier: ^4.17.0
+    version: 4.17.0
   mongoose:
     specifier: ^6.11.3
     version: 6.11.3
@@ -1063,6 +1063,14 @@ packages:
       - supports-color
     dev: false
 
+  /@mongodb-js/saslprep@1.1.1:
+    resolution: {integrity: sha512-t7c5K033joZZMspnHg/gWPE4kandgc2OxE74aYOtGKfgB9VPuVJPix0H6fhmm2erj5PBJ21mqcx34lpIGtUCsQ==}
+    requiresBuild: true
+    dependencies:
+      sparse-bitfield: 3.0.3
+    dev: false
+    optional: true
+
   /@smithy/protocol-http@1.0.1:
     resolution: {integrity: sha512-9OrEn0WfOVtBNYJUjUAn9AOiJ4lzERCJJ/JeZs8E6yajTGxBaFRxUnNBHiNqoDJVg076hY36UmEnPx7xXrvUSg==}
     engines: {node: '>=14.0.0'}
@@ -1295,13 +1303,6 @@ packages:
       fill-range: 7.0.1
     dev: true
 
-  /bson@4.7.1:
-    resolution: {integrity: sha512-XkuFtlCzi0WSy8D6PMhvrQ/q8VlZHN/2bJ/shJglwuA6TPD2ZP/hHLB7iDxOEWVINHN/UVTxP4pqZqOKMXPIXg==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      buffer: 5.7.1
-    dev: false
-
   /bson@4.7.2:
     resolution: {integrity: sha512-Ry9wCtIZ5kGqkJoi6aD8KjxFZEx78guTQDnpXWiNthsxzrxAK/i8E6pCHAIZTbaEFWcOCvbecMukfK7XUvyLpQ==}
     engines: {node: '>=6.9.0'}
@@ -1428,7 +1429,7 @@ packages:
       typedarray: 0.0.6
     dev: false
 
-  /connect-mongo@4.6.0(express-session@1.17.3)(mongodb@4.13.0):
+  /connect-mongo@4.6.0(express-session@1.17.3)(mongodb@4.17.0):
     resolution: {integrity: sha512-8new4Z7NLP3CGP65Aw6ls3xDBeKVvHRSh39CXuDZTQsvpeeU9oNMzfFgvqmHqZ6gWpxIl663RyoVEmCAGf1yOg==}
     engines: {node: '>=10'}
     peerDependencies:
@@ -1438,7 +1439,7 @@ packages:
       debug: 4.3.4
       express-session: 1.17.3
       kruptein: 3.0.5
-      mongodb: 4.13.0
+      mongodb: 4.17.0
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -2281,20 +2282,6 @@ packages:
       whatwg-url: 11.0.0
     dev: false
 
-  /mongodb@4.13.0:
-    resolution: {integrity: sha512-+taZ/bV8d1pYuHL4U+gSwkhmDrwkWbH1l4aah4YpmpscMwgFBkufIKxgP/G7m87/NUuQzc2Z75ZTI7ZOyqZLbw==}
-    engines: {node: '>=12.9.0'}
-    dependencies:
-      bson: 4.7.1
-      mongodb-connection-string-url: 2.6.0
-      socks: 2.7.1
-    optionalDependencies:
-      '@aws-sdk/credential-providers': 3.351.0
-      saslprep: 1.0.3
-    transitivePeerDependencies:
-      - aws-crt
-    dev: false
-
   /mongodb@4.16.0:
     resolution: {integrity: sha512-0EB113Fsucaq1wsY0dOhi1fmZOwFtLOtteQkiqOXGklvWMnSH3g2QS53f0KTP+/6qOkuoXE2JksubSZNmxeI+g==}
     engines: {node: '>=12.9.0'}
@@ -2305,6 +2292,20 @@ packages:
     optionalDependencies:
       '@aws-sdk/credential-providers': 3.351.0
       saslprep: 1.0.3
+    transitivePeerDependencies:
+      - aws-crt
+    dev: false
+
+  /mongodb@4.17.0:
+    resolution: {integrity: sha512-LZGMIPjPfWEfhPJATk1s9IvVTD18tyfKdT/0blCMih5vGagk2SwA9wFAUPMdtJpTrhXmyfGgwAaMkvneX2bn2A==}
+    engines: {node: '>=12.9.0'}
+    dependencies:
+      bson: 4.7.2
+      mongodb-connection-string-url: 2.6.0
+      socks: 2.7.1
+    optionalDependencies:
+      '@aws-sdk/credential-providers': 3.351.0
+      '@mongodb-js/saslprep': 1.1.1
     transitivePeerDependencies:
       - aws-crt
     dev: false
